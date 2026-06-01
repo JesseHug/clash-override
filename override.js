@@ -2,6 +2,9 @@ const main = (config) => {
   config["unified-delay"] = true;
   config["tcp-concurrent"] = true;
   config["keep-alive-interval"] = 1800;
+  config["global-client-fingerprint"] = "random";
+  config["geodata-mode"] = true;
+  config["find-process-mode"] = "strict";
 
   config["geox-url"] = {
     geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
