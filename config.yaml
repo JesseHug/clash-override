@@ -86,10 +86,24 @@ dns:
     - 223.5.5.5
     - 119.29.29.29
 
-  # 主 DNS 服务器
+  # 国内主 DNS（加密，防污染）
   nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
+
+  # 节点域名专用 DNS（确保订阅节点能正确解析）
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+
+  # DNS 分流：国内站走国内DNS快又准，国外站走国外DNS不被墙
+  nameserver-policy:
+    "geosite:cn,private":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "geosite:!cn,!private":
+      - tls://dns.google
+      - tls://cloudflare-dns.com
 
 # ==================== 代理提供者（多订阅源） ====================
 # 把你的机场订阅链接替换下方 url: 后面的地址
