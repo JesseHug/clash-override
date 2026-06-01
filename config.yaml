@@ -1,34 +1,63 @@
+# =========================================================
+#  FLClash / Mihomo 高性能配置
+#  基于官方模板 + 自用优化
+# =========================================================
+
 # ==================== 基础配置 ====================
+
+# 【开关】代理监听端口，HTTP/SOCKS 共用
 mixed-port: 7890
+
+# 【开关】允许局域网设备连接此代理（手机/平板/电视共享）
+# true=允许  false=仅本机可用
 allow-lan: true
 bind-address: "*"
+
+# 【开关】进程匹配模式
+# strict=智能匹配  always=强制匹配全部进程  off=关（路由器省电）
 find-process-mode: strict
+
+# 【开关】运行模式 rule=规则模式  global=全局代理  direct=全局直连
 mode: rule
+
+# 【开关】日志等级 silent=关  error=仅错误  warning=警告  info=info  debug=调试（最详细）
 log-level: warning
+
+# 【开关】IPv6 true=开启  false=关闭（部分机场要求关掉IPv6）
 ipv6: true
+
+# 【开关】TCP 保活间隔（秒），防断流
+# 1800=30分钟一次（省电）  15=15秒一次（响应快但耗电）
 keep-alive-interval: 1800
 
+# 【性能优化】统一延迟计算 & TCP 并发，明显提升测速准确度
 unified-delay: true
 tcp-concurrent: true
 
+# GeoIP 数据库国内加速镜像（如果无法更新GeoIP，把这行换成你的机场提供的地址）
 geox-url:
   geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
   mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb"
 
+# 【开关】TLS 指纹随机化，减少被墙概率
 global-client-fingerprint: random
 
+# 管理面板（通过 http://127.0.0.1:9090/ui 访问）
 external-controller: :9090
 external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
 external-ui-name: zashboard
 external-ui: ui
 
+# 【开关】记住手动选择的节点 / 缓存 DNS 结果
 profile:
   store-selected: true
   store-fake-ip: true
 
 # ==================== 域名嗅探 ====================
+# 把 IP 请求还原成域名，让规则能正确匹配
+# 如果机场要求关掉，就把 enable 改为 false
 sniffer:
-  enable: true
+  enable: true   # true=开启  false=关闭
   sniff:
     TLS:
       ports: [443, 8443]
@@ -37,36 +66,47 @@ sniffer:
       override-destination: true
 
 # ==================== DNS 配置 ====================
+# 【重要】很多机场要求"关掉DNS覆写"，就是把下面 enable 改成 false
+# 或者用"托管配置"时，直接整段 DNS 注释掉，让机场接管
 dns:
-  enable: true
-  ipv6: true
-  enhanced-mode: fake-ip
+  enable: true        # true=Mihomo接管DNS  false=使用系统DNS（机场推荐）
+  ipv6: true          # true=返回IPv6记录  false=只返回IPv4
+  enhanced-mode: fake-ip  # fake-ip=更快  redir-host=兼容性更好
   fake-ip-range: 198.18.0.1/16
+
+  # 以下域名/规则集不走 fake-ip，直接返回真实 IP
   fake-ip-filter:
     - rule-set:Private
     - rule-set:Direct
     - rule-set:China
     - +.push.apple.com
+
+  # 上游 DNS 服务器（用于解析 default-nameserver 自身）
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
+
+  # 主 DNS 服务器
   nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
 
 # ==================== 代理提供者（多订阅源） ====================
+# 把你的机场订阅链接替换下方 url: 后面的地址
+# 可以添加多个，自动聚合节点
 proxy-providers:
   服务商一:
     type: http
     url: "https://example.com/sub?token=your_token_here"
-    interval: 86400
-    proxy: DIRECT
+    interval: 86400           # 每24小时刷新一次订阅
+    proxy: DIRECT             # 用直连下载订阅（如果机场需要代理才能访问，改成你的节点名）
     health-check:
       enable: true
       url: "http://www.gstatic.com/generate_204"
       interval: 300
     override:
-      additional-prefix: "[一] "
+      additional-prefix: "[一] "  # 节点名前缀，区分来自哪个机场
+
   服务商二:
     type: http
     url: "https://example2.com/sub?token=your_token_here"
@@ -78,6 +118,7 @@ proxy-providers:
       interval: 300
     override:
       additional-prefix: "[二] "
+
   服务商三:
     type: http
     url: "https://example3.com/sub?token=your_token_here"
@@ -91,12 +132,14 @@ proxy-providers:
       additional-prefix: "[三] "
 
 # ==================== 策略组 ====================
+# 在面板里看到的节点分组，从上到下排列
 proxy-groups:
-  # 主要
+
+  # 【主入口】面板上选这个来切换默认走哪个地区
   - name: Proxies
     type: select
     proxies:
-      - Fallback
+      - Fallback       # 自动选地区
       - HK
       - JP
       - SG
@@ -104,15 +147,17 @@ proxy-groups:
       - US
       - KR
       - EU
-      - Other
-    include-all: true
+      - Other          # 冷门地区兜底
+    include-all: true  # 也显示所有单个节点
 
+  # 【最终兜底】所有规则都没匹配到就走这里
   - name: Final
     type: select
     proxies:
       - Proxies
       - DIRECT
 
+  # 【自动地区切换】从上到下试，哪个地区有活节点就用哪个
   - name: Fallback
     type: fallback
     proxies:
@@ -127,7 +172,7 @@ proxy-groups:
     url: "http://www.gstatic.com/generate_204"
     interval: 300
 
-  # 服务分流
+  # ====== 服务分流 ======
   - name: YouTube
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
@@ -165,7 +210,12 @@ proxy-groups:
     type: select
     proxies: [DIRECT, Proxies, HK, JP, SG, TW, US, KR, EU, Other]
 
-  # 地区自动 fallback
+  # ====== 地区自动 fallback ======
+  # 每个地区自动测速换节点，指标：
+  #   lazy=true — 闲置不测省电
+  #   timeout=2000 — 2秒没响应算超时
+  #   max-failures=2 — 连续挂2次才换，防误判
+  #   fallback-interval=60 — 备用节点每60秒轻触一次
   - &BaseFB
     name: HK
     type: fallback
@@ -202,12 +252,16 @@ proxy-groups:
     name: EU
     filter: "(?i)法|德|英|🇫🇷|🇩🇪|🇬🇧|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam"
 
+  # 【冷门地区】没被上面7个地区匹配到的节点全在这
+  # 土耳其/印度/巴西/俄罗斯等
   - name: Other
     type: select
     include-all: true
     filter: '^(?!.*(?i)(港|🇭🇰|HK|Hong|HKG|坡|🇸🇬|SG|Sing|SIN|台|🇹🇼|TW|tai|TPE|日|🇯🇵|JP|Japan|NRT|HND|美|🇺🇸|US|USA|LAX|SFO|JFK|韩|🇰🇷|KR|KOR|Korea|首尔|法|🇫🇷|FR|德|🇩🇪|DE|英|🇬🇧|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam)).*$'
 
-# ==================== 规则集 ====================
+# ==================== 规则集（远端子规则） ====================
+# 自动从 GitHub 下载编译好的 .mrs 二进制规则集
+# O(1) 匹配性能，规则再多也不慢
 rule-providers:
   &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
   &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
@@ -235,10 +289,18 @@ rule-providers:
   China:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
 
 # ==================== 路由规则 ====================
+# 规则从上到下依次匹配，命中即止
 rules:
+  # 局域网 / 内网地址 → 直连
   - RULE-SET,LocalAreaNetwork,DIRECT
+
+  # 推送/统计/DRM → 直连（否则推送延迟、视频看不了）
   - RULE-SET,Unbreak,DIRECT
+
+  # 测速网站 → Speedtest 组
   - RULE-SET,Speedtest,Speedtest
+
+  # 流媒体 & 应用分流
   - RULE-SET,YouTube,YouTube
   - RULE-SET,Netflix,Netflix
   - RULE-SET,Disney,Disney
@@ -246,13 +308,25 @@ rules:
   - RULE-SET,Bilibili,Bilibili
   - RULE-SET,Telegram,Telegram
   - RULE-SET,Steam,Steam
+
+  # 支付
   - RULE-SET,PayPal,PayPal
+
+  # AI
   - RULE-SET,OpenAI,OpenAI
   - RULE-SET,AI,AI
+
+  # Apple（国内苹果直连，国外苹果走代理）
   - RULE-SET,AppleCN,DIRECT
   - RULE-SET,Apple,Apple
+
+  # 国外网站兜底
   - RULE-SET,Proxies,Proxies
+
+  # 国内直连
   - RULE-SET,ChinaDomain,DIRECT
   - RULE-SET,ChinaIP,DIRECT
   - GEOIP,CN,DIRECT
+
+  # 最终兜底
   - MATCH,Final
