@@ -319,15 +319,17 @@ proxy-groups:
 rule-providers:
   &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
   &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
+  &BehaviorCLS {type: http, behavior: classical, format: text, interval: 86400}
 
+  # 以上用 666OS .mrs，以下无专属用 AGWA5783 classical
   LocalAreaNetwork: {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
-  Unbreak:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}  # 666OS 无 Unbreak 专属，用 Direct 替代
+  Unbreak:          {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset/Unbreak.list}
   Speedtest:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs}
   YouTube:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
   Netflix:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
   Disney:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Disney.mrs}
   Spotify:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
-  Bilibili:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}  # 666OS 无 Bilibili 专属，用 Direct 替代
+  Bilibili:         {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset/StreamingMedia/StreamingSE.list}
   Telegram:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
