@@ -42,6 +42,16 @@ geox-url:
 # 【开关】TLS 指纹随机化，减少被墙概率
 global-client-fingerprint: random
 
+# 【开关】Geo 数据库模式（GEOIP/GEOSITE 需要此模式）
+geodata-mode: true
+
+# 【开关】NTP 时间同步，防止系统时间不准导致 HTTPS 证书报错
+ntp:
+  enable: true
+  server: time.apple.com
+  port: 123
+  interval: 30
+
 # 管理面板（通过 http://127.0.0.1:9090/ui 访问）
 external-controller: :9090
 external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
@@ -52,6 +62,19 @@ external-ui: ui
 profile:
   store-selected: true
   store-fake-ip: true
+
+# ==================== TUN 模式 ====================
+# 【开关】虚拟网卡模式，所有流量强制经过代理（不需要配浏览器/App代理）
+# 耗电且可能与其他VPN冲突，非必要保持关闭
+tun:
+  enable: false    # true=开启（需要管理员权限） false=关闭
+  stack: system    # system / gvisor / mixed
+  dns-hijack:
+    - "any:53"
+    - "tcp://any:53"
+  auto-route: true
+  auto-detect-interface: true
+  strict-route: true
 
 # ==================== 域名嗅探 ====================
 # 把 IP 请求还原成域名，让规则能正确匹配
@@ -64,6 +87,10 @@ sniffer:
     HTTP:
       ports: [80, 8080-8880]
       override-destination: true
+  # 跳过以下域名不嗅探（避免推送/智能家居干扰）
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
 
 # ==================== DNS 配置 ====================
 # 【重要】很多机场要求"关掉DNS覆写"，就是把下面 enable 改成 false
@@ -83,8 +110,9 @@ dns:
 
   # 上游 DNS 服务器（用于解析 default-nameserver 自身）
   default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+    - 223.5.5.5      # 阿里
+    - 119.29.29.29   # 腾讯
+    - 114.114.114.114 # 114DNS（备选）
 
   # 国内主 DNS（加密，防污染）
   nameserver:
