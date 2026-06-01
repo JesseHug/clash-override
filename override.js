@@ -1,6 +1,12 @@
 const main = (config) => {
   config["unified-delay"] = true;
   config["tcp-concurrent"] = true;
+  config["keep-alive-interval"] = 1800;
+
+  config["geox-url"] = {
+    geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
+    mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb"
+  };
 
   const proxies = config.proxies ? config.proxies.map(p => p.name) : [];
 
@@ -18,14 +24,13 @@ const main = (config) => {
   const nodesKR = getNodes(/韩|KR|KOR|Korea/i);
   const nodesEU = getNodes(/法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i);
   const nodesOther = proxies.filter(n =>
-    !/港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe/i.test(n) && !junkFilter.test(n)
+    !/港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe/i.test(n)
+    && !junkFilter.test(n)
   );
 
   config["proxy-groups"] = [
     { name: "Proxies", type: "select", proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
     { name: "YouTube", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Netflix", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Disney", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Spotify", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Bilibili", type: "select", proxies: ["DIRECT", "HK", "TW", "JP", "KR", "Other"] },
     { name: "Telegram", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
@@ -33,6 +38,8 @@ const main = (config) => {
     { name: "PayPal", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "OpenAI", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "AI", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Netflix", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Disney", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Apple", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Speedtest", type: "select", proxies: ["DIRECT", "Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Final", type: "select", proxies: ["Proxies", "DIRECT"] },
@@ -62,31 +69,31 @@ const main = (config) => {
     });
   }
 
-  const rp = { type: "http", behavior: "classical", format: "text", interval: 86400 };
-  const domainRp = { type: "http", behavior: "domain", format: "text", interval: 86400 };
-  const ipcidrRp = { type: "http", behavior: "ipcidr", format: "text", interval: 86400 };
+  const cls = { type: "http", behavior: "classical", format: "text", interval: 86400 };
+  const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
+  const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
   const baseUrl = "https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset";
+  const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
 
   const myRuleProviders = {
-    Unbreak: { ...rp, url: `${baseUrl}/Unbreak.list` },
-    YouTube: { ...rp, url: `${baseUrl}/StreamingMedia/Video/YouTube.list` },
-    Netflix: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Netflix.list" },
-    Disney: { ...rp, url: `${baseUrl}/StreamingMedia/Video/DisneyPlus.list` },
-    Spotify: { ...rp, url: `${baseUrl}/StreamingMedia/Music/Spotify.list` },
-    Bahamut: { ...rp, url: `${baseUrl}/StreamingMedia/Video/Bahamut.list` },
-    Bilibili: { ...rp, url: `${baseUrl}/StreamingMedia/StreamingSE.list` },
-    Telegram: { ...rp, url: `${baseUrl}/Extra/Telegram/Telegram.list` },
-    Steam: { ...rp, url: `${baseUrl}/Extra/Game/Steam.list` },
-    PayPal: { ...rp, url: `${baseUrl}/Extra/PayPal.list` },
-    OpenAI: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/OpenAi.list" },
-    AI: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list" },
-    AppleCN: { ...domainRp, url: "https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs" },
-    Apple: { ...domainRp, url: "https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs" },
-    Speedtest: { ...domainRp, url: "https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs" },
-    Proxies: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyLite.list" },
-    ChinaDomain: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaDomain.list" },
-    ChinaIP: { ...ipcidrRp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaCompanyIp.list" },
-    LocalAreaNetwork: { ...rp, url: `${baseUrl}/LocalAreaNetwork.list` }
+    Unbreak: { ...cls, url: `${baseUrl}/Unbreak.list` },
+    Bilibili: { ...cls, url: `${baseUrl}/StreamingMedia/StreamingSE.list` },
+    LocalAreaNetwork: { ...cls, url: `${baseUrl}/LocalAreaNetwork.list` },
+    YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs` },
+    Netflix: { ...mrs, url: `${r66}/domain/Netflix.mrs` },
+    Disney: { ...mrs, url: `${r66}/domain/Disney.mrs` },
+    Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs` },
+    Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs` },
+    Steam: { ...mrs, url: `${r66}/domain/Games.mrs` },
+    PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs` },
+    OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs` },
+    AI: { ...mrs, url: `${r66}/domain/AI.mrs` },
+    AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs` },
+    Apple: { ...mrs, url: `${r66}/domain/Apple.mrs` },
+    Speedtest: { ...mrs, url: `${r66}/domain/Speedtest.mrs` },
+    Proxies: { ...mrs, url: `${r66}/domain/Proxy.mrs` },
+    ChinaDomain: { ...mrs, url: `${r66}/domain/China.mrs` },
+    ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs` },
   };
 
   config["rule-providers"] = { ...requiredDnsProviders, ...myRuleProviders };
@@ -105,8 +112,8 @@ const main = (config) => {
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
-    "GEOSITE,apple-cn,DIRECT",
-    "GEOSITE,apple,Apple",
+    "RULE-SET,AppleCN,DIRECT",
+    "RULE-SET,Apple,Apple",
     "RULE-SET,Proxies,Proxies",
     "RULE-SET,ChinaDomain,DIRECT",
     "RULE-SET,ChinaIP,DIRECT",
