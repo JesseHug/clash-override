@@ -26,7 +26,7 @@ log-level: warning
 # 【开关】IPv6 true=开启  false=关闭（部分机场要求关掉IPv6）
 ipv6: true
 
-# 【开关】TCP 保活间隔（秒），防断流
+# 【开关】TCP 保活间隔（秒），防止代理连接被 NAT 掐断导致断流
 # 1800=30分钟一次（省电）  15=15秒一次（响应快但耗电）
 keep-alive-interval: 1800
 
@@ -34,7 +34,8 @@ keep-alive-interval: 1800
 unified-delay: true
 tcp-concurrent: true
 
-# GeoIP 数据库国内加速镜像（如果无法更新GeoIP，把这行换成你的机场提供的地址）
+# Geo 数据库国内加速镜像（如果无法更新，换 ghproxy.com 或你的机场提供的地址）
+# 注意：我们没有配置 geosite 下载，因为规则集已全部用 RULE-SET .mrs，不再依赖 GEOSITE
 geox-url:
   geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
   mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb"
@@ -52,7 +53,18 @@ ntp:
   port: 123
   interval: 30
 
+# ==================== Smart 内核专属设置 ====================
+# 【开关】Smart 智能策略组需要魔改版 Mihomo 内核
+# 普通内核请保持注释状态，切勿启用会导致无法启动！
+# 魔改内核：https://github.com/vernesong/mihomo/releases
+# 开启后把地区策略组的 type: fallback 改成 type: smart 即可
+# smart-config:
+#   lgbm-auto-update: false      # 自动更新预测模型
+#   lgbm-update-interval: 72     # 模型更新间隔（小时）
+#   lgbm-url: "https://github.com/vernesong/mihomo/releases/download/LightGBM-Model/Model.bin"
+
 # 管理面板（通过 http://127.0.0.1:9090/ui 访问）
+# 如果暴露在公网，建议加 secret: 你的密码 防止别人控制
 external-controller: :9090
 external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
 external-ui-name: zashboard
@@ -309,13 +321,13 @@ rule-providers:
   &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
 
   LocalAreaNetwork: {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
-  Unbreak:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
+  Unbreak:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}  # 666OS 无 Unbreak 专属，用 Direct 替代
   Speedtest:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs}
   YouTube:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
   Netflix:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
   Disney:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Disney.mrs}
   Spotify:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
-  Bilibili:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
+  Bilibili:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}  # 666OS 无 Bilibili 专属，用 Direct 替代
   Telegram:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
