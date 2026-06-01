@@ -4,8 +4,9 @@ const main = (config) => {
 
   const proxies = config.proxies ? config.proxies.map(p => p.name) : [];
 
+  const junkFilter = /剩余|流量|邮箱|工单|通知|客服|官网|邀请|到期|已用|次数|USE|USED|TOTAL|EXPIRE|Panel|Channel|Author|群|返利|循环|获取|订阅|机场/i;
   const getNodes = (reg) => {
-    const res = proxies.filter(name => reg.test(name));
+    const res = proxies.filter(name => reg.test(name) && !junkFilter.test(name));
     return res.length > 0 ? res : ["DIRECT"];
   };
 
@@ -14,29 +15,37 @@ const main = (config) => {
   const nodesTW = getNodes(/台|TW|Taiwan/i);
   const nodesJP = getNodes(/日|JP|Japan/i);
   const nodesUS = getNodes(/美|US|UnitedStates|United States/i);
+  const nodesKR = getNodes(/韩|KR|KOR|Korea/i);
+  const nodesEU = getNodes(/法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i);
+  const nodesOther = proxies.filter(n =>
+    !/港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe/i.test(n) && !junkFilter.test(n)
+  );
 
   config["proxy-groups"] = [
-    { name: "Proxies", type: "select", proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", ...proxies] },
-    { name: "YouTube", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US"] },
-    { name: "Netflix", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US"] },
-    { name: "Disney", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US"] },
-    { name: "Spotify", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US"] },
-    { name: "Bahamut", type: "select", proxies: ["Proxies", "HK", "TW"] },
-    { name: "Bilibili", type: "select", proxies: ["DIRECT", "HK", "TW"] },
-    { name: "Telegram", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US"] },
-    { name: "Steam", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US"] },
-    { name: "PayPal", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US"] },
-    { name: "OpenAI", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US"] },
-    { name: "AI", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US"] },
-    { name: "Apple", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US"] },
+    { name: "Proxies", type: "select", proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
+    { name: "YouTube", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Netflix", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Disney", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Spotify", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Bilibili", type: "select", proxies: ["DIRECT", "HK", "TW", "JP", "KR", "Other"] },
+    { name: "Telegram", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Steam", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "PayPal", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "OpenAI", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "AI", type: "select", proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Apple", type: "select", proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
+    { name: "Speedtest", type: "select", proxies: ["DIRECT", "Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Final", type: "select", proxies: ["Proxies", "DIRECT"] },
 
-    { name: "Fallback", type: "fallback", proxies: ["HK", "JP", "SG", "TW", "US"], url: "http://www.gstatic.com/generate_204", interval: 300 },
-    { name: "HK", type: "url-test", proxies: nodesHK, url: "http://www.gstatic.com/generate_204", interval: 300 },
-    { name: "SG", type: "url-test", proxies: nodesSG, url: "http://www.gstatic.com/generate_204", interval: 300 },
-    { name: "TW", type: "url-test", proxies: nodesTW, url: "http://www.gstatic.com/generate_204", interval: 300 },
-    { name: "JP", type: "url-test", proxies: nodesJP, url: "http://www.gstatic.com/generate_204", interval: 300 },
-    { name: "US", type: "url-test", proxies: nodesUS, url: "http://www.gstatic.com/generate_204", interval: 300 }
+    { name: "Fallback", type: "fallback", proxies: ["HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"], url: "http://www.gstatic.com/generate_204", interval: 300 },
+    { name: "HK", type: "fallback", proxies: nodesHK, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "SG", type: "fallback", proxies: nodesSG, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "TW", type: "fallback", proxies: nodesTW, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "JP", type: "fallback", proxies: nodesJP, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "US", type: "fallback", proxies: nodesUS, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "KR", type: "fallback", proxies: nodesKR, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "EU", type: "fallback", proxies: nodesEU, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
+    { name: "Other", type: "fallback", proxies: nodesOther.length > 0 ? nodesOther : ["DIRECT"], url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 }
   ];
 
   const originalProviders = config["rule-providers"] || {};
@@ -57,7 +66,6 @@ const main = (config) => {
   const domainRp = { type: "http", behavior: "domain", format: "text", interval: 86400 };
   const ipcidrRp = { type: "http", behavior: "ipcidr", format: "text", interval: 86400 };
   const baseUrl = "https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset";
-  const bm7 = "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash";
 
   const myRuleProviders = {
     Unbreak: { ...rp, url: `${baseUrl}/Unbreak.list` },
@@ -72,7 +80,9 @@ const main = (config) => {
     PayPal: { ...rp, url: `${baseUrl}/Extra/PayPal.list` },
     OpenAI: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/OpenAi.list" },
     AI: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list" },
-    Apple: { ...rp, url: `${bm7}/Apple/Apple.list` },
+    AppleCN: { ...domainRp, url: "https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs" },
+    Apple: { ...domainRp, url: "https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs" },
+    Speedtest: { ...domainRp, url: "https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs" },
     Proxies: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyLite.list" },
     ChinaDomain: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaDomain.list" },
     ChinaIP: { ...ipcidrRp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaCompanyIp.list" },
@@ -82,23 +92,24 @@ const main = (config) => {
   config["rule-providers"] = { ...requiredDnsProviders, ...myRuleProviders };
 
   config.rules = [
+    "RULE-SET,LocalAreaNetwork,DIRECT",
     "RULE-SET,Unbreak,DIRECT",
+    "RULE-SET,Speedtest,Speedtest",
     "RULE-SET,YouTube,YouTube",
     "RULE-SET,Netflix,Netflix",
     "RULE-SET,Disney,Disney",
     "RULE-SET,Spotify,Spotify",
-    "RULE-SET,Bahamut,Bahamut",
     "RULE-SET,Bilibili,Bilibili",
     "RULE-SET,Telegram,Telegram",
     "RULE-SET,Steam,Steam",
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
-    "RULE-SET,Apple,Apple",
+    "GEOSITE,apple-cn,DIRECT",
+    "GEOSITE,apple,Apple",
     "RULE-SET,Proxies,Proxies",
     "RULE-SET,ChinaDomain,DIRECT",
     "RULE-SET,ChinaIP,DIRECT",
-    "RULE-SET,LocalAreaNetwork,DIRECT",
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
   ];
