@@ -54,12 +54,15 @@ const main = (config) => {
   }
 
   const rp = { type: "http", behavior: "classical", format: "text", interval: 86400 };
+  const domainRp = { type: "http", behavior: "domain", format: "text", interval: 86400 };
+  const ipcidrRp = { type: "http", behavior: "ipcidr", format: "text", interval: 86400 };
   const baseUrl = "https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset";
+  const bm7 = "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash";
 
   const myRuleProviders = {
     Unbreak: { ...rp, url: `${baseUrl}/Unbreak.list` },
     YouTube: { ...rp, url: `${baseUrl}/StreamingMedia/Video/YouTube.list` },
-    Netflix: { ...rp, url: `${baseUrl}/StreamingMedia/Video/Netflix.list` },
+    Netflix: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Netflix.list" },
     Disney: { ...rp, url: `${baseUrl}/StreamingMedia/Video/DisneyPlus.list` },
     Spotify: { ...rp, url: `${baseUrl}/StreamingMedia/Music/Spotify.list` },
     Bahamut: { ...rp, url: `${baseUrl}/StreamingMedia/Video/Bahamut.list` },
@@ -69,9 +72,10 @@ const main = (config) => {
     PayPal: { ...rp, url: `${baseUrl}/Extra/PayPal.list` },
     OpenAI: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/OpenAi.list" },
     AI: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list" },
-    Apple: { ...rp, url: `${baseUrl}/Extra/Apple/Apple.list` },
-    Proxies: { ...rp, url: `${baseUrl}/Global.list` },
-    China: { ...rp, url: `${baseUrl}/China.list` },
+    Apple: { ...rp, url: `${bm7}/Apple/Apple.list` },
+    Proxies: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyLite.list" },
+    ChinaDomain: { ...rp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaDomain.list" },
+    ChinaIP: { ...ipcidrRp, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaCompanyIp.list" },
     LocalAreaNetwork: { ...rp, url: `${baseUrl}/LocalAreaNetwork.list` }
   };
 
@@ -92,7 +96,8 @@ const main = (config) => {
     "RULE-SET,AI,AI",
     "RULE-SET,Apple,Apple",
     "RULE-SET,Proxies,Proxies",
-    "RULE-SET,China,DIRECT",
+    "RULE-SET,ChinaDomain,DIRECT",
+    "RULE-SET,ChinaIP,DIRECT",
     "RULE-SET,LocalAreaNetwork,DIRECT",
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
