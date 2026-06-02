@@ -251,6 +251,9 @@ proxy-groups:
   - name: PayPal
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
+  - name: X
+    type: select
+    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: OpenAI
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
@@ -333,6 +336,7 @@ rule-providers:
   Telegram:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
+  Twitter:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
   OpenAI:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/OpenAI.mrs}
   AI:               {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/AI.mrs}
   AppleCN:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
@@ -367,6 +371,9 @@ rules:
 
   # 支付
   - RULE-SET,PayPal,PayPal
+
+  # 社交
+  - RULE-SET,Twitter,X
 
   # AI
   - RULE-SET,OpenAI,OpenAI
