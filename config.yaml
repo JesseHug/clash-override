@@ -343,6 +343,9 @@ rule-providers:
   Proxies:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Proxy.mrs}
   ChinaDomain:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
   ChinaIP:          {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
+  AIIP:             {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs}
+  NetflixIP:        {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Netflix.mrs}
+  ProxyIP:          {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
   Private:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
   Direct:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
   China:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
@@ -387,7 +390,12 @@ rules:
 
   # 国内直连
   - RULE-SET,ChinaDomain,DIRECT
-  - RULE-SET,ChinaIP,DIRECT
+
+  # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
+  - RULE-SET,NetflixIP,Netflix,no-resolve
+  - RULE-SET,AIIP,AI,no-resolve
+  - RULE-SET,ProxyIP,Proxies,no-resolve
+  - RULE-SET,ChinaIP,DIRECT,no-resolve
   - GEOIP,CN,DIRECT
 
   # 最终兜底
