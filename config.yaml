@@ -34,8 +34,7 @@ keep-alive-interval: 1800
 unified-delay: true
 tcp-concurrent: true
 
-# Geo 数据库国内加速镜像（如果无法更新，换 ghproxy.com 或你的机场提供的地址）
-# 注意：我们没有配置 geosite 下载，因为规则集已全部用 RULE-SET .mrs，不再依赖 GEOSITE
+# GeoIP 数据库国内加速镜像（仅 GEOIP,CN 需要）
 geox-url:
   geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
   mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb"
@@ -333,7 +332,7 @@ rule-providers:
   Disney:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Disney.mrs}
   Spotify:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
   Bilibili:         {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset/StreamingMedia/StreamingSE.list}
-  Telegram:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
+  Telegram:         {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Telegram.list}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
   Twitter:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
