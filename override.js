@@ -13,7 +13,7 @@ const main = (config) => {
 
   const proxies = config.proxies ? config.proxies.map(p => p.name) : [];
 
-  const junkFilter = /剩余|流量|邮箱|工单|通知|客服|官网|邀请|到期|已用|次数|USE|USED|TOTAL|EXPIRE|Panel|Channel|Author|群|返利|循环|获取|订阅|机场/i;
+  const junkFilter = /剩余|流量|traffic|邮箱|工单|通知|客服|官网|邀请|到期|已用|次数|USE|USED|TOTAL|EXPIRE|Panel|Channel|Author|群|返利|循环|获取|订阅|机场/i;
   const getNodes = (reg) => {
     const res = proxies.filter(name => reg.test(name) && !junkFilter.test(name));
     return res.length > 0 ? res : ["DIRECT"];
@@ -99,6 +99,9 @@ const main = (config) => {
     Proxies: { ...mrs, url: `${r66}/domain/Proxy.mrs` },
     ChinaDomain: { ...mrs, url: `${r66}/domain/China.mrs` },
     ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs` },
+    AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs` },
+    NetflixIP: { ...mrsIP, url: `${r66}/ip/Netflix.mrs` },
+    ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs` },
   };
 
   config["rule-providers"] = { ...requiredDnsProviders, ...myRuleProviders };
@@ -122,7 +125,11 @@ const main = (config) => {
     "RULE-SET,Apple,Apple",
     "RULE-SET,Proxies,Proxies",
     "RULE-SET,ChinaDomain,DIRECT",
-    "RULE-SET,ChinaIP,DIRECT",
+    // IP规则（no-resolve：不主动触发DNS，仅已知IP时匹配）
+    "RULE-SET,NetflixIP,Netflix,no-resolve",
+    "RULE-SET,AIIP,AI,no-resolve",
+    "RULE-SET,ProxyIP,Proxies,no-resolve",
+    "RULE-SET,ChinaIP,DIRECT,no-resolve",
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
   ];
