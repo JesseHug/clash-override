@@ -107,8 +107,8 @@ sniffer:
 # 【重要】很多机场要求"关掉DNS覆写"，就是把下面 enable 改成 false
 # 或者用"托管配置"时，直接整段 DNS 注释掉，让机场接管
 dns:
-  enable: true        # true=Mihomo接管DNS  false=使用系统DNS（机场推荐）
-  ipv6: true          # true=返回IPv6记录  false=只返回IPv4
+  enable: false        # true=Mihomo接管DNS  false=使用系统DNS（机场推荐）
+  ipv6: false          # true=返回IPv6记录  false=只返回IPv4
   enhanced-mode: fake-ip  # fake-ip=更快  redir-host=兼容性更好
   fake-ip-range: 198.18.0.1/16
 
@@ -150,7 +150,7 @@ dns:
 proxy-providers:
   服务商一:
     type: http
-    url: "https://example.com/sub?token=your_token_here"
+    url: "https://popcornlab.de/api/v1/miaomiao?OuO=80ace3cac733e4bbbaf5462f2c8093e9"
     interval: 86400           # 每24小时刷新一次订阅
     proxy: DIRECT             # 用直连下载订阅（如果机场需要代理才能访问，改成你的节点名）
     health-check:
@@ -162,7 +162,7 @@ proxy-providers:
 
   服务商二:
     type: http
-    url: "https://example2.com/sub?token=your_token_here"
+    url: "https://api-huacloud.net/sub?target=clash&insert=true&emoji=true&udp=true&clash.doh=true&new_name=true&filename=Flower_Trojan.yaml&url=https%3A%2F%2Fapi.xmancdn.net%2Fosubscribe.php%3Ftoken2%3Dnye5n68y-6369e2c23fpij03xqp"
     interval: 86400
     proxy: DIRECT
     health-check:
@@ -174,7 +174,7 @@ proxy-providers:
 
   服务商三:
     type: http
-    url: "https://example3.com/sub?token=your_token_here"
+    url: "https://47.115.49.124:9999/api/v1/client/subscribe?token=e2ed03707bc2d0eb1f3fab9594df2d27"
     interval: 86400
     proxy: DIRECT
     health-check:
@@ -318,12 +318,12 @@ proxy-groups:
 # ==================== 规则集（远端子规则） ====================
 # 自动从 GitHub 下载编译好的 .mrs 二进制规则集
 # O(1) 匹配性能，规则再多也不慢
-rule-providers:
-  &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
-  &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
-  &BehaviorCLS {type: http, behavior: classical, format: text, interval: 86400}
+# 行为模板
+BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
+BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
+BehaviorCLS: &BehaviorCLS {type: http, behavior: classical, format: text, interval: 86400}
 
-  # 以上用 666OS .mrs，以下无专属用 AGWA5783 classical
+rule-providers:
   LocalAreaNetwork: {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
   Unbreak:          {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset/Unbreak.list}
   Speedtest:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs}
