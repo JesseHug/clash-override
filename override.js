@@ -95,12 +95,16 @@ const main = (config) => {
     AI: { ...mrs, url: `${r66}/domain/AI.mrs` },
     AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs` },
     Apple: { ...mrs, url: `${r66}/domain/Apple.mrs` },
+    // 【新增】Google 域名规则集
+    Google: { ...mrs, url: `${r66}/domain/Google.mrs` },
     Speedtest: { ...mrs, url: `${r66}/domain/Speedtest.mrs` },
     Proxies: { ...mrs, url: `${r66}/domain/Proxy.mrs` },
     ChinaDomain: { ...mrs, url: `${r66}/domain/China.mrs` },
     ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs` },
     AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs` },
     NetflixIP: { ...mrsIP, url: `${r66}/ip/Netflix.mrs` },
+    // 【新增】Google IP 规则集
+    GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs` },
     ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs` },
   };
 
@@ -123,11 +127,15 @@ const main = (config) => {
     "RULE-SET,AI,AI",
     "RULE-SET,AppleCN,DIRECT",
     "RULE-SET,Apple,Apple",
+    // 【新增】Google 域名分流至 Proxies 策略组
+    "RULE-SET,Google,Proxies",
     "RULE-SET,Proxies,Proxies",
     "RULE-SET,ChinaDomain,DIRECT",
     // IP规则（no-resolve：不主动触发DNS，仅已知IP时匹配）
     "RULE-SET,NetflixIP,Netflix,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
+    // 【新增】Google IP 分流至 Proxies 策略组
+    "RULE-SET,GoogleIP,Proxies,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,DIRECT,no-resolve",
     "GEOIP,CN,DIRECT",
