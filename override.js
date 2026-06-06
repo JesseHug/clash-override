@@ -33,7 +33,7 @@ const main = (config) => {
 
   const ico = "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color";
   config["proxy-groups"] = [
-    { name: "Proxies", type: "select", icon: `${ico}/Global.png`, proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
+    { name: "Proxies", type: "select", icon: ico + "/Global.png", proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
     { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Bilibili", type: "select", icon: `${ico}/bilibili.png`, proxies: ["DIRECT", "HK", "TW", "JP", "KR", "Other"] },
