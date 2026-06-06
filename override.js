@@ -31,6 +31,7 @@ const main = (config) => {
     && !junkFilter.test(n)
   );
 
+  const ico = "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color";
   config["proxy-groups"] = [
     { name: "Proxies", type: "select", icon: `${ico}/Global.png`, proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
     { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
@@ -78,7 +79,6 @@ const main = (config) => {
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
   const baseUrl = "https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset";
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
-  const ico = "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color";
 
   const myRuleProviders = {
     Unbreak: { ...cls, url: `${baseUrl}/Unbreak.list` },
