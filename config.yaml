@@ -190,6 +190,7 @@ proxy-groups:
 
   # 【主入口】面板上选这个来切换默认走哪个地区
   - name: Proxies
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png
     type: select
     proxies:
       - Fallback       # 自动选地区
@@ -205,6 +206,7 @@ proxy-groups:
 
   # 【最终兜底】所有规则都没匹配到就走这里
   - name: Final
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Final.png
     type: select
     proxies:
       - Proxies
@@ -212,6 +214,7 @@ proxy-groups:
 
   # 【自动地区切换】从上到下试，哪个地区有活节点就用哪个
   - name: Fallback
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png
     type: fallback
     proxies:
       - HK
@@ -227,42 +230,55 @@ proxy-groups:
 
   # ====== 服务分流 ======
   - name: YouTube
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Netflix
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Disney
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney+.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Spotify
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Bilibili
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/bilibili.png
     type: select
     proxies: [DIRECT, HK, TW, JP, KR, Other]
   - name: Telegram
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Steam
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Game.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
   - name: PayPal
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/PayPal.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
   - name: X
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/X.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: OpenAI
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/ChatGPT.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: AI
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/AI.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Apple
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Apple.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Speedtest
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Speedtest.png
     type: select
     proxies: [DIRECT, Proxies, HK, JP, SG, TW, US, KR, EU, Other]
 
@@ -290,27 +306,33 @@ proxy-groups:
 
   - <<: *BaseFB
     name: TW
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png
     filter: "(?i)台|🇹🇼|TW|tai|TPE"
 
   - <<: *BaseFB
     name: JP
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png
     filter: "(?i)日|🇯🇵|JP|Japan|NRT|HND"
 
   - <<: *BaseFB
     name: US
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png
     filter: "(?i)美|🇺🇸|US|USA|LAX|SFO|JFK"
 
   - <<: *BaseFB
     name: KR
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png
     filter: "(?i)韩|🇰🇷|KR|KOR|Korea|首尔"
 
   - <<: *BaseFB
     name: EU
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/European_Union.png
     filter: "(?i)法|德|英|🇫🇷|🇩🇪|🇬🇧|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam"
 
   # 【冷门地区】没被上面7个地区匹配到的节点全在这
   # 土耳其/印度/巴西/俄罗斯等
   - name: Other
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Europe_Map.png
     type: select
     include-all: true
     filter: '^(?!.*(?i)(港|🇭🇰|HK|Hong|HKG|坡|🇸🇬|SG|Sing|SIN|台|🇹🇼|TW|tai|TPE|日|🇯🇵|JP|Japan|NRT|HND|美|🇺🇸|US|USA|LAX|SFO|JFK|韩|🇰🇷|KR|KOR|Korea|首尔|法|🇫🇷|FR|德|🇩🇪|DE|英|🇬🇧|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam)).*$'
