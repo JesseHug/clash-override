@@ -39,8 +39,6 @@ geox-url:
   geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
   mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb"
 
-# 【开关】TLS 指纹随机化，减少被墙概率
-global-client-fingerprint: random
 
 # 【开关】Geo 数据库模式（GEOIP/GEOSITE 需要此模式）
 geodata-mode: true

@@ -2,7 +2,6 @@ const main = (config) => {
   config["unified-delay"] = true;
   config["tcp-concurrent"] = true;
   config["keep-alive-interval"] = 1800;
-  config["global-client-fingerprint"] = "random";
   config["geodata-mode"] = true;
   config["find-process-mode"] = "strict";
 
