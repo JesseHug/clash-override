@@ -110,50 +110,35 @@ hosts:
   dns.google: [8.8.8.8, 8.8.4.4]
   services.googleapis.cn: services.googleapis.com
 
-# ==================== DNS 配置 ====================
+# ==================== DNS 配置（教科书方案） ====================
 dns:
-  enable: true
-  ipv6: true
-  cache-algorithm: arc
-  use-hosts: true
-  respect-rules: false          # 防 DNS 泄露：DNS 请求不跟随路由规则
+  respect-rules: false
   enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
+  fake-ip-range: "198.18.0.1/16"
+  fake-ip-range6: ""
+  fake-ip-filter-mode: rule
   fake-ip-ttl: 1
-
-  # 不走 fake-ip 的域名/规则集
   fake-ip-filter:
-    - rule-set:Private
-    - rule-set:Direct
-    - rule-set:China
+    - "*"
 
-  # 用于解析 DNS 服务器域名自身的上游（纯 IP，不加密）
   default-nameserver:
     - 223.5.5.5
-    - 119.29.29.29
 
-  # 主 DNS（国外 DoH，过代理解析）
-  nameserver:
-    - https://dns.cloudflare.com/dns-query
-    - https://dns.google/dns-query
-
-  # 节点域名专用 DNS（直连国内 DNS，防止节点域名泄露）
   proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
-
-  # 直连流量专用 DNS（走系统 DNS + 国内）
-  direct-nameserver:
-    - system
     - 223.5.5.5
-    - 119.29.29.29
+
+  direct-nameserver:
+    - 223.5.5.5
   direct-nameserver-follow-policy: false
 
-  # DNS 分流：国内域名走国内 DNS，国外域名走 nameserver
-  nameserver-policy:
-    "rule-set:China,Direct,Private":
-      - https://dns.alidns.com/dns-query
-      - https://doh.pub/dns-query
+  nameserver:
+    - "https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true"
+
+  fallback:
+    - "https://1.1.1.1/dns-query#proxy"
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
 
 # ==================== 代理提供者（多订阅源） ====================
 # 把你的机场订阅链接替换下方 url: 后面的地址

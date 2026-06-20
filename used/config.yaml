@@ -101,48 +101,52 @@ sniffer:
     - "Mijia Cloud"
     - "+.push.apple.com"
 
+# ==================== Hosts 配置 ====================
+# 预置 DNS 服务器 IP，防止 DNS 服务器域名本身无法解析
+hosts:
+  dns.alidns.com: [223.5.5.5, 223.6.6.6]
+  doh.pub: [1.12.12.12, 120.53.53.53]
+  dns.cloudflare.com: [1.1.1.1, 1.0.0.1]
+  dns.google: [8.8.8.8, 8.8.4.4]
+  services.googleapis.cn: services.googleapis.com
+
+# ==================== DNS 配置（教科书方案） ====================
 dns:
-  enable: true
-  ipv6: true
-  cache-algorithm: arc
-  use-hosts: true
   respect-rules: false
   enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
+  fake-ip-range: "198.18.0.1/16"
+  fake-ip-range6: ""
+  fake-ip-filter-mode: rule
   fake-ip-ttl: 1
   fake-ip-filter:
-    - rule-set:Private
-    - rule-set:Direct
-    - rule-set:China
+    - "*"
+
   default-nameserver:
     - 223.5.5.5
-    - 119.29.29.29
-  nameserver:
-    - https://dns.cloudflare.com/dns-query
-    - https://dns.google/dns-query
-  proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
-  direct-nameserver:
-    - system
-    - 223.5.5.5
-    - 119.29.29.29
-  direct-nameserver-follow-policy: false
-  nameserver-policy:
-    "rule-set:China,Direct,Private":
-      - https://dns.alidns.com/dns-query
-      - https://doh.pub/dns-query
 
-# ==================== DNS 配置 ====================
-# 【重要】很多机场要求"关掉DNS覆写"，就是把下面 enable 改成 false
-# 或者用"托管配置"时，直接整段 DNS 注释掉，让机场接管
+  proxy-server-nameserver:
+    - 223.5.5.5
+
+  direct-nameserver:
+    - 223.5.5.5
+  direct-nameserver-follow-policy: false
+
+  nameserver:
+    - "https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true"
+
+  fallback:
+    - "https://1.1.1.1/dns-query#proxy"
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+
 # ==================== 代理提供者（多订阅源） ====================
 # 把你的机场订阅链接替换下方 url: 后面的地址
 # 可以添加多个，自动聚合节点
 proxy-providers:
   服务商一:
     type: http
-    url: "https://popcornlab.de/api/v1/miaomiao?OuO=80ace3cac733e4bbbaf5462f2c8093e9"
+    url: "https://example.com/sub?token=your_token_here"
     interval: 86400           # 每24小时刷新一次订阅
     proxy: DIRECT             # 用直连下载订阅（如果机场需要代理才能访问，改成你的节点名）
     health-check:
@@ -154,7 +158,7 @@ proxy-providers:
 
   服务商二:
     type: http
-    url: "https://api-huacloud.net/sub?target=clash&insert=true&emoji=true&udp=true&clash.doh=true&new_name=true&filename=Flower_Trojan.yaml&url=https%3A%2F%2Fapi.xmancdn.net%2Fosubscribe.php%3Ftoken2%3Dnye5n68y-6369e2c23fpij03xqp"
+    url: "https://example2.com/sub?token=your_token_here"
     interval: 86400
     proxy: DIRECT
     health-check:
@@ -166,7 +170,7 @@ proxy-providers:
 
   服务商三:
     type: http
-    url: "https://47.115.49.124:9999/api/v1/client/subscribe?token=e2ed03707bc2d0eb1f3fab9594df2d27"
+    url: "https://example3.com/sub?token=your_token_here"
     interval: 86400
     proxy: DIRECT
     health-check:
@@ -182,6 +186,7 @@ proxy-groups:
 
   # 【主入口】面板上选这个来切换默认走哪个地区
   - name: Proxies
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Global.png
     type: select
     proxies:
       - Fallback       # 自动选地区
@@ -205,6 +210,7 @@ proxy-groups:
 
   # 【自动地区切换】从上到下试，哪个地区有活节点就用哪个
   - name: Fallback
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Auto.png
     type: fallback
     proxies:
       - HK
@@ -235,6 +241,7 @@ proxy-groups:
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
+  - name: Bilibili
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/bilibili.png
     type: select
     proxies: [DIRECT, HK, TW, JP, KR, Other]
@@ -295,22 +302,27 @@ proxy-groups:
 
   - <<: *BaseFB
     name: TW
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Taiwan.png
     filter: "(?i)台|🇹🇼|TW|tai|TPE"
 
   - <<: *BaseFB
     name: JP
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Japan.png
     filter: "(?i)日|🇯🇵|JP|Japan|NRT|HND"
 
   - <<: *BaseFB
     name: US
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/United_States.png
     filter: "(?i)美|🇺🇸|US|USA|LAX|SFO|JFK"
 
   - <<: *BaseFB
     name: KR
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Korea.png
     filter: "(?i)韩|🇰🇷|KR|KOR|Korea|首尔"
 
   - <<: *BaseFB
     name: EU
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/European_Union.png
     filter: "(?i)法|德|英|🇫🇷|🇩🇪|🇬🇧|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam"
 
   # 【冷门地区】没被上面7个地区匹配到的节点全在这
@@ -323,18 +335,19 @@ proxy-groups:
 
 # ==================== 规则集（远端子规则） ====================
 # 自动从 GitHub 下载编译好的 .mrs 二进制规则集
-# O(1) 匹配性能，规则再多也不慢
-# 行为模板
+# 全部使用 666OS .mrs（二进制编译，O(1) 匹配）
 BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
 BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
 
 rule-providers:
-  LocalAreaNetwork: {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
+  Direct:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
+  Private:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
   Speedtest:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs}
   YouTube:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
   Netflix:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
   Disney:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Disney.mrs}
   Spotify:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
+  Telegram:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
   Twitter:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
@@ -357,13 +370,10 @@ rule-providers:
 # ==================== 路由规则 ====================
 # 规则从上到下依次匹配，命中即止
 rules:
+  # 局域网 / 内网地址 → 直连
   # 直连 & 私有网络
   - RULE-SET,Direct,DIRECT
   - RULE-SET,Private,DIRECT
-  # 局域网 / 内网地址 → 直连
-
-  # 推送/统计/DRM → 直连（否则推送延迟、视频看不了）
-  - RULE-SET,Direct,DIRECT
 
   # 测速网站 → Speedtest 组
   - RULE-SET,Speedtest,Speedtest
