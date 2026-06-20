@@ -159,7 +159,7 @@ proxy-providers:
     health-check:
       enable: true
       url: "http://www.gstatic.com/generate_204"
-      interval: 300
+      interval: 600
     override:
       additional-prefix: "[一] "  # 节点名前缀，区分来自哪个机场
 
@@ -171,7 +171,7 @@ proxy-providers:
     health-check:
       enable: true
       url: "http://www.gstatic.com/generate_204"
-      interval: 300
+      interval: 600
     override:
       additional-prefix: "[二] "
 
@@ -183,7 +183,7 @@ proxy-providers:
     health-check:
       enable: true
       url: "http://www.gstatic.com/generate_204"
-      interval: 300
+      interval: 600
     override:
       additional-prefix: "[三] "
 
@@ -229,7 +229,7 @@ proxy-groups:
       - EU
       - Other
     url: "http://www.gstatic.com/generate_204"
-    interval: 300
+    interval: 600
 
   # ====== 服务分流 ======
   - name: YouTube
@@ -292,11 +292,11 @@ proxy-groups:
   - &BaseFB
     name: HK
     type: fallback
-    interval: 300
+    interval: 600
     lazy: true
     url: "http://www.gstatic.com/generate_204"
-    timeout: 2000
-    max-failures: 2
+    timeout: 3000
+    max-failures: 3
     fallback-interval: 60
     include-all: true
     filter: "(?i)港|🇭🇰|HK|Hong|HKG"

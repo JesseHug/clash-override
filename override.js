@@ -42,20 +42,19 @@ const main = (config) => {
     { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Netflix", type: "select", icon: `${ico}/Netflix.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Disney", type: "select", icon: `${ico}/Disney+.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Apple", type: "select", icon: `${ico}/Apple.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Speedtest", type: "select", icon: `${ico}/Speedtest.png`, proxies: ["DIRECT", "Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
 
-    { name: "Fallback", type: "fallback", icon: `${ico}/Auto.png`, proxies: ["HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"], url: "http://www.gstatic.com/generate_204", interval: 300 },
-    { name: "HK", type: "fallback", icon: `${ico}/Hong_Kong.png`, proxies: nodesHK, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "SG", type: "fallback", icon: `${ico}/Singapore.png`, proxies: nodesSG, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "TW", type: "fallback", icon: `${ico}/Taiwan.png`, proxies: nodesTW, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "JP", type: "fallback", icon: `${ico}/Japan.png`, proxies: nodesJP, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "US", type: "fallback", icon: `${ico}/United_States.png`, proxies: nodesUS, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "KR", type: "fallback", icon: `${ico}/Korea.png`, proxies: nodesKR, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "EU", type: "fallback", icon: `${ico}/European_Union.png`, proxies: nodesEU, url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 },
-    { name: "Other", type: "fallback", icon: `${ico}/Europe_Map.png`, proxies: nodesOther.length > 0 ? nodesOther : ["DIRECT"], url: "http://www.gstatic.com/generate_204", interval: 300, "fallback-interval": 60, lazy: true, "max-failures": 2, timeout: 2000 }
+    { name: "Fallback", type: "fallback", icon: `${ico}/Auto.png`, proxies: ["HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"], url: "http://www.gstatic.com/generate_204", interval: 600 },
+    { name: "HK", type: "fallback", icon: `${ico}/Hong_Kong.png`, proxies: nodesHK, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "SG", type: "fallback", icon: `${ico}/Singapore.png`, proxies: nodesSG, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "TW", type: "fallback", icon: `${ico}/Taiwan.png`, proxies: nodesTW, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "JP", type: "fallback", icon: `${ico}/Japan.png`, proxies: nodesJP, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "US", type: "fallback", icon: `${ico}/United_States.png`, proxies: nodesUS, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "KR", type: "fallback", icon: `${ico}/Korea.png`, proxies: nodesKR, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "EU", type: "fallback", icon: `${ico}/European_Union.png`, proxies: nodesEU, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "Other", type: "fallback", icon: `${ico}/Europe_Map.png`, proxies: nodesOther.length > 0 ? nodesOther : ["DIRECT"], url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 }
   ];
 
   const originalProviders = config["rule-providers"] || {};
@@ -82,7 +81,6 @@ const main = (config) => {
     Private: { ...mrs, url: `${r66}/domain/Private.mrs` },
     YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs` },
     Netflix: { ...mrs, url: `${r66}/domain/Netflix.mrs` },
-    Disney: { ...mrs, url: `${r66}/domain/Disney.mrs` },
     Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs` },
     Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs` },
     Steam: { ...mrs, url: `${r66}/domain/Games.mrs` },
@@ -129,7 +127,6 @@ const main = (config) => {
     // 流媒体 & 应用分流
     "RULE-SET,YouTube,YouTube",
     "RULE-SET,Netflix,Netflix",
-    "RULE-SET,Disney,Disney",
     "RULE-SET,Spotify,Spotify",
     "RULE-SET,Telegram,Telegram",
     "RULE-SET,Steam,Steam",
