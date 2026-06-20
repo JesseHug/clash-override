@@ -101,47 +101,41 @@ sniffer:
     - "Mijia Cloud"
     - "+.push.apple.com"
 
-# ==================== DNS 配置 ====================
-# 【重要】很多机场要求"关掉DNS覆写"，就是把下面 enable 改成 false
-# 或者用"托管配置"时，直接整段 DNS 注释掉，让机场接管
 dns:
-  enable: false        # true=Mihomo接管DNS  false=使用系统DNS（机场推荐）
-  ipv6: false          # true=返回IPv6记录  false=只返回IPv4
-  enhanced-mode: fake-ip  # fake-ip=更快  redir-host=兼容性更好
+  enable: true
+  ipv6: true
+  cache-algorithm: arc
+  use-hosts: true
+  respect-rules: false
+  enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
-
-  # 以下域名/规则集不走 fake-ip，直接返回真实 IP
+  fake-ip-ttl: 1
   fake-ip-filter:
     - rule-set:Private
     - rule-set:Direct
     - rule-set:China
-    - +.push.apple.com
-
-  # 上游 DNS 服务器（用于解析 default-nameserver 自身）
   default-nameserver:
-    - 223.5.5.5      # 阿里
-    - 119.29.29.29   # 腾讯
-    - 114.114.114.114 # 114DNS（备选）
-
-  # 国内主 DNS（加密，防污染）
+    - 223.5.5.5
+    - 119.29.29.29
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-
-  # 节点域名专用 DNS（确保订阅节点能正确解析）
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.google/dns-query
   proxy-server-nameserver:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-
-  # DNS 分流：国内站走国内DNS快又准，国外站走国外DNS不被墙
+    - https://dns.alidns.com/dns-query#DIRECT
+    - https://doh.pub/dns-query#DIRECT
+  direct-nameserver:
+    - system
+    - 223.5.5.5
+    - 119.29.29.29
+  direct-nameserver-follow-policy: false
   nameserver-policy:
-    "geosite:cn,private":
-      - https://doh.pub/dns-query
+    "rule-set:China,Direct,Private":
       - https://dns.alidns.com/dns-query
-    "geosite:!cn,!private":
-      - tls://dns.google
-      - tls://cloudflare-dns.com
+      - https://doh.pub/dns-query
 
+# ==================== DNS 配置 ====================
+# 【重要】很多机场要求"关掉DNS覆写"，就是把下面 enable 改成 false
+# 或者用"托管配置"时，直接整段 DNS 注释掉，让机场接管
 # ==================== 代理提供者（多订阅源） ====================
 # 把你的机场订阅链接替换下方 url: 后面的地址
 # 可以添加多个，自动聚合节点
@@ -241,7 +235,6 @@ proxy-groups:
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
-  - name: Bilibili
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/bilibili.png
     type: select
     proxies: [DIRECT, HK, TW, JP, KR, Other]
@@ -334,18 +327,14 @@ proxy-groups:
 # 行为模板
 BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
 BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
-BehaviorCLS: &BehaviorCLS {type: http, behavior: classical, format: text, interval: 86400}
 
 rule-providers:
   LocalAreaNetwork: {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
-  Unbreak:          {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset/Unbreak.list}
   Speedtest:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs}
   YouTube:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
   Netflix:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
   Disney:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Disney.mrs}
   Spotify:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
-  Bilibili:         {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset/StreamingMedia/StreamingSE.list}
-  Telegram:         {<<: *BehaviorCLS, url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Telegram.list}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
   Twitter:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
@@ -368,11 +357,13 @@ rule-providers:
 # ==================== 路由规则 ====================
 # 规则从上到下依次匹配，命中即止
 rules:
+  # 直连 & 私有网络
+  - RULE-SET,Direct,DIRECT
+  - RULE-SET,Private,DIRECT
   # 局域网 / 内网地址 → 直连
-  - RULE-SET,LocalAreaNetwork,DIRECT
 
   # 推送/统计/DRM → 直连（否则推送延迟、视频看不了）
-  - RULE-SET,Unbreak,DIRECT
+  - RULE-SET,Direct,DIRECT
 
   # 测速网站 → Speedtest 组
   - RULE-SET,Speedtest,Speedtest
@@ -382,7 +373,6 @@ rules:
   - RULE-SET,Netflix,Netflix
   - RULE-SET,Disney,Disney
   - RULE-SET,Spotify,Spotify
-  - RULE-SET,Bilibili,Bilibili
   - RULE-SET,Telegram,Telegram
   - RULE-SET,Steam,Steam
 

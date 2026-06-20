@@ -35,7 +35,6 @@ const main = (config) => {
     { name: "Proxies", type: "select", icon: ico + "/Global.png", proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
     { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Bilibili", type: "select", icon: `${ico}/bilibili.png`, proxies: ["DIRECT", "HK", "TW", "JP", "KR", "Other"] },
     { name: "Telegram", type: "select", icon: `${ico}/Telegram_X.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Steam", type: "select", icon: `${ico}/Game.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "PayPal", type: "select", icon: `${ico}/PayPal.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
@@ -73,16 +72,14 @@ const main = (config) => {
     });
   }
 
-  const cls = { type: "http", behavior: "classical", format: "text", interval: 86400 };
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
-  const baseUrl = "https://raw.githubusercontent.com/AGWA5783/Profiles/master/Surge/Ruleset";
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
 
   const myRuleProviders = {
-    Unbreak: { ...cls, url: `${baseUrl}/Unbreak.list` },
-    Bilibili: { ...cls, url: `${baseUrl}/StreamingMedia/StreamingSE.list` },
-    LocalAreaNetwork: { ...cls, url: `${baseUrl}/LocalAreaNetwork.list` },
+    // Unbreak / LocalAreaNetwork 已替换为 666OS
+    Direct: { ...mrs, url: `${r66}/domain/Direct.mrs` },
+    Private: { ...mrs, url: `${r66}/domain/Private.mrs` },
     YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs` },
     Netflix: { ...mrs, url: `${r66}/domain/Netflix.mrs` },
     Disney: { ...mrs, url: `${r66}/domain/Disney.mrs` },
@@ -111,33 +108,51 @@ const main = (config) => {
   config["rule-providers"] = { ...requiredDnsProviders, ...myRuleProviders };
 
   config.rules = [
-    "RULE-SET,LocalAreaNetwork,DIRECT",
-    "RULE-SET,Unbreak,DIRECT",
+    // 私有网络 & 直连
+    "RULE-SET,Direct,DIRECT",
+    "RULE-SET,Private,DIRECT",
+
+    // 禁用国外 QUIC（UDP/443），防止 YouTube/Netflix 视频卡顿
+    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
+
+    // 测速
     "RULE-SET,Speedtest,Speedtest",
+
+    // 流媒体 & 应用分流
     "RULE-SET,YouTube,YouTube",
     "RULE-SET,Netflix,Netflix",
     "RULE-SET,Disney,Disney",
     "RULE-SET,Spotify,Spotify",
-    "RULE-SET,Bilibili,Bilibili",
     "RULE-SET,Telegram,Telegram",
     "RULE-SET,Steam,Steam",
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,Twitter,X",
+
+    // AI
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
+
+    // Apple（国内直连，国外代理）
     "RULE-SET,AppleCN,DIRECT",
     "RULE-SET,Apple,Apple",
-    // 【新增】Google 域名分流至 Proxies 策略组
+
+    // Google 分流至 Proxies（解决 Play Store 下载）
     "RULE-SET,Google,Proxies",
+
+    // 国外网站兜底
     "RULE-SET,Proxies,Proxies",
+
+    // 国内直连
     "RULE-SET,ChinaDomain,DIRECT",
-    // IP规则（no-resolve：不主动触发DNS，仅已知IP时匹配）
+
+    // IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
     "RULE-SET,NetflixIP,Netflix,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
-    // 【新增】Google IP 分流至 Proxies 策略组
     "RULE-SET,GoogleIP,Proxies,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,DIRECT,no-resolve",
+
+    // GeoIP 兜底
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
   ];
