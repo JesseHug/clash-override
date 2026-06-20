@@ -240,16 +240,10 @@ proxy-groups:
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
-    type: select
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Spotify
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Spotify.png
     type: select
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
-  - name: Bilibili
-    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/bilibili.png
-    type: select
-    proxies: [DIRECT, HK, TW, JP, KR, Other]
   - name: Telegram
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Telegram_X.png
     type: select
