@@ -103,9 +103,17 @@ const main = (config) => {
     // 【新增】Google IP 规则集
     GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs` },
     ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs` },
+    // 新增：fake-ip 过滤 + 国内域名补充（wwqgtxx 源）
+    fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs" },
+    cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs" },
   };
 
   config["rule-providers"] = { ...requiredDnsProviders, ...myRuleProviders };
+
+  // DNS fake-ip-filter 加入 fakeip_filter 规则集
+  if (config.dns && Array.isArray(config.dns["fake-ip-filter"])) {
+    config.dns["fake-ip-filter"].push("rule-set:fakeip_filter");
+  }
 
   config.rules = [
     // 私有网络 & 直连
@@ -144,6 +152,7 @@ const main = (config) => {
 
     // 国内直连
     "RULE-SET,ChinaDomain,DIRECT",
+    "RULE-SET,cn_additional,DIRECT",
 
     // IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
     "RULE-SET,NetflixIP,Netflix,no-resolve",

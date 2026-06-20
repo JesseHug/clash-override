@@ -46,7 +46,7 @@ geodata-mode: true
 # 【开关】NTP 时间同步，防止系统时间不准导致 HTTPS 证书报错
 ntp:
   enable: true
-  server: time.apple.com
+  server: ntp.aliyun.com
   port: 123
   interval: 30
 
@@ -119,7 +119,10 @@ dns:
   fake-ip-filter-mode: rule
   fake-ip-ttl: 1
   fake-ip-filter:
-    - "*"
+    - rule-set:fakeip_filter
+    - rule-set:Private
+    - rule-set:Direct
+    - rule-set:China
 
   default-nameserver:
     - 223.5.5.5
@@ -363,6 +366,8 @@ rule-providers:
   NetflixIP:        {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Netflix.mrs}
   GoogleIP:         {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
   ProxyIP:          {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
+  fakeip_filter:    {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs}
+  cn_additional:    {<<: *BehaviorDN, url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs}
   Private:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
   Direct:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
   China:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
@@ -407,6 +412,7 @@ rules:
 
   # 国内直连
   - RULE-SET,ChinaDomain,DIRECT
+  - RULE-SET,cn_additional,DIRECT
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
   - RULE-SET,NetflixIP,Netflix,no-resolve
