@@ -110,6 +110,10 @@ hosts:
   dns.google: [8.8.8.8, 8.8.4.4]
   services.googleapis.cn: services.googleapis.com
 
+  # 屏蔽哔哩哔哩 PCDN，解决看视频卡顿问题
+  "+.mcdn.bilivideo.com": ["0.0.0.0"]
+  "+.mcdn.bilivideo.cn": ["0.0.0.0"]
+
 # ==================== DNS 配置（教科书方案） ====================
 dns:
   respect-rules: false
@@ -236,8 +240,6 @@ proxy-groups:
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Netflix.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
-  - name: Disney
-    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Disney+.png
     type: select
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Spotify
@@ -348,7 +350,6 @@ rule-providers:
   Speedtest:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Speedtest.mrs}
   YouTube:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
   Netflix:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Netflix.mrs}
-  Disney:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Disney.mrs}
   Spotify:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
   Telegram:         {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
   Steam:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
@@ -386,7 +387,6 @@ rules:
   # 流媒体 & 应用分流
   - RULE-SET,YouTube,YouTube
   - RULE-SET,Netflix,Netflix
-  - RULE-SET,Disney,Disney
   - RULE-SET,Spotify,Spotify
   - RULE-SET,Telegram,Telegram
   - RULE-SET,Steam,Steam
