@@ -46,15 +46,15 @@ const main = (config) => {
     { name: "Speedtest", type: "select", icon: `${ico}/Speedtest.png`, proxies: ["DIRECT", "Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
     { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
 
-    { name: "Fallback", type: "fallback", icon: `${ico}/Auto.png`, proxies: ["HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"], url: "http://www.gstatic.com/generate_204", interval: 600 },
-    { name: "HK", type: "fallback", icon: `${ico}/Hong_Kong.png`, proxies: nodesHK, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "SG", type: "fallback", icon: `${ico}/Singapore.png`, proxies: nodesSG, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "TW", type: "fallback", icon: `${ico}/Taiwan.png`, proxies: nodesTW, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "JP", type: "fallback", icon: `${ico}/Japan.png`, proxies: nodesJP, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "US", type: "fallback", icon: `${ico}/United_States.png`, proxies: nodesUS, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "KR", type: "fallback", icon: `${ico}/Korea.png`, proxies: nodesKR, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "EU", type: "fallback", icon: `${ico}/European_Union.png`, proxies: nodesEU, url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "Other", type: "fallback", icon: `${ico}/Europe_Map.png`, proxies: nodesOther.length > 0 ? nodesOther : ["DIRECT"], url: "http://www.gstatic.com/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 }
+    { name: "Fallback", type: "fallback", icon: `${ico}/Auto.png`, proxies: ["HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"], url: "https://g.cn/generate_204", interval: 600 },
+    { name: "HK", type: "fallback", icon: `${ico}/Hong_Kong.png`, proxies: nodesHK, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "SG", type: "fallback", icon: `${ico}/Singapore.png`, proxies: nodesSG, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "TW", type: "fallback", icon: `${ico}/Taiwan.png`, proxies: nodesTW, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "JP", type: "fallback", icon: `${ico}/Japan.png`, proxies: nodesJP, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "US", type: "fallback", icon: `${ico}/United_States.png`, proxies: nodesUS, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "KR", type: "fallback", icon: `${ico}/Korea.png`, proxies: nodesKR, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "EU", type: "fallback", icon: `${ico}/European_Union.png`, proxies: nodesEU, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
+    { name: "Other", type: "fallback", icon: `${ico}/Europe_Map.png`, proxies: nodesOther.length > 0 ? nodesOther : ["DIRECT"], url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 }
   ];
 
   const originalProviders = config["rule-providers"] || {};
