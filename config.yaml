@@ -173,7 +173,7 @@ proxy-groups:
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram_X.png
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
-  - name: Steam
+  - name: Games
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
@@ -350,7 +350,7 @@ rules:
   - RULE-SET,Google,Google
   - RULE-SET,Spotify,Spotify
   - RULE-SET,Telegram,Telegram
-  - RULE-SET,Steam,Steam
+  - RULE-SET,Steam,Games
   - RULE-SET,PayPal,PayPal
   - RULE-SET,Twitter,X
   - RULE-SET,Apple,Apple
