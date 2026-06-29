@@ -421,11 +421,11 @@ rules:
   - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,AIIP,AI,no-resolve
   - RULE-SET,GoogleIP,Proxies,no-resolve
-  - RULE-SET,ProxyIP,Proxies,no-resolve
   TelegramIP:      {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
   PrivateIP:       {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
   - RULE-SET,ChinaIP,DIRECT,no-resolve
   - GEOIP,CN,DIRECT
 
   # 最终兜底
+  - RULE-SET,ProxyIP,Proxies,no-resolve
   - MATCH,Final

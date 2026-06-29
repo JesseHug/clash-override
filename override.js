@@ -272,8 +272,8 @@ function main(config) {
     "RULE-SET,PrivateIP,DIRECT,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
     "RULE-SET,GoogleIP,Google,no-resolve",
-    "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,TelegramIP,Telegram,no-resolve",
+    "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,DIRECT,no-resolve",
     
     "GEOIP,CN,DIRECT",
