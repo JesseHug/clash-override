@@ -417,8 +417,8 @@ rules:
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
   - RULE-SET,NetflixIP,Netflix,no-resolve
-  - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,PrivateIP,DIRECT,no-resolve
+  - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,AIIP,AI,no-resolve
   - RULE-SET,GoogleIP,Proxies,no-resolve
   - RULE-SET,ProxyIP,Proxies,no-resolve
