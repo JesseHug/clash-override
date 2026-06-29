@@ -30,7 +30,7 @@ function main(config) {
       return true;
     });
   }
-
+  
   const proxies = config.proxies || [];
   const isAllDirectOrReject = proxies.every(p => p.type?.toLowerCase() === 'direct' || p.type?.toLowerCase() === 'reject');
   if (!proxies.length || isAllDirectOrReject) {
@@ -48,9 +48,9 @@ function main(config) {
   newConfig['unified-delay'] = true;
   newConfig['tcp-concurrent'] = true;
   newConfig['keep-alive-idle'] = 600;
-  newConfig['keep-alive-interval'] = 60;
+  newConfig['keep-alive-interval'] = 60; 
   newConfig['find-process-mode'] = 'strict';
-
+  
   newConfig['external-controller'] = '127.0.0.1:9090';
   newConfig['external-ui'] = 'ui';
   newConfig['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
@@ -75,7 +75,7 @@ function main(config) {
   const originalPolicyNameserver = {};
 
   for (const policy of [
-    originalDnsConfig['proxy-server-nameserver-policy'] || {},
+    originalDnsConfig['proxy-server-nameserver-policy'] || {}, 
     originalDnsConfig['nameserver-policy'] || {},
   ]) {
     for (const [rule, dns] of Object.entries(policy)) {
@@ -98,8 +98,8 @@ function main(config) {
     'cache-algorithm': 'arc',
     'use-system-hosts': true,
     'enhanced-mode': 'fake-ip',
-    'fake-ip-range': '198.18.0.1/16',
-    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'],
+    'fake-ip-range': '198.18.0.1/16', 
+    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'], 
     'proxy-server-nameserver': [
       ...(originalProxyServerNameserver.length > 0 ? originalProxyServerNameserver : chinaDNS),
     ],
@@ -109,7 +109,7 @@ function main(config) {
     'default-nameserver': ['223.5.5.5', '119.29.29.29'],
     nameserver: [...foreignDNS],
     'nameserver-policy': {
-      'rule-set:ChinaDomain,cn_additional': [...chinaDNS],
+      'rule-set:ChinaDomain,cn_additional': [...chinaDNS], 
     },
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
@@ -216,7 +216,7 @@ function main(config) {
 
   newConfig["rule-providers"] = {
     GoogleFCM: { ...mrs, url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs', path: './rules/googlefcm.mrs' },
-
+    
     Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
     Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs" },
     YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" },
@@ -236,6 +236,8 @@ function main(config) {
     AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" },
     GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" },
     ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs`, path: "./rules/ProxyIP.mrs" },
+    TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" },
+    PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs" },
     fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
@@ -248,10 +250,10 @@ function main(config) {
     "RULE-SET,Direct,DIRECT",
     "RULE-SET,Private,DIRECT",
     "RULE-SET,AppleCN,DIRECT",
-
+    
     // FCM 推送规则直接硬编码指向 Proxies
     "RULE-SET,GoogleFCM,Proxies",
-
+    
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
     "RULE-SET,YouTube,YouTube",
@@ -262,16 +264,18 @@ function main(config) {
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,Twitter,X",
     "RULE-SET,Apple,Apple",
-
+    
     "RULE-SET,Proxies,Proxies",
     "RULE-SET,ChinaDomain,DIRECT",
     "RULE-SET,cn_additional,DIRECT",
-
+    
+    "RULE-SET,TelegramIP,Telegram,no-resolve",
+    "RULE-SET,PrivateIP,DIRECT,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
     "RULE-SET,GoogleIP,Google,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,DIRECT,no-resolve",
-
+    
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
   ];

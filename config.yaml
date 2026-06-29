@@ -366,6 +366,8 @@ rule-providers:
   NetflixIP:        {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Netflix.mrs}
   GoogleIP:         {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
   ProxyIP:          {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
+  TelegramIP:      {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
+  PrivateIP:       {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
   fakeip_filter:    {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs}
   cn_additional:    {<<: *BehaviorDN, url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs}
   Private:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
@@ -415,9 +417,13 @@ rules:
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
   - RULE-SET,NetflixIP,Netflix,no-resolve
+  - RULE-SET,TelegramIP,Telegram,no-resolve
+  - RULE-SET,PrivateIP,DIRECT,no-resolve
   - RULE-SET,AIIP,AI,no-resolve
   - RULE-SET,GoogleIP,Proxies,no-resolve
   - RULE-SET,ProxyIP,Proxies,no-resolve
+  TelegramIP:      {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
+  PrivateIP:       {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
   - RULE-SET,ChinaIP,DIRECT,no-resolve
   - GEOIP,CN,DIRECT
 
