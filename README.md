@@ -17,23 +17,26 @@ FLClash (Mihomo) 高性能代理覆写配置 + YAML 完整配置，九版迭代�
 | **v8.1** | 极致轻量版重构：FCM 推送规则、`url-test` 取代 `fallback`、倍率过滤分组、独立 Google 策略组、自动选择组、DNS 提取保留订阅配置 |
 | **v9.0** | 全面同步：IP 规则体系完善（TelegramIP/PrivateIP），YAML 完全对齐 override.js，策略组采用两层结构（select + hidden url-test） |
 
-## 配置说明
+## 快速链接
 
-### override.js（覆写脚本）
-- 用于 FLClash 的 JavaScript 覆写功能
-- 自动过滤垃圾节点、倍率分组、DNS 防污染
-- 日常使用：面板选 `Auto` 自动测速最优地区
+| 文件 | 用途 | 直接使用 |
+|:----|:----|:---------|
+| **override.js** | FLClash 覆写（自动过滤/倍率分组/DNS防污染） | `https://raw.githubusercontent.com/JesseHug/clash-override/master/override.js` |
+| **config.yaml** | 完整独立配置（替换订阅 URL 即用） | `https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml` |
 
-### config.yaml（独立配置）
-- 可直接作为 Mihomo 配置文件使用
-- 与 override.js 策略组和规则完全一致
-- 支持 3 个订阅源，替换 `proxy-providers` 中的 URL 即可
+### override.js 使用方式
+- FLClash → 覆写 → 添加远程覆写 → 粘贴上方 URL
+- 日常面板选 `Auto` 自动测速最优地区
+- 如需手动固定地区，选 `HK` / `JP` / `US` 等
+
+### config.yaml 使用方式
+- 修改 `proxy-providers` 中的订阅 URL 为你的机场链接
+- 直接作为 Mihomo 主配置文件使用
 
 ## 查看各版本
 
 ```bash
-git checkout v1.0
-git checkout v2.0
-# ...
-git checkout v9.0
+git checkout v9.0   # 最新版
+git checkout v8.1   # 上一版
+# 更多版本见 tag 列表
 ```

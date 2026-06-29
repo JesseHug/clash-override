@@ -1,5 +1,7 @@
 /**
- * mihomo配置覆写脚本（极致轻量定制版 - 隐藏 FCM 策略组）
+ * mihomo配置覆写脚本（极致轻量定制版）
+ * 仓库：https://github.com/JesseHug/clash-override
+ * 链接：https://raw.githubusercontent.com/JesseHug/clash-override/master/override.js
  * 核心基建：最新标准脚本模板（严谨 DNS 防污染、低内存占用）
  * 策略与规则：纯净 url-test 自动测速、地区优选、倍率过滤、AI防劫持、FCM直接指向Proxies
  * 优化说明：已彻底剥离 Smart/GeoData，去除了冗余的 FCM 面板策略组
