@@ -1,6 +1,6 @@
 # Clash Override
 
-FLClash (Mihomo) JavaScript 覆写配置 + YAML 正式配置，六版迭代记录。
+FLClash (Mihomo) 高性能代理覆写配置 + YAML 完整配置，九版迭代。
 
 ## 版本历史
 
@@ -12,14 +12,28 @@ FLClash (Mihomo) JavaScript 覆写配置 + YAML 正式配置，六版迭代记�
 | **v4.0** | 全面迁移 666OS `.mrs`：所有规则集换二进制格式（O(1) 匹配），GEOSITE→RULE-SET，清理废弃代码 |
 | **v5.0** | 补充 NTP/geodata-mode/TUN/Smart 配置，Telegram 换 ACL4SSR，新增 X 策略组 + IP 规则 |
 | **v6.0** | Google 分流至 Proxies（使香港等节点正常下载 Play Store），新增 GoogleIP 规则 |
+| **v7.0** | 全策略组添加 Qure 面板图标，提升面板可视化 |
+| **v8.0** | DNS 教科书方案：`respect-rules` + `fake-ip-filter-mode` + `fallback-filter`，QUIC 拦截，`cn_additional` 补充国内域名 |
+| **v8.1** | 极致轻量版重构：FCM 推送规则、`url-test` 取代 `fallback`、倍率过滤分组、独立 Google 策略组、自动选择组、DNS 提取保留订阅配置 |
+| **v9.0** | 全面同步：IP 规则体系完善（TelegramIP/PrivateIP），YAML 完全对齐 override.js，策略组采用两层结构（select + hidden url-test） |
+
+## 配置说明
+
+### override.js（覆写脚本）
+- 用于 FLClash 的 JavaScript 覆写功能
+- 自动过滤垃圾节点、倍率分组、DNS 防污染
+- 日常使用：面板选 `Auto` 自动测速最优地区
+
+### config.yaml（独立配置）
+- 可直接作为 Mihomo 配置文件使用
+- 与 override.js 策略组和规则完全一致
+- 支持 3 个订阅源，替换 `proxy-providers` 中的 URL 即可
 
 ## 查看各版本
 
 ```bash
 git checkout v1.0
 git checkout v2.0
-git checkout v3.0
-git checkout v4.0
-git checkout v5.0
-git checkout v6.0
+# ...
+git checkout v9.0
 ```
