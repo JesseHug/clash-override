@@ -232,6 +232,10 @@ proxy-groups:
     interval: 600
 
   # ====== 服务分流 ======
+  - name: Google
+    icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/Google_Search.png
+    type: select
+    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
   - name: YouTube
     icon: https://github.com/Koolson/Qure/raw/master/IconSet/Color/YouTube.png
     type: select
@@ -354,6 +358,7 @@ rule-providers:
   AppleCN:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
   Apple:            {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs}
   Google:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs}
+  GoogleFCM:        {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs}
   Proxies:          {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Proxy.mrs}
   ChinaDomain:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
   ChinaIP:          {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
@@ -398,8 +403,8 @@ rules:
   # Apple（国内苹果直连，国外苹果走代理）
   - RULE-SET,AppleCN,DIRECT
   - RULE-SET,Apple,Apple
-  # Google 分流至 Proxies（使香港等地区节点能正常下载 Play Store）
-  - RULE-SET,Google,Proxies
+  - RULE-SET,GoogleFCM,Proxies
+  - RULE-SET,Google,Google
 
   # 国外网站兜底
   - RULE-SET,Proxies,Proxies

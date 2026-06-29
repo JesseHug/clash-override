@@ -1,167 +1,280 @@
-const main = (config) => {
-  config["unified-delay"] = true;
-  config["tcp-concurrent"] = true;
-  config["keep-alive-interval"] = 1800;
-  config["geodata-mode"] = true;
-  config["find-process-mode"] = "strict";
+/**
+ * mihomo配置覆写脚本（极致轻量定制版 - 隐藏 FCM 策略组）
+ * 核心基建：最新标准脚本模板（严谨 DNS 防污染、低内存占用）
+ * 策略与规则：纯净 url-test 自动测速、地区优选、倍率过滤、AI防劫持、FCM直接指向Proxies
+ * 优化说明：已彻底剥离 Smart/GeoData，去除了冗余的 FCM 面板策略组
+ */
 
-  config["geox-url"] = {
-    geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
-    mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb"
-  };
+// ==========================================
+// ★ 核心开关区域 ★
+// ==========================================
+const excludeHighRateProxiesEnable = false;
 
-  const proxies = config.proxies ? config.proxies.map(p => p.name) : [];
+// ==========================================
+// ★ 节点匹配正则定义 ★
+// ==========================================
+const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|⚠️|@|Expire|http|com/u;
+const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<!\d)0\.[0-5]|下载|低倍)/;
+const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×xX✕✖⨉]))/u;
 
-  const junkFilter = /剩余|流量|traffic|邮箱|工单|通知|客服|官网|邀请|到期|已用|次数|USE|USED|TOTAL|EXPIRE|Panel|Channel|Author|群|返利|循环|获取|订阅|机场/i;
-  const getNodes = (reg) => {
-    const res = proxies.filter(name => reg.test(name) && !junkFilter.test(name));
-    return res.length > 0 ? res : ["DIRECT"];
-  };
+function main(config) {
+  const newConfig = {};
 
-  const nodesHK = getNodes(/港|HK|HongKong|Hong Kong/i);
-  const nodesSG = getNodes(/坡|SG|Singapore/i);
-  const nodesTW = getNodes(/台|TW|Taiwan/i);
-  const nodesJP = getNodes(/日|JP|Japan/i);
-  const nodesUS = getNodes(/美|US|UnitedStates|United States/i);
-  const nodesKR = getNodes(/韩|KR|KOR|Korea/i);
-  const nodesEU = getNodes(/法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i);
-  const nodesOther = proxies.filter(n =>
-    !/港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe/i.test(n)
-    && !junkFilter.test(n)
-  );
-
-  const ico = "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color";
-  config["proxy-groups"] = [
-    { name: "Proxies", type: "select", icon: ico + "/Global.png", proxies: ["Fallback", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other", ...proxies] },
-    { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Telegram", type: "select", icon: `${ico}/Telegram_X.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Steam", type: "select", icon: `${ico}/Game.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "PayPal", type: "select", icon: `${ico}/PayPal.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "X", type: "select", icon: `${ico}/X.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Netflix", type: "select", icon: `${ico}/Netflix.png`, proxies: ["Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Apple", type: "select", icon: `${ico}/Apple.png`, proxies: ["Proxies", "DIRECT", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Speedtest", type: "select", icon: `${ico}/Speedtest.png`, proxies: ["DIRECT", "Proxies", "HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"] },
-    { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
-
-    { name: "Fallback", type: "fallback", icon: `${ico}/Auto.png`, proxies: ["HK", "JP", "SG", "TW", "US", "KR", "EU", "Other"], url: "https://g.cn/generate_204", interval: 600 },
-    { name: "HK", type: "fallback", icon: `${ico}/Hong_Kong.png`, proxies: nodesHK, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "SG", type: "fallback", icon: `${ico}/Singapore.png`, proxies: nodesSG, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "TW", type: "fallback", icon: `${ico}/Taiwan.png`, proxies: nodesTW, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "JP", type: "fallback", icon: `${ico}/Japan.png`, proxies: nodesJP, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "US", type: "fallback", icon: `${ico}/United_States.png`, proxies: nodesUS, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "KR", type: "fallback", icon: `${ico}/Korea.png`, proxies: nodesKR, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "EU", type: "fallback", icon: `${ico}/European_Union.png`, proxies: nodesEU, url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 },
-    { name: "Other", type: "fallback", icon: `${ico}/Europe_Map.png`, proxies: nodesOther.length > 0 ? nodesOther : ["DIRECT"], url: "https://g.cn/generate_204", interval: 600, "fallback-interval": 60, lazy: true, "max-failures": 3, timeout: 3000 }
-  ];
-
-  const originalProviders = config["rule-providers"] || {};
-  const requiredDnsProviders = {};
-
-  if (config.dns && config.dns["fake-ip-filter"]) {
-    config.dns["fake-ip-filter"].forEach(item => {
-      if (item.startsWith("rule-set:")) {
-        const ruleName = item.replace("rule-set:", "");
-        if (originalProviders[ruleName]) {
-          requiredDnsProviders[ruleName] = originalProviders[ruleName];
-        }
-      }
+  // ==========================================
+  // 1. 节点过滤与倍率剔除逻辑
+  // ==========================================
+  if (Array.isArray(config.proxies)) {
+    config.proxies = config.proxies.filter(proxy => {
+      if (excludeFilter.test(proxy.name)) return false;
+      if (excludeHighRateProxiesEnable && highRateRegex.test(proxy.name)) return false;
+      return true;
     });
   }
 
+  const proxies = config.proxies || [];
+  const isAllDirectOrReject = proxies.every(p => p.type?.toLowerCase() === 'direct' || p.type?.toLowerCase() === 'reject');
+  if (!proxies.length || isAllDirectOrReject) {
+    throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
+  }
+
+  // ==========================================
+  // 2. 基础网络配置
+  // ==========================================
+  newConfig['allow-lan'] = true;
+  newConfig['ipv6'] = true;
+  newConfig['mode'] = 'rule';
+  newConfig['log-level'] = 'info';
+  newConfig['bind-address'] = '*';
+  newConfig['unified-delay'] = true;
+  newConfig['tcp-concurrent'] = true;
+  newConfig['keep-alive-idle'] = 600;
+  newConfig['keep-alive-interval'] = 60;
+  newConfig['find-process-mode'] = 'strict';
+
+  newConfig['external-controller'] = '127.0.0.1:9090';
+  newConfig['external-ui'] = 'ui';
+  newConfig['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
+
+  newConfig['profile'] = {
+    'store-selected': true,
+    'store-fake-ip': true,
+  };
+
+  // ==========================================
+  // 3. 严谨 DNS 提取策略 (防污染)
+  // ==========================================
+  const originalDnsConfig = config.dns || {};
+
+  const commonDnsRegex =
+    /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|alidns|doh\.pub|dot\.pub|dns\.baidu|dns\.google|cloudflare|system)/i;
+
+  const originalProxyServerNameserver = (originalDnsConfig['proxy-server-nameserver'] || []).filter(
+    (dns) => !commonDnsRegex.test(String(dns)),
+  );
+
+  const originalPolicyNameserver = {};
+
+  for (const policy of [
+    originalDnsConfig['proxy-server-nameserver-policy'] || {},
+    originalDnsConfig['nameserver-policy'] || {},
+  ]) {
+    for (const [rule, dns] of Object.entries(policy)) {
+      const dnsList = Array.isArray(dns) ? dns : [dns];
+
+      if (dnsList.some((item) => commonDnsRegex.test(String(item)))) {
+        continue;
+      }
+      originalPolicyNameserver[rule] = dns;
+    }
+  }
+
+  const chinaDNS = ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
+  const foreignDNS = ['https://dns.cloudflare.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
+
+  newConfig['dns'] = {
+    enable: true,
+    ipv6: true,
+    'use-hosts': true,
+    'cache-algorithm': 'arc',
+    'use-system-hosts': true,
+    'enhanced-mode': 'fake-ip',
+    'fake-ip-range': '198.18.0.1/16',
+    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'],
+    'proxy-server-nameserver': [
+      ...(originalProxyServerNameserver.length > 0 ? originalProxyServerNameserver : chinaDNS),
+    ],
+    ...(Object.keys(originalPolicyNameserver).length > 0 && {
+      'proxy-server-nameserver-policy': originalPolicyNameserver,
+    }),
+    'default-nameserver': ['223.5.5.5', '119.29.29.29'],
+    nameserver: [...foreignDNS],
+    'nameserver-policy': {
+      'rule-set:ChinaDomain,cn_additional': [...chinaDNS],
+    },
+    'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
+  };
+
+  newConfig['hosts'] = {
+    'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
+    'doh.pub': ['1.12.12.12', '120.53.53.53'],
+    'dns.cloudflare.com': ['1.1.1.1', '1.0.0.1'],
+    'dns.google': ['8.8.8.8', '8.8.4.4'],
+    'services.googleapis.cn': ['services.googleapis.com'],
+    '+.mcdn.bilivideo.com': ['0.0.0.0'],
+    '+.mcdn.bilivideo.cn': ['0.0.0.0'],
+  };
+
+  newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
+  newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
+
+  newConfig['proxies'] = [...proxies];
+
+  // ==========================================
+  // 4. 构建策略组
+  // ==========================================
+  const pNames = proxies.map(p => p.name);
+  const getNodes = (reg) => {
+    const res = pNames.filter(name => reg.test(name));
+    return res.length > 0 ? res : ["DIRECT"];
+  };
+
+  const healthCheckUrl = "https://g.cn/generate_204";
+  const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 600, tolerance: 50, lazy: true, timeout: 3000 };
+  const ico = "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color";
+
+  const regionMappings = [
+    { key: "HK", regex: /港|HK|HongKong|Hong Kong/i, icon: "Hong_Kong.png" },
+    { key: "SG", regex: /坡|SG|Singapore/i, icon: "Singapore.png" },
+    { key: "TW", regex: /台|TW|Taiwan/i, icon: "Taiwan.png" },
+    { key: "JP", regex: /日|JP|Japan/i, icon: "Japan.png" },
+    { key: "US", regex: /美|US|UnitedStates|United States/i, icon: "United_States.png" },
+    { key: "KR", regex: /韩|KR|KOR|Korea/i, icon: "Korea.png" },
+    { key: "EU", regex: /法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
+  ];
+
+  const regionGroups = [];
+  const regionAutoGroups = [];
+  const activeRegions = [];
+
+  regionMappings.forEach(r => {
+    const nodes = getNodes(r.regex);
+    if (nodes[0] !== "DIRECT") {
+      activeRegions.push(r.key);
+      const autoName = `${r.key}-自动选择`;
+      regionAutoGroups.push({ name: autoName, proxies: nodes, hidden: true, ...autoBaseOption });
+      regionGroups.push({ name: r.key, type: "select", icon: `${ico}/${r.icon}`, proxies: [autoName, ...nodes] });
+    }
+  });
+
+  const nodesOther = pNames.filter(n => !/港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe/i.test(n) && !lowRateRegex.test(n) && !highRateRegex.test(n));
+  if (nodesOther.length > 0) {
+    activeRegions.push("Other");
+    regionAutoGroups.push({ name: "Other-自动选择", proxies: nodesOther, hidden: true, ...autoBaseOption });
+    regionGroups.push({ name: "Other", type: "select", icon: `${ico}/Europe_Map.png`, proxies: ["Other-自动选择", ...nodesOther] });
+  }
+
+  const nodesLowRate = getNodes(lowRateRegex);
+  const nodesHighRate = getNodes(highRateRegex);
+  if (nodesLowRate[0] !== "DIRECT") {
+    activeRegions.push("低倍率节点");
+    regionAutoGroups.push({ name: "低倍率节点-自动选择", proxies: nodesLowRate, hidden: true, ...autoBaseOption });
+    regionGroups.push({ name: "低倍率节点", type: "select", icon: `${ico}/Available_1.png`, proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
+  }
+  if (nodesHighRate[0] !== "DIRECT") {
+    activeRegions.push("高倍率节点");
+    regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
+    regionGroups.push({ name: "高倍率节点", type: "select", icon: `${ico}/Airport.png`, proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+  }
+
+  const masterName = "Auto";
+
+  newConfig["proxy-groups"] = [
+    { name: "Proxies", type: "select", icon: ico + "/Global.png", proxies: [masterName, ...activeRegions, ...pNames] },
+    { name: "Google", type: "select", icon: `${ico}/Google.png`, proxies: ["Proxies", ...activeRegions] },
+    { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", ...activeRegions] },
+    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
+    { name: "Telegram", type: "select", icon: `${ico}/Telegram_X.png`, proxies: ["Proxies", ...activeRegions] },
+    { name: "Steam", type: "select", icon: `${ico}/Game.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
+    { name: "PayPal", type: "select", icon: `${ico}/PayPal.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
+    { name: "X", type: "select", icon: `${ico}/X.png`, proxies: ["Proxies", ...activeRegions] },
+    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", ...activeRegions], 'default-selected': activeRegions.includes('US') ? 'US' : 'Proxies' },
+    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", ...activeRegions], 'default-selected': activeRegions.includes('US') ? 'US' : 'Proxies' },
+    { name: "Apple", type: "select", icon: `${ico}/Apple.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
+    { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
+
+    { name: masterName, icon: `${ico}/Auto.png`, proxies: activeRegions, ...autoBaseOption },
+    ...regionGroups,
+    ...regionAutoGroups
+  ];
+
+  // ==========================================
+  // 5. Rule Providers (混合 666OS 与 标准 FCM)
+  // ==========================================
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
 
-  const myRuleProviders = {
-    // Unbreak / LocalAreaNetwork 已替换为 666OS
-    Direct: { ...mrs, url: `${r66}/domain/Direct.mrs` },
-    Private: { ...mrs, url: `${r66}/domain/Private.mrs` },
-    YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs` },
-    Netflix: { ...mrs, url: `${r66}/domain/Netflix.mrs` },
-    Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs` },
-    Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs` },
-    Steam: { ...mrs, url: `${r66}/domain/Games.mrs` },
-    PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs` },
-    Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs` },
-    OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs` },
-    AI: { ...mrs, url: `${r66}/domain/AI.mrs` },
-    AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs` },
-    Apple: { ...mrs, url: `${r66}/domain/Apple.mrs` },
-    // 【新增】Google 域名规则集
-    Google: { ...mrs, url: `${r66}/domain/Google.mrs` },
-    Speedtest: { ...mrs, url: `${r66}/domain/Speedtest.mrs` },
-    Proxies: { ...mrs, url: `${r66}/domain/Proxy.mrs` },
-    ChinaDomain: { ...mrs, url: `${r66}/domain/China.mrs` },
-    ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs` },
-    AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs` },
-    NetflixIP: { ...mrsIP, url: `${r66}/ip/Netflix.mrs` },
-    // 【新增】Google IP 规则集
-    GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs` },
-    ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs` },
-    // 新增：fake-ip 过滤 + 国内域名补充（wwqgtxx 源）
-    fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs" },
-    cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs" },
+  newConfig["rule-providers"] = {
+    GoogleFCM: { ...mrs, url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs', path: './rules/googlefcm.mrs' },
+
+    Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
+    Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs" },
+    YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" },
+    Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs`, path: "./rules/Spotify.mrs" },
+    Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs`, path: "./rules/Telegram.mrs" },
+    Steam: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Steam.mrs" },
+    PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs`, path: "./rules/PayPal.mrs" },
+    Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs`, path: "./rules/Twitter.mrs" },
+    OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs`, path: "./rules/OpenAI.mrs" },
+    AI: { ...mrs, url: `${r66}/domain/AI.mrs`, path: "./rules/AI.mrs" },
+    AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
+    Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" },
+    Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
+    Proxies: { ...mrs, url: `${r66}/domain/Proxy.mrs`, path: "./rules/Proxies.mrs" },
+    ChinaDomain: { ...mrs, url: `${r66}/domain/China.mrs`, path: "./rules/ChinaDomain.mrs" },
+    ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs`, path: "./rules/ChinaIP.mrs" },
+    AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" },
+    GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" },
+    ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs`, path: "./rules/ProxyIP.mrs" },
+    fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
+    cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
 
-  config["rule-providers"] = { ...requiredDnsProviders, ...myRuleProviders };
-
-  // DNS fake-ip-filter 加入 fakeip_filter 规则集
-  if (config.dns && Array.isArray(config.dns["fake-ip-filter"])) {
-    config.dns["fake-ip-filter"].push("rule-set:fakeip_filter");
-  }
-
-  config.rules = [
-    // 私有网络 & 直连
+  // ==========================================
+  // 6. 路由分流规则
+  // ==========================================
+  newConfig.rules = [
+    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
     "RULE-SET,Direct,DIRECT",
     "RULE-SET,Private,DIRECT",
+    "RULE-SET,AppleCN,DIRECT",
 
-    // 禁用国外 QUIC（UDP/443），防止 YouTube/Netflix 视频卡顿
-    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
+    // FCM 推送规则直接硬编码指向 Proxies
+    "RULE-SET,GoogleFCM,Proxies",
 
-    // 测速
-    "RULE-SET,Speedtest,Speedtest",
-
-    // 流媒体 & 应用分流
+    "RULE-SET,OpenAI,OpenAI",
+    "RULE-SET,AI,AI",
     "RULE-SET,YouTube,YouTube",
-    "RULE-SET,Netflix,Netflix",
+    "RULE-SET,Google,Google",
     "RULE-SET,Spotify,Spotify",
     "RULE-SET,Telegram,Telegram",
     "RULE-SET,Steam,Steam",
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,Twitter,X",
-
-    // AI
-    "RULE-SET,OpenAI,OpenAI",
-    "RULE-SET,AI,AI",
-
-    // Apple（国内直连，国外代理）
-    "RULE-SET,AppleCN,DIRECT",
     "RULE-SET,Apple,Apple",
 
-    // Google 分流至 Proxies（解决 Play Store 下载）
-    "RULE-SET,Google,Proxies",
-
-    // 国外网站兜底
     "RULE-SET,Proxies,Proxies",
-
-    // 国内直连
     "RULE-SET,ChinaDomain,DIRECT",
     "RULE-SET,cn_additional,DIRECT",
 
-    // IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
-    "RULE-SET,NetflixIP,Netflix,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
-    "RULE-SET,GoogleIP,Proxies,no-resolve",
+    "RULE-SET,GoogleIP,Google,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,DIRECT,no-resolve",
 
-    // GeoIP 兜底
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
   ];
 
-  return config;
-};
+  return newConfig;
+}
