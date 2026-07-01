@@ -71,6 +71,7 @@ hosts:
   services.googleapis.cn: services.googleapis.com
   "+.mcdn.bilivideo.com": ["0.0.0.0"]
   "+.mcdn.bilivideo.cn": ["0.0.0.0"]
+  "+.edge.mountaintoys.cn": ["0.0.0.0"]
 
 # ==================== DNS 配置 ====================
 dns:
@@ -301,7 +302,6 @@ BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86
 BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
 
 rule-providers:
-  GoogleFCM:    {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs}
   Direct:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
   Private:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
   YouTube:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
@@ -339,7 +339,6 @@ rules:
   - RULE-SET,AppleCN,DIRECT
 
   # FCM 推送 → Proxies
-  - RULE-SET,GoogleFCM,Proxies
 
   # AI
   - RULE-SET,OpenAI,OpenAI

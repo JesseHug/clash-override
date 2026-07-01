@@ -1,10 +1,9 @@
 /**
  * mihomo配置覆写脚本（极致轻量定制版）
  * 仓库：https://github.com/JesseHug/clash-override
- * 链接：https://raw.githubusercontent.com/JesseHug/clash-override/master/override.js
- * 核心基建：最新标准脚本模板（严谨 DNS 防污染、低内存占用）
+ * 核心基建：最新标准脚本模板（严谨 DNS 防污染、新增防 PCDN Hosts 映射）
  * 策略与规则：纯净 url-test 自动测速、地区优选、倍率过滤、AI防劫持、FCM直接指向Proxies
- * 优化说明：已彻底剥离 Smart/GeoData，去除了冗余的 FCM 面板策略组
+ * 优化说明：彻底剥离 Smart/GeoData；AI 与 Spotify 策略组已硬编码强制指定默认选区
  */
 
 // ==========================================
@@ -15,7 +14,7 @@ const excludeHighRateProxiesEnable = false;
 // ==========================================
 // ★ 节点匹配正则定义 ★
 // ==========================================
-const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|⚠️|@|Expire|http|com/u;
+const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|⚠️|@|Expire|http|com/u;
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<!\d)0\.[0-5]|下载|低倍)/;
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×xX✕✖⨉]))/u;
 
@@ -32,7 +31,7 @@ function main(config) {
       return true;
     });
   }
-  
+
   const proxies = config.proxies || [];
   const isAllDirectOrReject = proxies.every(p => p.type?.toLowerCase() === 'direct' || p.type?.toLowerCase() === 'reject');
   if (!proxies.length || isAllDirectOrReject) {
@@ -50,9 +49,9 @@ function main(config) {
   newConfig['unified-delay'] = true;
   newConfig['tcp-concurrent'] = true;
   newConfig['keep-alive-idle'] = 600;
-  newConfig['keep-alive-interval'] = 60; 
+  newConfig['keep-alive-interval'] = 60;
   newConfig['find-process-mode'] = 'strict';
-  
+
   newConfig['external-controller'] = '127.0.0.1:9090';
   newConfig['external-ui'] = 'ui';
   newConfig['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
@@ -77,7 +76,7 @@ function main(config) {
   const originalPolicyNameserver = {};
 
   for (const policy of [
-    originalDnsConfig['proxy-server-nameserver-policy'] || {}, 
+    originalDnsConfig['proxy-server-nameserver-policy'] || {},
     originalDnsConfig['nameserver-policy'] || {},
   ]) {
     for (const [rule, dns] of Object.entries(policy)) {
@@ -100,8 +99,8 @@ function main(config) {
     'cache-algorithm': 'arc',
     'use-system-hosts': true,
     'enhanced-mode': 'fake-ip',
-    'fake-ip-range': '198.18.0.1/16', 
-    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'], 
+    'fake-ip-range': '198.18.0.1/16',
+    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'],
     'proxy-server-nameserver': [
       ...(originalProxyServerNameserver.length > 0 ? originalProxyServerNameserver : chinaDNS),
     ],
@@ -111,7 +110,7 @@ function main(config) {
     'default-nameserver': ['223.5.5.5', '119.29.29.29'],
     nameserver: [...foreignDNS],
     'nameserver-policy': {
-      'rule-set:ChinaDomain,cn_additional': [...chinaDNS], 
+      'rule-set:ChinaDomain,cn_additional': [...chinaDNS],
     },
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
@@ -124,6 +123,7 @@ function main(config) {
     'services.googleapis.cn': ['services.googleapis.com'],
     '+.mcdn.bilivideo.com': ['0.0.0.0'],
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
+    '+.edge.mountaintoys.cn': ['0.0.0.0'],
   };
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
@@ -194,13 +194,19 @@ function main(config) {
     { name: "Proxies", type: "select", icon: ico + "/Global.png", proxies: [masterName, ...activeRegions, ...pNames] },
     { name: "Google", type: "select", icon: `${ico}/Google.png`, proxies: ["Proxies", ...activeRegions] },
     { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", ...activeRegions] },
-    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
+
+    // 【修改点】：硬编码锁定 Spotify 为 TW
+    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", ...activeRegions], "default-selected": "TW" },
+
     { name: "Telegram", type: "select", icon: `${ico}/Telegram_X.png`, proxies: ["Proxies", ...activeRegions] },
     { name: "Games", type: "select", icon: `${ico}/Game.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
     { name: "PayPal", type: "select", icon: `${ico}/PayPal.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
     { name: "X", type: "select", icon: `${ico}/X.png`, proxies: ["Proxies", ...activeRegions] },
-    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", ...activeRegions], 'default-selected': activeRegions.includes('US') ? 'US' : 'Proxies' },
-    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", ...activeRegions], 'default-selected': activeRegions.includes('US') ? 'US' : 'Proxies' },
+
+    // 【修改点】：硬编码锁定 OpenAI 与 AI 为 US
+    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", ...activeRegions], "default-selected": "US" },
+    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", ...activeRegions], "default-selected": "US" },
+
     { name: "Apple", type: "select", icon: `${ico}/Apple.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
     { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
 
@@ -210,15 +216,13 @@ function main(config) {
   ];
 
   // ==========================================
-  // 5. Rule Providers (混合 666OS 与 标准 FCM)
+  // 5. Rule Providers (纯净 666OS 体系)
   // ==========================================
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
 
   newConfig["rule-providers"] = {
-    GoogleFCM: { ...mrs, url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs', path: './rules/googlefcm.mrs' },
-    
     Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
     Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs" },
     YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" },
@@ -245,17 +249,14 @@ function main(config) {
   };
 
   // ==========================================
-  // 6. 路由分流规则
+  // 6. 路由分流规则 (FCM 彻底交由 Google 规则处理)
   // ==========================================
   newConfig.rules = [
     "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
     "RULE-SET,Direct,DIRECT",
     "RULE-SET,Private,DIRECT",
     "RULE-SET,AppleCN,DIRECT",
-    
-    // FCM 推送规则直接硬编码指向 Proxies
-    "RULE-SET,GoogleFCM,Proxies",
-    
+
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
     "RULE-SET,YouTube,YouTube",
@@ -266,18 +267,18 @@ function main(config) {
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,Twitter,X",
     "RULE-SET,Apple,Apple",
-    
+
     "RULE-SET,Proxies,Proxies",
     "RULE-SET,ChinaDomain,DIRECT",
     "RULE-SET,cn_additional,DIRECT",
-    
+
     "RULE-SET,PrivateIP,DIRECT,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
     "RULE-SET,GoogleIP,Google,no-resolve",
     "RULE-SET,TelegramIP,Telegram,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,DIRECT,no-resolve",
-    
+
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
   ];
