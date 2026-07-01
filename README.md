@@ -1,6 +1,6 @@
 # Clash Override
 
-Mihomo（Clash Meta）高性能覆写脚本与配置文件，无 DNS 泄露、`url-test` 自动测速、倍率过滤、IP 规则兜底。
+Mihomo（Clash Meta）高性能覆写脚本与配置文件，无 DNS 泄露、`url-test` 自动测速、倍率过滤、IP 规则兜底、PCDN 拦截。
 
 友情推荐，非常好用、省电且内存占用低的代理软件：[Bettbox](https://github.com/appshubcc/Bettbox)
 
@@ -71,7 +71,7 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 
 | 版本 | 说明 |
 |:----|:------|
-| **v9.0** | IP 规则体系完善（TelegramIP/PrivateIP），YAML 完全同步，README 更新 |
+| **v9.1** | 移除 FCM/Speedtest 规则集，Games 完整重命名，PCDN 拦截扩展，default-selected 硬编码 |
 | **v8.1** | 极致轻量版重构：FCM 推送、url-test 取代 fallback、倍率过滤、DNS 提取 |
 | **v8.0** | DNS 教科书方案：respect-rules + fake-ip-filter-mode + fallback-filter |
 | **v7.0** | 全策略组添加 Qure 面板图标 |
