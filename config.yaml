@@ -166,12 +166,14 @@ proxy-groups:
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
+  # 硬编码锁定 Spotify 为 TW
   - name: Spotify
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png
     default-selected: TW
     proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
   - name: Telegram
+
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram_X.png
     proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
