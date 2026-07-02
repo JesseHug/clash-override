@@ -42,7 +42,7 @@ function main(config) {
   // 2. 基础网络配置
   // ==========================================
   newConfig['allow-lan'] = true;
-  newConfig['ipv6'] = true;
+  newConfig['ipv6'] = false;
   newConfig['mode'] = 'rule';
   newConfig['log-level'] = 'info';
   newConfig['bind-address'] = '*';

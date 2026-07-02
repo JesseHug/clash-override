@@ -12,7 +12,7 @@ bind-address: "*"
 find-process-mode: strict
 mode: rule
 log-level: warning
-ipv6: true
+ipv6: false
 keep-alive-interval: 1800
 unified-delay: true
 tcp-concurrent: true
