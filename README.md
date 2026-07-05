@@ -1,5 +1,7 @@
 # Clash Override
 
+> 由 AI 辅助开发（Claude Code + AIsouler/MyClash 参考）
+
 Mihomo（Clash Meta）高性能覆写脚本与配置文件，无 DNS 泄露、`url-test` 自动测速、倍率过滤、IP 规则兜底、PCDN 拦截、已关闭 IPv6。
 
 友情推荐，非常好用、省电且内存占用低的代理软件：[Bettbox](https://github.com/appshubcc/Bettbox)
