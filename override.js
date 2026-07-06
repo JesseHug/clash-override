@@ -142,7 +142,7 @@ function main(config) {
 
   const healthCheckUrl = "https://g.cn/generate_204";
   const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 600, tolerance: 50, lazy: true, timeout: 3000 };
-  const ico = "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color";
+  const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
 
   const regionMappings = [
     { key: "HK", regex: /港|HK|HongKong|Hong Kong/i, icon: "Hong_Kong.png" },
