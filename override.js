@@ -115,6 +115,16 @@ function main(config) {
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
 
+  // 收集节点域名，保留机场私有 hosts（防止覆盖导致节点解析失败）
+  const proxyDomains = new Set(proxies.map((p) => p.server?.toLowerCase()).filter(Boolean));
+  const originalHosts = config.hosts || {};
+  const proxyHosts = {};
+  for (const [host, value] of Object.entries(originalHosts)) {
+    if (proxyDomains.has(host.toLowerCase())) {
+      proxyHosts[host] = value;
+    }
+  }
+
   newConfig['hosts'] = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
     'doh.pub': ['1.12.12.12', '120.53.53.53'],
@@ -124,6 +134,7 @@ function main(config) {
     '+.mcdn.bilivideo.com': ['0.0.0.0'],
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
     '+.edge.mountaintoys.cn': ['0.0.0.0'],
+    ...proxyHosts,
   };
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
