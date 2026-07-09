@@ -207,7 +207,7 @@ function main(config) {
     { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", ...activeRegions] },
 
     // 【修改点】：硬编码锁定 Spotify 为 TW
-    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", ...activeRegions], "default-selected": "TW" },
+    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", ...activeRegions], defaultSelected: "TW" },
 
     { name: "Telegram", type: "select", icon: `${ico}/Telegram_X.png`, proxies: ["Proxies", ...activeRegions] },
     { name: "Games", type: "select", icon: `${ico}/Game.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
@@ -215,8 +215,8 @@ function main(config) {
     { name: "X", type: "select", icon: `${ico}/X.png`, proxies: ["Proxies", ...activeRegions] },
 
     // 【修改点】：硬编码锁定 OpenAI 与 AI 为 US
-    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", ...activeRegions], "default-selected": "US" },
-    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", ...activeRegions], "default-selected": "US" },
+    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", ...activeRegions], defaultSelected: "US" },
+    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", ...activeRegions], defaultSelected: "US" },
 
     { name: "Apple", type: "select", icon: `${ico}/Apple.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
     { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
@@ -225,6 +225,14 @@ function main(config) {
     ...regionGroups,
     ...regionAutoGroups
   ];
+
+  // 转换 defaultSelected → default-selected（Mihomo 需要的格式）
+  newConfig["proxy-groups"].forEach(g => {
+    if (g.defaultSelected !== undefined) {
+      g["default-selected"] = g.defaultSelected;
+      delete g.defaultSelected;
+    }
+  });
 
   // ==========================================
   // 5. Rule Providers (纯净 666OS 体系)
