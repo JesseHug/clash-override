@@ -6,26 +6,47 @@
  * 优化说明：彻底剥离 Smart/GeoData；AI 与 Spotify 策略组已硬编码强制指定默认选区
  */
 
-// ==========================================
-// ★ 核心开关区域 ★
-// ==========================================
+// --- 静态配置区域 ---
+
+/**
+ * 全局排除高倍率节点配置
+ * 该配置用于启用全局排除高倍率节点功能
+ * true = 启用
+ * false = 禁用
+ */
 const excludeHighRateProxiesEnable = false;
 
-// ==========================================
-// ★ 节点匹配正则定义 ★
-// ==========================================
+// --- 节点匹配正则定义 ---
+
+// 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
 const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|traffic|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|⚠️|@|Expire|http|com/iu;
-const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<!\d)0\.[0-5]|下载|低倍|实验性)/;
-const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×xX✕✖⨉]))/u;
+const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
+const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
 
 function main(config) {
   const newConfig = {};
 
-  // ==========================================
-  // 1. 节点过滤与倍率剔除逻辑
-  // ==========================================
+  // --- 节点过滤与校验 ---
+
+  /**
+   * 基础节点结构校验函数
+   * 1. 踢出因机场疏漏导致缺少 server/port 等关键字段的坏节点
+   * 2. 自动屏蔽 127.0.0.1、0.0.0.0 等占位假节点
+   * 以防止 Mihomo 内核加载配置时崩溃
+   */
+  const checkProxy = (proxy) => {
+    if (!proxy || typeof proxy !== 'object') return false;
+    if (typeof proxy.server !== 'string' || proxy.server.trim() === '') return false;
+    if (typeof proxy.port !== 'number' || proxy.port <= 0 || proxy.port > 65535) return false;
+    if (typeof proxy.type !== 'string' || proxy.type.trim() === '') return false;
+    if (proxy.server === '127.0.0.1' || proxy.server === 'localhost' || proxy.server === '0.0.0.0') return false;
+    return true;
+  };
+
+  // 执行节点有效性校验、屏蔽词剔除以及倍率拦截
   if (Array.isArray(config.proxies)) {
     config.proxies = config.proxies.filter(proxy => {
+      if (!checkProxy(proxy)) return false; // 踢出缺少 server/port 等关键字段的坏节点
       if (excludeFilter.test(proxy.name)) return false;
       if (excludeHighRateProxiesEnable && highRateRegex.test(proxy.name)) return false;
       return true;
@@ -38,9 +59,7 @@ function main(config) {
     throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
   }
 
-  // ==========================================
-  // 2. 基础网络配置
-  // ==========================================
+  // --- 基础网络与内核特性配置 ---
   newConfig['allow-lan'] = true;
   newConfig['ipv6'] = false;
   newConfig['mode'] = 'rule';
@@ -61,9 +80,10 @@ function main(config) {
     'store-fake-ip': true,
   };
 
-  // ==========================================
-  // 3. 严谨 DNS 提取策略 (防污染)
-  // ==========================================
+  // --- DNS 提取策略与 Hosts 映射 ---
+
+  // 读取订阅中的 DNS 配置，提取并保留机场私有 DNS (nameserver-policy)
+  // 完美解决高端协议机场因公用 DNS 导致无法解析节点落地 IP 的问题
   const originalDnsConfig = config.dns || {};
 
   const commonDnsRegex =
@@ -101,9 +121,7 @@ function main(config) {
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/16',
     'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'],
-    'proxy-server-nameserver': [
-      ...(originalProxyServerNameserver.length > 0 ? originalProxyServerNameserver : chinaDNS),
-    ],
+    'proxy-server-nameserver': [...chinaDNS, ...originalProxyServerNameserver],
     ...(Object.keys(originalPolicyNameserver).length > 0 && {
       'proxy-server-nameserver-policy': originalPolicyNameserver,
     }),
@@ -142,9 +160,7 @@ function main(config) {
 
   newConfig['proxies'] = [...proxies];
 
-  // ==========================================
-  // 4. 构建策略组
-  // ==========================================
+  // --- 策略组构建 ---
   const pNames = proxies.map(p => p.name);
   const getNodes = (reg) => {
     const res = pNames.filter(name => reg.test(name));
@@ -152,7 +168,7 @@ function main(config) {
   };
 
   const healthCheckUrl = "https://g.cn/generate_204";
-  const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 600, tolerance: 50, lazy: true, timeout: 3000 };
+  const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3 };
   const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
 
   const regionMappings = [
@@ -168,18 +184,20 @@ function main(config) {
   const regionGroups = [];
   const regionAutoGroups = [];
   const activeRegions = [];
+  const matchedByRegion = new Set();
 
   regionMappings.forEach(r => {
     const nodes = getNodes(r.regex);
     if (nodes[0] !== "DIRECT") {
       activeRegions.push(r.key);
+      nodes.forEach(n => matchedByRegion.add(n));
       const autoName = `${r.key}-自动选择`;
       regionAutoGroups.push({ name: autoName, proxies: nodes, hidden: true, ...autoBaseOption });
       regionGroups.push({ name: r.key, type: "select", icon: `${ico}/${r.icon}`, proxies: [autoName, ...nodes] });
     }
   });
 
-  const nodesOther = pNames.filter(n => !/港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe/i.test(n) && !lowRateRegex.test(n) && !highRateRegex.test(n));
+  const nodesOther = pNames.filter(n => !matchedByRegion.has(n) && !lowRateRegex.test(n) && !highRateRegex.test(n));
   if (nodesOther.length > 0) {
     activeRegions.push("Other");
     regionAutoGroups.push({ name: "Other-自动选择", proxies: nodesOther, hidden: true, ...autoBaseOption });
@@ -234,9 +252,10 @@ function main(config) {
     }
   });
 
-  // ==========================================
-  // 5. Rule Providers (纯净 666OS 体系)
-  // ==========================================
+  // --- Rule Providers (666OS 体系) ---
+  
+  // 完全抛弃臃肿的 MetaCubeX Dat 数据库，采用按需下发的 MRS 规则集
+  // 极大幅度降低内存占用并实现精准分流
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
@@ -267,9 +286,10 @@ function main(config) {
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
 
-  // ==========================================
-  // 6. 路由分流规则 (FCM 彻底交由 Google 规则处理)
-  // ==========================================
+  // --- 路由分流规则 (Rules) ---
+  
+  // 基于 666OS 设计哲学的核心路由规则
+  // 注意：FCM 服务由于大陆环境特殊性，已交由 Google 兜底策略接管
   newConfig.rules = [
     "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
     "RULE-SET,Direct,DIRECT",

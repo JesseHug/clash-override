@@ -140,7 +140,7 @@ proxy-providers:
       additional-prefix: "[三] "
 
 # ==================== 策略组模板 ====================
-BaseUT: &BaseUT {type: url-test, url: "https://g.cn/generate_204", interval: 600, tolerance: 50, lazy: true, timeout: 3000, hidden: true}
+BaseUT: &BaseUT {type: url-test, url: "https://g.cn/generate_204", interval: 300, tolerance: 50, lazy: true, timeout: 3000, hidden: true, max-failed-times: 3}
 
 # ==================== 策略组 ====================
 proxy-groups:
@@ -211,9 +211,10 @@ proxy-groups:
   - name: Auto
     type: url-test
     url: "https://g.cn/generate_204"
-    interval: 600
+    interval: 300
     tolerance: 50
     lazy: true
+    max-failed-times: 3
     timeout: 3000
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png
     proxies: [HK, JP, SG, TW, US, KR, EU, Other]
