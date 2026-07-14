@@ -10,7 +10,7 @@ Mihomo（Clash Meta）高性能覆写脚本与配置文件，无 DNS 泄露、`u
 
 > **注意：该脚本仅适用于覆写机场提供的配置文件，请勿用于覆写自己编写的配置文件**
 
-复制以下链接导入到 FLClash 的远程覆写中：
+复制以下链接导入到 Bettbox 的远程覆写中：
 
 ```txt
 https://raw.githubusercontent.com/JesseHug/clash-override/master/override.js
@@ -73,6 +73,7 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 
 | 版本 | 说明 |
 |:----|:------|
+| **v10.0** | 终极防崩溃打磨：引入节点强校验、完美动态 Other 补集、重构倍率识别算法、合并并发 DNS |
 | **v9.1** | 移除 FCM/Speedtest 规则集，Games 完整重命名，PCDN 拦截扩展，default-selected 硬编码 |
 | **v8.1** | 极致轻量版重构：FCM 推送、url-test 取代 fallback、倍率过滤、DNS 提取 |
 | **v8.0** | DNS 教科书方案：respect-rules + fake-ip-filter-mode + fallback-filter |
