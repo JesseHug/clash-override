@@ -219,25 +219,30 @@ function main(config) {
 
   const masterName = "Auto";
 
+  // 策略组工厂函数：极大减少模板代码
+  const buildGroup = (name, iconName, proxies = ["Proxies", ...activeRegions], extra = {}) => ({
+    name,
+    type: "select",
+    icon: `${ico}/${iconName}.png`,
+    proxies,
+    ...extra
+  });
+
   newConfig["proxy-groups"] = [
-    { name: "Proxies", type: "select", icon: ico + "/Global.png", proxies: [masterName, ...activeRegions, ...pNames] },
-    { name: "Google", type: "select", icon: `${ico}/Google.png`, proxies: ["Proxies", ...activeRegions] },
-    { name: "YouTube", type: "select", icon: `${ico}/YouTube.png`, proxies: ["Proxies", ...activeRegions] },
-
+    buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
+    buildGroup("Google", "Google"),
+    buildGroup("YouTube", "YouTube"),
     // 【修改点】：硬编码锁定 Spotify 为 TW
-    { name: "Spotify", type: "select", icon: `${ico}/Spotify.png`, proxies: ["Proxies", "DIRECT", ...activeRegions], defaultSelected: "TW" },
-
-    { name: "Telegram", type: "select", icon: `${ico}/Telegram_X.png`, proxies: ["Proxies", ...activeRegions] },
-    { name: "Games", type: "select", icon: `${ico}/Game.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
-    { name: "PayPal", type: "select", icon: `${ico}/PayPal.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
-    { name: "X", type: "select", icon: `${ico}/X.png`, proxies: ["Proxies", ...activeRegions] },
-
+    buildGroup("Spotify", "Spotify", ["Proxies", "DIRECT", ...activeRegions], { defaultSelected: "TW" }),
+    buildGroup("Telegram", "Telegram_X"),
+    buildGroup("Games", "Game", ["Proxies", "DIRECT", ...activeRegions]),
+    buildGroup("PayPal", "PayPal", ["Proxies", "DIRECT", ...activeRegions]),
+    buildGroup("X", "X"),
     // 【修改点】：硬编码锁定 OpenAI 与 AI 为 US
-    { name: "OpenAI", type: "select", icon: `${ico}/ChatGPT.png`, proxies: ["Proxies", ...activeRegions], defaultSelected: "US" },
-    { name: "AI", type: "select", icon: `${ico}/AI.png`, proxies: ["Proxies", ...activeRegions], defaultSelected: "US" },
-
-    { name: "Apple", type: "select", icon: `${ico}/Apple.png`, proxies: ["Proxies", "DIRECT", ...activeRegions] },
-    { name: "Final", type: "select", icon: `${ico}/Final.png`, proxies: ["Proxies", "DIRECT"] },
+    buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
+    buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
+    buildGroup("Apple", "Apple", ["Proxies", "DIRECT", ...activeRegions]),
+    buildGroup("Final", "Final", ["Proxies", "DIRECT"]),
 
     { name: masterName, icon: `${ico}/Auto.png`, proxies: activeRegions, ...autoBaseOption },
     ...regionGroups,
