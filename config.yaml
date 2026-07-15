@@ -344,8 +344,6 @@ rules:
   # Apple 国内直连
   - RULE-SET,AppleCN,DIRECT
 
-  # FCM 推送 → Proxies
-
   # AI
   - RULE-SET,OpenAI,OpenAI
   - RULE-SET,AI,AI

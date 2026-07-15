@@ -2,7 +2,7 @@
  * mihomo 配置覆写脚本
  * 仓库：https://github.com/JesseHug/clash-override
  * 核心基建：基于标准脚本模板（包含 DNS 防污染与 Hosts 映射）
- * 策略与规则：url-test 测速、地区分组、倍率过滤、FCM 路由
+ * 策略与规则：url-test 测速、地区分组、倍率过滤
  * 说明：移除 Smart/GeoData，部分策略组已硬编码 default-selected
  */
 

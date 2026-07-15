@@ -31,7 +31,6 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 - ✅ **`url-test` 自动测速** — tolerance 50ms 防抖动，lazy 懒加载省电
 - ✅ **IP 规则体系** — AIIP / GoogleIP / TelegramIP / ProxyIP / ChinaIP + PrivateIP，域名漏网 IP 兜底
 - ✅ **QUIC 拦截** — 禁用国外 UDP/443，防止 YouTube/Netflix 视频卡顿
-- ✅ **FCM 推送** — GoogleFCM 直接走 Proxies，无需独立策略组
 - ✅ **自动排除非地区信息节点** — 可自定义是否启用（默认启用）
 - ✅ **自动识别节点倍率** — 低倍率节点（≤0.5）、高倍率节点（≥2）分别归类
 
