@@ -1,9 +1,9 @@
 /**
- * mihomo配置覆写脚本（极致轻量定制版）
+ * mihomo 配置覆写脚本
  * 仓库：https://github.com/JesseHug/clash-override
- * 核心基建：最新标准脚本模板（严谨 DNS 防污染、新增防 PCDN Hosts 映射）
- * 策略与规则：纯净 url-test 自动测速、地区优选、倍率过滤、AI防劫持、FCM直接指向Proxies
- * 优化说明：彻底剥离 Smart/GeoData；AI 与 Spotify 策略组已硬编码强制指定默认选区
+ * 核心基建：基于标准脚本模板（包含 DNS 防污染与 Hosts 映射）
+ * 策略与规则：url-test 测速、地区分组、倍率过滤、FCM 路由
+ * 说明：移除 Smart/GeoData，部分策略组已硬编码 default-selected
  */
 
 // --- 静态配置区域 ---
@@ -30,9 +30,9 @@ function main(config) {
 
   /**
    * 基础节点结构校验函数
-   * 1. 踢出因机场疏漏导致缺少 server/port 等关键字段的坏节点
-   * 2. 自动屏蔽 127.0.0.1、0.0.0.0 等占位假节点
-   * 以防止 Mihomo 内核加载配置时崩溃
+   * 1. 过滤缺少 server/port 字段的异常节点
+   * 2. 过滤 127.0.0.1、0.0.0.0 等本地节点
+   * 防止内核加载异常节点时崩溃
    */
   const checkProxy = (proxy) => {
     if (!proxy || typeof proxy !== 'object') return false;
@@ -83,7 +83,7 @@ function main(config) {
   // --- DNS 提取策略与 Hosts 映射 ---
 
   // 读取订阅中的 DNS 配置，提取并保留机场私有 DNS (nameserver-policy)
-  // 完美解决高端协议机场因公用 DNS 导致无法解析节点落地 IP 的问题
+  // 解决部分私有协议节点因公共 DNS 无法解析落地 IP 的问题
   const originalDnsConfig = config.dns || {};
 
   const commonDnsRegex =
@@ -219,7 +219,7 @@ function main(config) {
 
   const masterName = "Auto";
 
-  // 策略组工厂函数：极大减少模板代码
+  // 策略组工厂函数
   const buildGroup = (name, iconName, proxies = ["Proxies", ...activeRegions], extra = {}) => ({
     name,
     type: "select",
@@ -232,13 +232,13 @@ function main(config) {
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
     buildGroup("Google", "Google"),
     buildGroup("YouTube", "YouTube"),
-    // 【修改点】：硬编码锁定 Spotify 为 TW
+    // Spotify 默认选择 TW
     buildGroup("Spotify", "Spotify", ["Proxies", "DIRECT", ...activeRegions], { defaultSelected: "TW" }),
     buildGroup("Telegram", "Telegram_X"),
     buildGroup("Games", "Game", ["Proxies", "DIRECT", ...activeRegions]),
     buildGroup("PayPal", "PayPal", ["Proxies", "DIRECT", ...activeRegions]),
     buildGroup("X", "X"),
-    // 【修改点】：硬编码锁定 OpenAI 与 AI 为 US
+    // OpenAI 与 AI 默认选择 US
     buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("Apple", "Apple", ["Proxies", "DIRECT", ...activeRegions]),
@@ -259,8 +259,8 @@ function main(config) {
 
   // --- Rule Providers (666OS 体系) ---
   
-  // 完全抛弃臃肿的 MetaCubeX Dat 数据库，采用按需下发的 MRS 规则集
-  // 极大幅度降低内存占用并实现精准分流
+  // 使用 666OS 的 MRS 规则集
+  // 降低内存占用并实现分流
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
@@ -293,8 +293,8 @@ function main(config) {
 
   // --- 路由分流规则 (Rules) ---
   
-  // 基于 666OS 设计哲学的核心路由规则
-  // 注意：FCM 服务由于大陆环境特殊性，已交由 Google 兜底策略接管
+  // 核心路由规则
+  // 注意：FCM 服务已交由 Google 策略接管
   newConfig.rules = [
     "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
     "RULE-SET,Direct,DIRECT",
