@@ -13,9 +13,13 @@ find-process-mode: strict
 mode: rule
 log-level: warning
 ipv6: false
-keep-alive-interval: 1800
+keep-alive-interval: 60
+keep-alive-idle: 600
 unified-delay: true
 tcp-concurrent: true
+
+# ==================== 客户端指纹伪装 ====================
+global-client-fingerprint: chrome
 
 geox-url:
   geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
@@ -25,11 +29,12 @@ geodata-mode: true
 
 ntp:
   enable: true
+  write-to-system: false
   server: ntp.aliyun.com
   port: 123
-  interval: 30
+  interval: 60
 
-external-controller: :9090
+external-controller: '127.0.0.1:9090'
 external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
 external-ui-name: zashboard
 external-ui: ui
@@ -46,6 +51,7 @@ tun:
     - "any:53"
     - "tcp://any:53"
   auto-route: true
+  auto-redirect: true
   auto-detect-interface: true
   strict-route: true
 
@@ -313,7 +319,7 @@ rule-providers:
   YouTube:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
   Spotify:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
   Telegram:     {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
-  Games:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
+  Games:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
   PayPal:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
   Twitter:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
   OpenAI:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/OpenAI.mrs}
