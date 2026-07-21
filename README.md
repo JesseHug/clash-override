@@ -72,6 +72,7 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 
 | 版本 | 说明 |
 |:----|:------|
+| **v10.1** | 同步非标机场 DNS 提取逻辑，优化 Keep-Alive、NTP 及 TUN 模式参数 |
 | **v10.0** | 终极防崩溃打磨：引入节点强校验、完美动态 Other 补集、重构倍率识别算法、合并并发 DNS |
 | **v9.1** | 移除 FCM/Speedtest 规则集，Games 完整重命名，PCDN 拦截扩展，default-selected 硬编码 |
 | **v8.1** | 极致轻量版重构：FCM 推送、url-test 取代 fallback、倍率过滤、DNS 提取 |
