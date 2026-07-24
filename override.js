@@ -89,14 +89,14 @@ function main(config) {
   const commonDnsRegex =
     /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
 
-  const originalProxyServerNameserver = [
+  const privateDNS = [
     ...new Set([
       ...(originalDnsConfig['nameserver'] || []),
       ...(originalDnsConfig['proxy-server-nameserver'] || []),
     ]),
   ].filter((dns) => !commonDnsRegex.test(String(dns)));
 
-  const originalPolicyNameserver = {};
+  const proxyServerPolicy = {};
 
   for (const policy of [
     originalDnsConfig['proxy-server-nameserver-policy'] || {},
@@ -108,7 +108,7 @@ function main(config) {
       if (dnsList.some((item) => commonDnsRegex.test(String(item)))) {
         continue;
       }
-      originalPolicyNameserver[rule] = dns;
+      proxyServerPolicy[rule] = dns;
     }
   }
 
@@ -124,9 +124,9 @@ function main(config) {
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/16',
     'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'],
-    'proxy-server-nameserver': [...chinaDNS, ...originalProxyServerNameserver],
-    ...(Object.keys(originalPolicyNameserver).length > 0 && {
-      'proxy-server-nameserver-policy': originalPolicyNameserver,
+    'proxy-server-nameserver': [...chinaDNS, ...privateDNS],
+    ...(Object.keys(proxyServerPolicy).length > 0 && {
+      'proxy-server-nameserver-policy': proxyServerPolicy,
     }),
     'default-nameserver': ['223.5.5.5', '119.29.29.29'],
     nameserver: [...foreignDNS],
@@ -139,10 +139,10 @@ function main(config) {
   // 收集节点域名，保留机场私有 hosts（防止覆盖导致节点解析失败）
   const proxyDomains = new Set(proxies.map((p) => p.server?.toLowerCase()).filter(Boolean));
   const originalHosts = config.hosts || {};
-  const proxyHosts = {};
+  const proxyServerHosts = {};
   for (const [host, value] of Object.entries(originalHosts)) {
     if (proxyDomains.has(host.toLowerCase())) {
-      proxyHosts[host] = value;
+      proxyServerHosts[host] = value;
     }
   }
 
@@ -155,7 +155,7 @@ function main(config) {
     '+.mcdn.bilivideo.com': ['0.0.0.0'],
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
     '+.edge.mountaintoys.cn': ['0.0.0.0'],
-    ...proxyHosts,
+    ...proxyServerHosts,
   };
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
