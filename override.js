@@ -177,7 +177,6 @@ function main(config) {
     { key: "TW", regex: /台|TW|Taiwan/i, icon: "Taiwan.png" },
     { key: "JP", regex: /日|JP|Japan/i, icon: "Japan.png" },
     { key: "US", regex: /美|US|UnitedStates|United States/i, icon: "United_States.png" },
-    { key: "KR", regex: /韩|KR|KOR|Korea/i, icon: "Korea.png" },
     { key: "MO", regex: /澳|MO|Macao|Macau/i, icon: "Macao.png" },
     { key: "EU", regex: /法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
   ];
