@@ -26,6 +26,8 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 
 ## 配置和脚本说明
 
+- ✅ **现代 JS 语法 (ES2020)** — 脚本采用最前沿的 ES2020 语法架构（如可选链 `?.` 与空值合并 `??`），请确保您的客户端支持 **QuickJS** 引擎。
+
 - ✅ **无 DNS 泄露** — 保留订阅私有 DNS，国内外 DNS 分离，`nameserver-policy` 精准分流
 - ✅ **高性能规则集** — 666OS 编译 `.mrs` 二进制格式，O(1) 哈希匹配，告别臃肿 geodata
 - ✅ **`url-test` 自动测速** — tolerance 50ms 防抖动，lazy 懒加载省电
