@@ -84,23 +84,23 @@ function main(config) {
 
   // 读取订阅中的 DNS 配置，提取并保留机场私有 DNS (nameserver-policy)
   // 解决部分私有协议节点因公共 DNS 无法解析落地 IP 的问题
-  const originalDnsConfig = config.dns || {};
+  const originalDnsConfig = config.dns ?? {};
 
   const commonDnsRegex =
     /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
 
   const privateDNS = [
     ...new Set([
-      ...(originalDnsConfig['nameserver'] || []),
-      ...(originalDnsConfig['proxy-server-nameserver'] || []),
+      ...(originalDnsConfig['nameserver'] ?? []),
+      ...(originalDnsConfig['proxy-server-nameserver'] ?? []),
     ]),
   ].filter((dns) => !commonDnsRegex.test(String(dns)));
 
   const proxyServerPolicy = {};
 
   for (const policy of [
-    originalDnsConfig['proxy-server-nameserver-policy'] || {},
-    originalDnsConfig['nameserver-policy'] || {},
+    originalDnsConfig['proxy-server-nameserver-policy'] ?? {},
+    originalDnsConfig['nameserver-policy'] ?? {},
   ]) {
     for (const [rule, dns] of Object.entries(policy)) {
       const dnsList = Array.isArray(dns) ? dns : [dns];
@@ -138,13 +138,10 @@ function main(config) {
 
   // 收集节点域名，保留机场私有 hosts（防止覆盖导致节点解析失败）
   const proxyDomains = new Set(proxies.map((p) => p.server?.toLowerCase()).filter(Boolean));
-  const originalHosts = config.hosts || {};
-  const proxyServerHosts = {};
-  for (const [host, value] of Object.entries(originalHosts)) {
-    if (proxyDomains.has(host.toLowerCase())) {
-      proxyServerHosts[host] = value;
-    }
-  }
+  const originalHosts = config.hosts ?? {};
+  const proxyServerHosts = Object.fromEntries(
+    Object.entries(originalHosts).filter(([host]) => proxyDomains.has(host.toLowerCase()))
+  );
 
   newConfig['hosts'] = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
