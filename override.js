@@ -393,9 +393,9 @@ function main(config) {
   // 注意：FCM 服务已交由 Google 策略接管
   newConfig.rules = [
     "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
-    "RULE-SET,Direct,DIRECT",
-    "RULE-SET,Private,DIRECT",
-    "RULE-SET,AppleCN,DIRECT",
+    "RULE-SET,Direct,直连",
+    "RULE-SET,Private,直连",
+    "RULE-SET,AppleCN,直连",
 
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
@@ -409,17 +409,17 @@ function main(config) {
     "RULE-SET,Apple,Apple",
 
     "RULE-SET,gfw,Proxies",
-    "RULE-SET,geolocation-cn,DIRECT",
-    "RULE-SET,cn_additional,DIRECT",
+    "RULE-SET,geolocation-cn,直连",
+    "RULE-SET,cn_additional,直连",
 
-    "RULE-SET,PrivateIP,DIRECT,no-resolve",
+    "RULE-SET,PrivateIP,直连,no-resolve",
     "RULE-SET,AIIP,AI,no-resolve",
     "RULE-SET,GoogleIP,Google,no-resolve",
     "RULE-SET,TelegramIP,Telegram,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
-    "RULE-SET,ChinaIP,DIRECT",
+    "RULE-SET,ChinaIP,直连",
 
-    "GEOIP,CN,DIRECT",
+    "GEOIP,CN,直连",
     "MATCH,Final"
   ];
 

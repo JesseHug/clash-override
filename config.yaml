@@ -345,11 +345,11 @@ rules:
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
 
   # 直连 & 私有网络
-  - RULE-SET,Direct,DIRECT
-  - RULE-SET,Private,DIRECT
+  - RULE-SET,Direct,直连
+  - RULE-SET,Private,直连
 
   # Apple 国内直连
-  - RULE-SET,AppleCN,DIRECT
+  - RULE-SET,AppleCN,直连
 
   # AI
   - RULE-SET,OpenAI,OpenAI
@@ -369,17 +369,17 @@ rules:
   - RULE-SET,gfw,Proxies
 
   # 国内域名
-  - RULE-SET,geolocation-cn,DIRECT
-  - RULE-SET,cn_additional,DIRECT
+  - RULE-SET,geolocation-cn,直连
+  - RULE-SET,cn_additional,直连
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
-  - RULE-SET,PrivateIP,DIRECT,no-resolve
+  - RULE-SET,PrivateIP,直连,no-resolve
   - RULE-SET,AIIP,AI,no-resolve
   - RULE-SET,GoogleIP,Google,no-resolve
   - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,ProxyIP,Proxies,no-resolve
-  - RULE-SET,ChinaIP,DIRECT
+  - RULE-SET,ChinaIP,直连
 
   # GeoIP 兜底
-  - GEOIP,CN,DIRECT
+  - GEOIP,CN,直连
   - MATCH,Final
