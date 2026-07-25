@@ -61,7 +61,7 @@ function main(config) {
 
   // --- 基础网络与内核特性配置 ---
   newConfig['allow-lan'] = true;
-  newConfig['ipv6'] = false;
+  newConfig['ipv6'] = true;
   newConfig['mode'] = 'rule';
   newConfig['log-level'] = 'info';
   newConfig['bind-address'] = '*';
@@ -131,7 +131,7 @@ function main(config) {
     'default-nameserver': ['223.5.5.5', '119.29.29.29'],
     nameserver: [...foreignDNS],
     'nameserver-policy': {
-      'rule-set:ChinaDomain,cn_additional': [...chinaDNS],
+      'rule-set:geolocation-cn,cn_additional': [...chinaDNS],
     },
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
@@ -158,7 +158,12 @@ function main(config) {
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
-  newConfig['proxies'] = [...proxies];
+  const directProxies = [
+    { name: '🇨🇳 直连 | IPv4优先', type: 'direct', 'ip-version': 'ipv4-prefer' },
+    { name: '🇨🇳 直连 | IPv6优先', type: 'direct', 'ip-version': 'ipv6-prefer' },
+    { name: '🇨🇳 直连 | 双栈', type: 'direct' }
+  ];
+  newConfig['proxies'] = [...proxies, ...directProxies];
 
   // --- 策略组构建 ---
   const pNames = proxies.map(p => p.name);
@@ -244,6 +249,13 @@ function main(config) {
     buildGroup("Apple", "Apple", ["Proxies", "DIRECT", ...activeRegions]),
     buildGroup("Final", "Final", ["Proxies", "DIRECT"]),
 
+    {
+      name: "DIRECT",
+      type: "select",
+      icon: `${ico}/China_Map.png`,
+      proxies: ["🇨🇳 直连 | 双栈", "🇨🇳 直连 | IPv4优先", "🇨🇳 直连 | IPv6优先"]
+    },
+
     { name: masterName, icon: `${ico}/Auto.png`, proxies: activeRegions, ...autoBaseOption },
     ...regionGroups,
     ...regionAutoGroups
@@ -279,8 +291,8 @@ function main(config) {
     AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
     Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" },
     Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
-    Proxies: { ...mrs, url: `${r66}/domain/Proxy.mrs`, path: "./rules/Proxies.mrs" },
-    ChinaDomain: { ...mrs, url: `${r66}/domain/China.mrs`, path: "./rules/ChinaDomain.mrs" },
+    gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./rules/gfw.mrs" },
+    geolocation-cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs`, path: "./rules/ChinaIP.mrs" },
     AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" },
     GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" },
@@ -296,7 +308,7 @@ function main(config) {
   // 核心路由规则
   // 注意：FCM 服务已交由 Google 策略接管
   newConfig.rules = [
-    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
+    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
     "RULE-SET,Direct,DIRECT",
     "RULE-SET,Private,DIRECT",
     "RULE-SET,AppleCN,DIRECT",
@@ -312,8 +324,8 @@ function main(config) {
     "RULE-SET,Twitter,X",
     "RULE-SET,Apple,Apple",
 
-    "RULE-SET,Proxies,Proxies",
-    "RULE-SET,ChinaDomain,DIRECT",
+    "RULE-SET,gfw,Proxies",
+    "RULE-SET,geolocation-cn,DIRECT",
     "RULE-SET,cn_additional,DIRECT",
 
     "RULE-SET,PrivateIP,DIRECT,no-resolve",
@@ -321,7 +333,7 @@ function main(config) {
     "RULE-SET,GoogleIP,Google,no-resolve",
     "RULE-SET,TelegramIP,Telegram,no-resolve",
     "RULE-SET,ProxyIP,Proxies,no-resolve",
-    "RULE-SET,ChinaIP,DIRECT,no-resolve",
+    "RULE-SET,ChinaIP,DIRECT",
 
     "GEOIP,CN,DIRECT",
     "MATCH,Final"
