@@ -64,29 +64,12 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 - `SG`
 - `TW`
 - `US`
-- `KR`
-- `EU`
+- `MO`
 - `Other`
 - `低倍率节点`
 - `高倍率节点`
 
-## 版本历史
 
-| 版本 | 说明 |
-|:----|:------|
-| **v11.0** | 架构升级：引入完整 IPv6/双栈控制体系，弃用内置保留关键字 DIRECT 策略组（重命名为直连），全面集成 gfw 与 geolocation-cn 规则集，优化 DNS 策略与 B站静态资源分流。 |
-| **v10.1** | 同步非标机场 DNS 提取逻辑，优化 Keep-Alive、NTP 及 TUN 模式参数 |
-| **v10.0** | 终极防崩溃打磨：引入节点强校验、完美动态 Other 补集、重构倍率识别算法、合并并发 DNS |
-| **v9.1** | 移除 FCM/Speedtest 规则集，Games 完整重命名，PCDN 拦截扩展，default-selected 硬编码 |
-| **v8.1** | 极致轻量版重构：FCM 推送、url-test 取代 fallback、倍率过滤、DNS 提取 |
-| **v8.0** | DNS 教科书方案：respect-rules + fake-ip-filter-mode + fallback-filter |
-| **v7.0** | 全策略组添加 Qure 面板图标 |
-| **v6.0** | Google 分流至 Proxies，解决 Play Store 下载 |
-| **v5.0** | 补充 NTP/geodata-mode/TUN/Smart 配置 |
-| **v4.0** | 全面迁移 666OS `.mrs`，GEOSITE→RULE-SET |
-| **v3.0** | fallback 取代 url-test，加 KR/EU/Other 地区 |
-| **v2.0** | ACL4SSR 迁移：ChinaDomain/ChinaIP/ProxyLite |
-| **v1.0** | 初始版：AGWA5783 规则集 + url-test |
 
 ## 致谢
 
