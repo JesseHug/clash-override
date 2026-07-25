@@ -23,6 +23,63 @@ const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订�
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
 
+// --- 域名匹配工具函数 ---
+
+function matchDomainPattern(pattern, domains) {
+  pattern = pattern.toLowerCase();
+
+  // 精确匹配
+  if (!pattern.includes('*') && !pattern.startsWith('+.') && !pattern.startsWith('.')) {
+    return domains.has(pattern);
+  }
+
+  // +.example.com
+  if (pattern.startsWith('+.')) {
+    const suffix = pattern.slice(2);
+    for (const domain of domains) {
+      if (domain === suffix || domain.endsWith(`.${suffix}`)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // .example.com
+  if (pattern.startsWith('.')) {
+    const suffix = pattern.slice(1);
+    for (const domain of domains) {
+      if (domain !== suffix && domain.endsWith(`.${suffix}`)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // *.example.com、example.*.com 等
+  const patternParts = pattern.split('.');
+  for (const domain of domains) {
+    const domainParts = domain.split('.');
+
+    // 标签数量必须一致
+    if (patternParts.length !== domainParts.length) {
+      continue;
+    }
+    let matched = true;
+    for (let i = 0; i < patternParts.length; i++) {
+      if (patternParts[i] !== '*' && patternParts[i] !== domainParts[i]) {
+        matched = false;
+        break;
+      }
+    }
+
+    if (matched) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function main(config) {
   const newConfig = {};
 
@@ -86,29 +143,53 @@ function main(config) {
   // 解决部分私有协议节点因公共 DNS 无法解析落地 IP 的问题
   const originalDnsConfig = config.dns ?? {};
 
-  const commonDnsRegex =
-    /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
+  // 过滤常见的公共 DNS
+  const commonDnsList = [
+    // IP（国内）
+    '223.5.5.5', '223.6.6.6', '119.29.29.29', '1.12.12.12', '120.53.53.53',
+    '114.114.114.114', '180.76.76.76', '1.2.4.8', '116.116.116.116',
+    '101.226.4.6', '123.125.81.6', '180.184.1.1', '180.184.2.2',
+    // IP（国外）
+    '1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4', '9.9.9.9',
+    '149.112.112.112', '208.67.222.222', '208.67.220.220',
+    '94.140.14.14', '94.140.15.15', '76.76.2.0', '76.76.10.0',
+    '185.228.168.9', '185.228.169.9', '77.88.8.8', '77.88.8.1',
+    '156.154.70.1', '156.154.71.1',
+    // 非公共 DNS，但部分机场会使用
+    '127.0.0.1',
+    // 关键词（国内）
+    'alidns', 'doh.pub', 'dot.pub', 'dnspod', 'dns.baidu',
+    // 关键词（国外）
+    'dns.google', 'cloudflare', 'quad9', 'opendns', 'nextdns', 'adguard',
+    // 系统
+    'system',
+  ];
 
+  const isCommonDns = (dns) => {
+    const value = String(dns).toLowerCase();
+    return commonDnsList.some((keyword) => value.includes(keyword));
+  };
+
+  // 收集所有节点域名
+  const proxyDomains = new Set(
+    proxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
+  );
+
+  // 提取私有 DNS
   const privateDNS = [
-    ...new Set([
-      ...(originalDnsConfig['nameserver'] ?? []),
-      ...(originalDnsConfig['proxy-server-nameserver'] ?? []),
-    ]),
-  ].filter((dns) => !commonDnsRegex.test(String(dns)));
+    ...new Set([...(originalDnsConfig['nameserver'] ?? []), ...(originalDnsConfig['proxy-server-nameserver'] ?? [])]),
+  ].filter((dns) => !isCommonDns(dns));
 
+  // 提取节点域名对应的 DNS 配置
   const proxyServerPolicy = {};
-
   for (const policy of [
-    originalDnsConfig['proxy-server-nameserver-policy'] ?? {},
     originalDnsConfig['nameserver-policy'] ?? {},
+    originalDnsConfig['proxy-server-nameserver-policy'] ?? {},
   ]) {
-    for (const [rule, dns] of Object.entries(policy)) {
-      const dnsList = Array.isArray(dns) ? dns : [dns];
-
-      if (dnsList.some((item) => commonDnsRegex.test(String(item)))) {
-        continue;
+    for (const [domain, dns] of Object.entries(policy)) {
+      if (matchDomainPattern(domain, proxyDomains)) {
+        proxyServerPolicy[domain] = dns;
       }
-      proxyServerPolicy[rule] = dns;
     }
   }
 
@@ -131,17 +212,19 @@ function main(config) {
     'default-nameserver': ['223.5.5.5', '119.29.29.29'],
     nameserver: [...foreignDNS],
     'nameserver-policy': {
-      'rule-set:geolocation-cn,cn_additional': [...chinaDNS],
+      'rule-set:cn': [...chinaDNS],
     },
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
 
-  // 收集节点域名，保留机场私有 hosts（防止覆盖导致节点解析失败）
-  const proxyDomains = new Set(proxies.map((p) => p.server?.toLowerCase()).filter(Boolean));
+  // 提取订阅 hosts 中与节点域名对应的记录
   const originalHosts = config.hosts ?? {};
-  const proxyServerHosts = Object.fromEntries(
-    Object.entries(originalHosts).filter(([host]) => proxyDomains.has(host.toLowerCase()))
-  );
+  const proxyServerHosts = {};
+  for (const [domain, value] of Object.entries(originalHosts)) {
+    if (matchDomainPattern(domain, proxyDomains)) {
+      proxyServerHosts[domain] = value;
+    }
+  }
 
   newConfig['hosts'] = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
@@ -301,6 +384,7 @@ function main(config) {
     PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs" },
     fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
+    cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs", path: "./rules/cn.mrs" },
   };
 
   // --- 路由分流规则 (Rules) ---

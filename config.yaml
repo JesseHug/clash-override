@@ -12,7 +12,7 @@ bind-address: "*"
 find-process-mode: strict
 mode: rule
 log-level: warning
-ipv6: false
+ipv6: true
 keep-alive-interval: 60
 keep-alive-idle: 600
 unified-delay: true
@@ -82,7 +82,7 @@ hosts:
 # ==================== DNS 配置 ====================
 dns:
   enable: true
-  ipv6: false
+  ipv6: true
   use-hosts: true
   cache-algorithm: arc
   use-system-hosts: true
@@ -101,7 +101,7 @@ dns:
     - https://dns.cloudflare.com/dns-query#Proxies
     - https://dns.google/dns-query#Proxies
   nameserver-policy:
-    "rule-set:ChinaDomain,cn_additional":
+    "rule-set:cn":
       - https://dns.alidns.com/dns-query
       - https://doh.pub/dns-query
   direct-nameserver:
@@ -327,8 +327,8 @@ rule-providers:
   AppleCN:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
   Apple:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs}
   Google:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs}
-  Proxies:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Proxy.mrs}
-  ChinaDomain:  {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/China.mrs}
+  gfw:          {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs}
+  geolocation-cn: {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs}
   ChinaIP:      {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
   AIIP:         {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs}
   GoogleIP:     {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
@@ -337,11 +337,12 @@ rule-providers:
   PrivateIP:    {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
   fakeip_filter:{<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs}
   cn_additional:{<<: *BehaviorDN, url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs}
+  cn:           {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs}
 
 # ==================== 路由规则 ====================
 rules:
   # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
-  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,ChinaDomain),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
+  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
 
   # 直连 & 私有网络
   - RULE-SET,Direct,DIRECT
@@ -365,10 +366,10 @@ rules:
   - RULE-SET,Apple,Apple
 
   # 国外网站兜底
-  - RULE-SET,Proxies,Proxies
+  - RULE-SET,gfw,Proxies
 
   # 国内域名
-  - RULE-SET,ChinaDomain,DIRECT
+  - RULE-SET,geolocation-cn,DIRECT
   - RULE-SET,cn_additional,DIRECT
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
@@ -377,7 +378,7 @@ rules:
   - RULE-SET,GoogleIP,Google,no-resolve
   - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,ProxyIP,Proxies,no-resolve
-  - RULE-SET,ChinaIP,DIRECT,no-resolve
+  - RULE-SET,ChinaIP,DIRECT
 
   # GeoIP 兜底
   - GEOIP,CN,DIRECT
