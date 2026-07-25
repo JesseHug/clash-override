@@ -321,19 +321,19 @@ function main(config) {
     buildGroup("Google", "Google"),
     buildGroup("YouTube", "YouTube"),
     // Spotify 默认选择 TW
-    buildGroup("Spotify", "Spotify", ["Proxies", "DIRECT", ...activeRegions], { defaultSelected: "TW" }),
+    buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { defaultSelected: "TW" }),
     buildGroup("Telegram", "Telegram_X"),
-    buildGroup("Games", "Game", ["Proxies", "DIRECT", ...activeRegions]),
-    buildGroup("PayPal", "PayPal", ["Proxies", "DIRECT", ...activeRegions]),
+    buildGroup("Games", "Game", ["Proxies", "直连", ...activeRegions]),
+    buildGroup("PayPal", "PayPal", ["Proxies", "直连", ...activeRegions]),
     buildGroup("X", "X"),
     // OpenAI 与 AI 默认选择 US
     buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
-    buildGroup("Apple", "Apple", ["Proxies", "DIRECT", ...activeRegions]),
-    buildGroup("Final", "Final", ["Proxies", "DIRECT"]),
+    buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions]),
+    buildGroup("Final", "Final", ["Proxies", "直连"]),
 
     {
-      name: "DIRECT",
+      name: "直连",
       type: "select",
       icon: `${ico}/China_Map.png`,
       proxies: ["🇨🇳 直连 | 双栈", "🇨🇳 直连 | IPv4优先", "🇨🇳 直连 | IPv6优先"]
