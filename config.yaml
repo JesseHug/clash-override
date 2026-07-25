@@ -351,6 +351,9 @@ rules:
   # Apple 国内直连
   - RULE-SET,AppleCN,直连
 
+  # Bilibili 静态资源
+  - DOMAIN-SUFFIX,hdslb.com,直连
+
   # AI
   - RULE-SET,OpenAI,OpenAI
   - RULE-SET,AI,AI

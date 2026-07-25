@@ -16,14 +16,6 @@
  */
 const excludeHighRateProxiesEnable = false;
 
-/**
- * 代理节点 IPv6 路由控制
- * 该配置用于控制机场代理节点是否允许走 IPv6 路由
- * true = 允许节点走 IPv6（顺其自然）
- * false = 强制所有代理节点优先走 IPv4
- */
-const proxyIpv6Enable = false;
-
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
@@ -114,12 +106,6 @@ function main(config) {
       if (!checkProxy(proxy)) return false; // 踢出缺少 server/port 等关键字段的坏节点
       if (excludeFilter.test(proxy.name)) return false;
       if (excludeHighRateProxiesEnable && highRateRegex.test(proxy.name)) return false;
-
-      // 控制代理节点是否走 IPv6
-      if (!proxyIpv6Enable) {
-        proxy['ip-version'] = 'ipv4-prefer';
-      }
-
       return true;
     });
   }
@@ -410,6 +396,8 @@ function main(config) {
     "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
     "RULE-SET,AppleCN,直连",
+
+    "DOMAIN-SUFFIX,hdslb.com,直连",
 
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
