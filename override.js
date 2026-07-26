@@ -16,12 +16,21 @@
  */
 const excludeHighRateProxiesEnable = false;
 
+// --- 预定义规则 ---
+
+// 直连节点
+const directProxies = [
+  { name: '🇨🇳 直连 | 双栈', type: 'direct' },
+  { name: '🇨🇳 直连 | IPv4优先', type: 'direct', 'ip-version': 'ipv4-prefer' },
+  { name: '🇨🇳 直连 | IPv6优先', type: 'direct', 'ip-version': 'ipv6-prefer' },
+];
+
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
 const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|traffic|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|⚠️|@|Expire|http|com/iu;
-const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
-const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
+const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<!\d)0\.\d+|下载|低倍|实验性)/;
+const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<!\d)(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
 
 // --- 域名匹配工具函数 ---
 
@@ -241,11 +250,6 @@ function main(config) {
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
-  const directProxies = [
-    { name: '🇨🇳 直连 | IPv4优先', type: 'direct', 'ip-version': 'ipv4-prefer' },
-    { name: '🇨🇳 直连 | IPv6优先', type: 'direct', 'ip-version': 'ipv6-prefer' },
-    { name: '🇨🇳 直连 | 双栈', type: 'direct' }
-  ];
   newConfig['proxies'] = [...proxies, ...directProxies];
 
   // --- 策略组构建 ---
@@ -319,7 +323,7 @@ function main(config) {
   newConfig["proxy-groups"] = [
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
     buildGroup("Google", "Google"),
-    buildGroup("YouTube", "YouTube"),
+    buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" }),
     // Spotify 默认选择 TW
     buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { defaultSelected: "TW" }),
     buildGroup("Telegram", "Telegram_X"),
@@ -336,7 +340,7 @@ function main(config) {
       name: "直连",
       type: "select",
       icon: `${ico}/China_Map.png`,
-      proxies: ["🇨🇳 直连 | 双栈", "🇨🇳 直连 | IPv4优先", "🇨🇳 直连 | IPv6优先"]
+      proxies: [...directProxies.map(p => p.name)]
     },
 
     { name: masterName, icon: `${ico}/Auto.png`, proxies: activeRegions, ...autoBaseOption },
@@ -383,8 +387,8 @@ function main(config) {
     TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" },
     PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs" },
     fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
-    cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
     cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs", path: "./rules/cn.mrs" },
+    cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
 
   // --- 路由分流规则 (Rules) ---
@@ -392,12 +396,14 @@ function main(config) {
   // 核心路由规则
   // 注意：FCM 服务已交由 Google 策略接管
   newConfig.rules = [
-    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
     "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
     "RULE-SET,AppleCN,直连",
 
     "DOMAIN-SUFFIX,hdslb.com,直连",
+
+    // 禁用国外 QUIC 流量
+    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
 
     "RULE-SET,OpenAI,OpenAI",
     "RULE-SET,AI,AI",
