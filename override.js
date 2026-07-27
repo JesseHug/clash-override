@@ -289,7 +289,7 @@ function main(config) {
     }
   });
 
-  const nodesOther = pNames.filter(n => !matchedByRegion.has(n) && !lowRateRegex.test(n) && !highRateRegex.test(n));
+  const nodesOther = pNames.filter(n => !matchedByRegion.has(n));
   if (nodesOther.length > 0) {
     activeRegions.push("Other");
     regionAutoGroups.push({ name: "Other-自动选择", proxies: nodesOther, hidden: true, ...autoBaseOption });
