@@ -16,6 +16,10 @@
  */
 const excludeHighRateProxiesEnable = false;
 
+// 策略组功能开关
+const enableEmby = false;     // Emby 分流策略组
+const enableAdBlock = true;   // 去广告策略组
+
 // --- 预定义规则 ---
 
 // 直连节点
@@ -322,6 +326,7 @@ function main(config) {
 
   newConfig["proxy-groups"] = [
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
+    ...(enableAdBlock ? [buildGroup("AdBlock", "AdBlock", ["直连", "REJECT", "Proxies", ...activeRegions])] : []),
     buildGroup("Google", "Google"),
     buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" }),
     // Spotify 默认选择 TW
@@ -334,6 +339,7 @@ function main(config) {
     buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions]),
+    ...(enableEmby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
     buildGroup("Final", "Final", ["Proxies", "直连"]),
 
     {
@@ -365,6 +371,7 @@ function main(config) {
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
 
   newConfig["rule-providers"] = {
+    ...(enableAdBlock ? { AdBlock: { ...mrs, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs", path: "./rules/AdBlock.mrs" } } : {}),
     Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
     Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs" },
     YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" },
@@ -377,6 +384,10 @@ function main(config) {
     AI: { ...mrs, url: `${r66}/domain/AI.mrs`, path: "./rules/AI.mrs" },
     AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
     Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" },
+    ...(enableEmby ? {
+      Emby: { ...mrs, url: `${r66}/domain/Emby.mrs`, path: "./rules/Emby.mrs" },
+      EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
+    } : {}),
     Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
     gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./rules/gfw.mrs" },
     'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
@@ -396,6 +407,7 @@ function main(config) {
   // 核心路由规则
   // 注意：FCM 服务已交由 Google 策略接管
   newConfig.rules = [
+    ...(enableAdBlock ? ["RULE-SET,AdBlock,AdBlock"] : []),
     "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
     "RULE-SET,AppleCN,直连",
@@ -415,6 +427,10 @@ function main(config) {
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,Twitter,X",
     "RULE-SET,Apple,Apple",
+    ...(enableEmby ? [
+      "RULE-SET,Emby,Emby",
+      "RULE-SET,EmbyIP,Emby"
+    ] : []),
 
     "RULE-SET,gfw,Proxies",
     "RULE-SET,geolocation-cn,直连",
