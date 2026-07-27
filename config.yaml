@@ -5,6 +5,27 @@
 #  完全对齐 override.js v10.1
 # =========================================================
 
+# --- 锚点定义 (通用属性) ---
+proxy_providers_common: &proxy_providers_common
+  type: http
+  interval: 86400
+  proxy: DIRECT
+  health-check: { enable: true, url: https://g.cn/generate_204, interval: 600, lazy: true }
+
+global_exclude_filter: &global_exclude_filter
+  exclude-filter: '(?i)(群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic)'
+
+BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
+BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
+BaseUT: &BaseUT {type: url-test, url: "https://g.cn/generate_204", interval: 300, tolerance: 50, lazy: true, timeout: 3000, hidden: true, max-failed-times: 3, exclude-type: "DIRECT"}
+BaseSelect: &BaseSelect {type: select, empty-fallback: REJECT}
+
+# ==================== 直连节点定义 ====================
+proxies:
+  - { name: '🇨🇳 直连 | 双栈', type: direct }
+  - { name: '🇨🇳 直连 | IPv4优先', type: direct, ip-version: ipv4-prefer }
+  - { name: '🇨🇳 直连 | IPv6优先', type: direct, ip-version: ipv6-prefer }
+
 # ==================== 基础配置 ====================
 mixed-port: 7890
 allow-lan: true
@@ -80,6 +101,9 @@ hosts:
   "+.edge.mountaintoys.cn": ["0.0.0.0"]
 
 # ==================== DNS 配置 ====================
+chinaDNS: &chinaDNS ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT']
+foreignDNS: &foreignDNS ['https://dns.cloudflare.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies']
+
 dns:
   enable: true
   ipv6: true
@@ -94,16 +118,10 @@ dns:
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-  proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
-  nameserver:
-    - https://dns.cloudflare.com/dns-query#Proxies
-    - https://dns.google/dns-query#Proxies
+  proxy-server-nameserver: *chinaDNS
+  nameserver: *foreignDNS
   nameserver-policy:
-    "rule-set:cn":
-      - https://dns.alidns.com/dns-query
-      - https://doh.pub/dns-query
+    "rule-set:cn": *chinaDNS
   direct-nameserver:
     - system
     - 223.5.5.5
@@ -112,46 +130,25 @@ dns:
 # ==================== 代理提供者 ====================
 proxy-providers:
   服务商一:
-    type: http
+    <<: [*proxy_providers_common, *global_exclude_filter]
     url: "https://example.com/sub?token=your_token_here"
-    interval: 86400
-    proxy: DIRECT
-    health-check:
-      enable: true
-      url: "https://g.cn/generate_204"
-      interval: 600
     override:
       additional-prefix: "[一] "
   服务商二:
-    type: http
+    <<: [*proxy_providers_common, *global_exclude_filter]
     url: "https://example2.com/sub?token=your_token_here"
-    interval: 86400
-    proxy: DIRECT
-    health-check:
-      enable: true
-      url: "https://g.cn/generate_204"
-      interval: 600
     override:
       additional-prefix: "[二] "
   服务商三:
-    type: http
+    <<: [*proxy_providers_common, *global_exclude_filter]
     url: "https://example3.com/sub?token=your_token_here"
-    interval: 86400
-    proxy: DIRECT
-    health-check:
-      enable: true
-      url: "https://g.cn/generate_204"
-      interval: 600
     override:
       additional-prefix: "[三] "
-
-# ==================== 策略组模板 ====================
-BaseUT: &BaseUT {type: url-test, url: "https://g.cn/generate_204", interval: 300, tolerance: 50, lazy: true, timeout: 3000, hidden: true, max-failed-times: 3}
 
 # ==================== 策略组 ====================
 proxy-groups:
   - name: Proxies
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
     proxies:
       - Auto
@@ -160,59 +157,63 @@ proxy-groups:
       - SG
       - TW
       - US
-      - KR
+      - MO
       - EU
       - Other
     include-all: true
   - name: Google
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
   - name: YouTube
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
-  # 硬编码锁定 Spotify 为 TW
+    default-selected: MO
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
   - name: Spotify
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
     default-selected: TW
-    proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
   - name: Telegram
-
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
   - name: Games
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
-    proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
   - name: PayPal
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png
-    proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
   - name: X
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
   - name: OpenAI
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
     default-selected: US
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
   - name: AI
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png
     default-selected: US
-    proxies: [Proxies, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
   - name: Apple
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
-    proxies: [Proxies, DIRECT, HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
   - name: Final
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png
-    proxies: [Proxies, DIRECT]
+    proxies: [Proxies, 直连]
+
+  - name: 直连
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png
+    proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先']
 
   - name: Auto
     type: url-test
@@ -223,57 +224,70 @@ proxy-groups:
     max-failed-times: 3
     timeout: 3000
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png
-    proxies: [HK, JP, SG, TW, US, KR, EU, Other]
+    proxies: [HK, JP, SG, TW, US, MO, EU, Other]
 
   # 地区策略组（手动 select + 隐藏 url-test 自动选择）
   - name: HK
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     proxies: [HK-自动选择]
     include-all: true
     filter: "(?i)港|HK|HongKong|Hong Kong"
   - name: SG
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
     proxies: [SG-自动选择]
     include-all: true
     filter: "(?i)坡|SG|Singapore"
   - name: TW
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
     proxies: [TW-自动选择]
     include-all: true
     filter: "(?i)台|TW|Taiwan"
   - name: JP
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
     proxies: [JP-自动选择]
     include-all: true
     filter: "(?i)日|JP|Japan"
   - name: US
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
     proxies: [US-自动选择]
     include-all: true
     filter: "(?i)美|US|UnitedStates|United States"
-  - name: KR
-    type: select
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png
-    proxies: [KR-自动选择]
+  - name: MO
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png
+    proxies: [MO-自动选择]
     include-all: true
-    filter: "(?i)韩|KR|KOR|Korea"
+    filter: "(?i)澳|MO|Macao|Macau"
   - name: EU
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/European_Union.png
     proxies: [EU-自动选择]
     include-all: true
     filter: "(?i)法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam"
   - name: Other
-    type: select
+    <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Europe_Map.png
     proxies: [Other-自动选择]
     include-all: true
-    filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
+    filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|澳|MO|Macao|Macau|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
+  - name: 低倍率节点
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png
+    proxies: [低倍率节点-自动选择]
+    include-all: true
+    filter: '^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)'
+  - name: 高倍率节点
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
+    proxies: [高倍率节点-自动选择]
+    include-all: true
+    filter: '(?u)(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))'
+
 
   # 隐藏的 url-test 自动选择组（include-all + filter 动态注入节点）
   - <<: *BaseUT
@@ -297,9 +311,9 @@ proxy-groups:
     include-all: true
     filter: "(?i)美|US|UnitedStates|United States"
   - <<: *BaseUT
-    name: KR-自动选择
+    name: MO-自动选择
     include-all: true
-    filter: "(?i)韩|KR|KOR|Korea"
+    filter: "(?i)澳|MO|Macao|Macau"
   - <<: *BaseUT
     name: EU-自动选择
     include-all: true
@@ -307,11 +321,18 @@ proxy-groups:
   - <<: *BaseUT
     name: Other-自动选择
     include-all: true
-    filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|韩|KR|KOR|Korea|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
+    filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|澳|MO|Macao|Macau|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
+  - <<: *BaseUT
+    name: 低倍率节点-自动选择
+    include-all: true
+    filter: '^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)'
+  - <<: *BaseUT
+    name: 高倍率节点-自动选择
+    include-all: true
+    filter: '(?u)(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))'
+
 
 # ==================== 规则集 ====================
-BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
-BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
 
 rule-providers:
   Direct:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
@@ -336,23 +357,21 @@ rule-providers:
   TelegramIP:   {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
   PrivateIP:    {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
   fakeip_filter:{<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs}
-  cn_additional:{<<: *BehaviorDN, url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs}
   cn:           {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs}
+  cn_additional:{<<: *BehaviorDN, url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs}
 
 # ==================== 路由规则 ====================
 rules:
-  # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
-  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
-
   # 直连 & 私有网络
   - RULE-SET,Direct,直连
   - RULE-SET,Private,直连
-
-  # Apple 国内直连
   - RULE-SET,AppleCN,直连
 
   # Bilibili 静态资源
   - DOMAIN-SUFFIX,hdslb.com,直连
+
+  # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
+  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
 
   # AI
   - RULE-SET,OpenAI,OpenAI
