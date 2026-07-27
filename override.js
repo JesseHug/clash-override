@@ -129,6 +129,7 @@ function main(config) {
   }
 
   // --- 基础网络与内核特性配置 ---
+  newConfig['mixed-port'] = 7890;
   newConfig['allow-lan'] = true;
   newConfig['ipv6'] = true;
   newConfig['mode'] = 'rule';
