@@ -326,7 +326,7 @@ function main(config) {
 
   newConfig["proxy-groups"] = [
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
-    ...(enableAdBlock ? [buildGroup("AdBlock", "AdBlock", ["直连", "REJECT", "Proxies", ...activeRegions])] : []),
+    ...(enableAdBlock ? [buildGroup("AdBlock", "Advertising", ["直连", "REJECT", "REJECT-DROP", "PASS"])] : []),
     buildGroup("Google", "Google"),
     buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" }),
     // Spotify 默认选择 TW
