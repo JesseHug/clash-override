@@ -140,12 +140,7 @@ dns:
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-  proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
-    - system
-    - 223.5.5.5
-    - 119.29.29.29
+  proxy-server-nameserver: *chinaDNS
   nameserver: *foreignDNS
   nameserver-policy:
     "rule-set:cn": *chinaDNS
@@ -187,51 +182,54 @@ proxy-groups:
       - MO
       - EU
       - Other
+      - 低倍率节点
+      - 高倍率节点
     include-all: true
+    exclude-type: "DIRECT"
   - name: Google
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: YouTube
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
     default-selected: MO
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Spotify
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
     default-selected: TW
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Telegram
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Games
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: PayPal
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: X
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: OpenAI
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
     default-selected: US
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: AI
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png
     default-selected: US
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Apple
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other]
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png
