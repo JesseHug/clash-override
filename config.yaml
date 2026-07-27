@@ -15,10 +15,32 @@ proxy_providers_common: &proxy_providers_common
 global_exclude_filter: &global_exclude_filter
   exclude-filter: '(?i)(群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic)'
 
-BehaviorDN: &BehaviorDN {type: http, behavior: domain, format: mrs, interval: 86400}
-BehaviorIP: &BehaviorIP {type: http, behavior: ipcidr, format: mrs, interval: 86400}
-BaseUT: &BaseUT {type: url-test, url: "https://g.cn/generate_204", interval: 300, tolerance: 50, lazy: true, timeout: 3000, hidden: true, max-failed-times: 3, exclude-type: "DIRECT"}
-BaseSelect: &BaseSelect {type: select, empty-fallback: REJECT}
+BehaviorDN: &BehaviorDN
+  type: http
+  behavior: domain
+  format: mrs
+  interval: 86400
+
+BehaviorIP: &BehaviorIP
+  type: http
+  behavior: ipcidr
+  format: mrs
+  interval: 86400
+
+BaseUT: &BaseUT
+  type: url-test
+  url: "https://g.cn/generate_204"
+  interval: 300
+  tolerance: 50
+  lazy: true
+  timeout: 3000
+  hidden: true
+  max-failed-times: 3
+  exclude-type: "DIRECT"
+
+BaseSelect: &BaseSelect
+  type: select
+  empty-fallback: REJECT
 
 # ==================== 直连节点定义 ====================
 proxies:
@@ -335,30 +357,78 @@ proxy-groups:
 # ==================== 规则集 ====================
 
 rule-providers:
-  Direct:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs}
-  Private:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs}
-  YouTube:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs}
-  Spotify:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs}
-  Telegram:     {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs}
-  Games:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs}
-  PayPal:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs}
-  Twitter:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs}
-  OpenAI:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/OpenAI.mrs}
-  AI:           {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/AI.mrs}
-  AppleCN:      {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs}
-  Apple:        {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs}
-  Google:       {<<: *BehaviorDN, url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs}
-  gfw:          {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs}
-  geolocation-cn: {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs}
-  ChinaIP:      {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs}
-  AIIP:         {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs}
-  GoogleIP:     {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs}
-  ProxyIP:      {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs}
-  TelegramIP:   {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs}
-  PrivateIP:    {<<: *BehaviorIP, url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs}
-  fakeip_filter:{<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs}
-  cn:           {<<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs}
-  cn_additional:{<<: *BehaviorDN, url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs}
+  Direct:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs
+  Private:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs
+  YouTube:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs
+  Spotify:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs
+  Telegram:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs
+  Games:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs
+  PayPal:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs
+  Twitter:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs
+  OpenAI:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/OpenAI.mrs
+  AI:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/AI.mrs
+  AppleCN:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs
+  Apple:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs
+  Google:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs
+  gfw:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs
+  geolocation-cn:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs
+  ChinaIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs
+  AIIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs
+  GoogleIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs
+  ProxyIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs
+  TelegramIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs
+  PrivateIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs
+  fakeip_filter:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs
+  cn:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs
+  cn_additional:
+    <<: *BehaviorDN
+    url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
 
 # ==================== 路由规则 ====================
 rules:
