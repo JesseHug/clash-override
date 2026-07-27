@@ -18,7 +18,6 @@ const excludeHighRateProxiesEnable = false;
 
 // 策略组功能开关
 const enableEmby = false;     // Emby 分流策略组
-const enableAdBlock = true;   // 去广告策略组
 
 // --- 预定义规则 ---
 
@@ -326,7 +325,6 @@ function main(config) {
 
   newConfig["proxy-groups"] = [
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
-    ...(enableAdBlock ? [buildGroup("AdBlock", "Advertising", ["直连", "REJECT", "REJECT-DROP", "PASS"])] : []),
     buildGroup("Google", "Google"),
     buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" }),
     // Spotify 默认选择 TW
@@ -371,7 +369,6 @@ function main(config) {
   const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
 
   newConfig["rule-providers"] = {
-    ...(enableAdBlock ? { AdBlock: { ...mrs, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs", path: "./rules/AdBlock.mrs" } } : {}),
     Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
     Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs" },
     YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" },
@@ -407,7 +404,6 @@ function main(config) {
   // 核心路由规则
   // 注意：FCM 服务已交由 Google 策略接管
   newConfig.rules = [
-    ...(enableAdBlock ? ["RULE-SET,AdBlock,AdBlock"] : []),
     "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
     "RULE-SET,AppleCN,直连",
