@@ -299,6 +299,7 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Europe_Map.png
     proxies: [Other-自动选择]
     include-all: true
+    exclude-type: "DIRECT"
     filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|澳|MO|Macao|Macau|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
   - name: 低倍率节点
     <<: *BaseSelect
