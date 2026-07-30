@@ -463,6 +463,12 @@ function main(config) {
       "RULE-SET,NetflixIP,Netflix"
     ] : []),
     ...(ruleOptionsEnable.Emby ? [
+      "DOMAIN-SUFFIX,nubebelle.com,Emby",
+      "PROCESS-NAME,com.mb.android,Emby",
+      "PROCESS-NAME,tv.emby.embyatv,Emby",
+      "PROCESS-NAME,com.hush.yamby,Emby",
+      "PROCESS-NAME,com.jellycine.app,Emby",
+      "PROCESS-NAME,com.mountains.hills,Emby",
       "RULE-SET,Emby,Emby",
       "RULE-SET,EmbyIP,Emby"
     ] : []),
