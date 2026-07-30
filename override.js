@@ -8,16 +8,21 @@
 
 // --- 静态配置区域 ---
 
+// 适配 Bettbox 自定义配置参数
+const Compatible_With_Bettbox = { ruleOptionsEnable: true };
+
 /**
- * 全局排除高倍率节点配置
- * 该配置用于启用全局排除高倍率节点功能
+ * 自定义配置选项
  * true = 启用
  * false = 禁用
  */
-const excludeHighRateProxiesEnable = false;
+const ruleOptionsEnable = {
+  // 分流策略组
+  Emby: false,            // Emby 媒体服务
 
-// 策略组功能开关
-const enableEmby = false;     // Emby 分流策略组
+  // 非分流策略配置
+  过滤高倍率节点: false,  // 全局排除高倍率节点（2x 及以上）
+};
 
 // --- 预定义规则 ---
 
@@ -117,7 +122,7 @@ function main(config) {
     config.proxies = config.proxies.filter(proxy => {
       if (!checkProxy(proxy)) return false; // 踢出缺少 server/port 等关键字段的坏节点
       if (excludeFilter.test(proxy.name)) return false;
-      if (excludeHighRateProxiesEnable && highRateRegex.test(proxy.name)) return false;
+      if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(proxy.name)) return false;
       return true;
     });
   }
@@ -338,7 +343,7 @@ function main(config) {
     buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
     buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions]),
-    ...(enableEmby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
     buildGroup("Final", "Final", ["Proxies", "直连"]),
 
     {
@@ -382,7 +387,7 @@ function main(config) {
     AI: { ...mrs, url: `${r66}/domain/AI.mrs`, path: "./rules/AI.mrs" },
     AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
     Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" },
-    ...(enableEmby ? {
+    ...(ruleOptionsEnable.Emby ? {
       Emby: { ...mrs, url: `${r66}/domain/Emby.mrs`, path: "./rules/Emby.mrs" },
       EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
     } : {}),
@@ -424,7 +429,7 @@ function main(config) {
     "RULE-SET,PayPal,PayPal",
     "RULE-SET,Twitter,X",
     "RULE-SET,Apple,Apple",
-    ...(enableEmby ? [
+    ...(ruleOptionsEnable.Emby ? [
       "RULE-SET,Emby,Emby",
       "RULE-SET,EmbyIP,Emby"
     ] : []),
