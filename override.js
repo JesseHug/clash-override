@@ -18,10 +18,26 @@ const Compatible_With_Bettbox = { ruleOptionsEnable: true };
  */
 const ruleOptionsEnable = {
   // 分流策略组
+  Google: true,           // Google 服务
+  YouTube: true,          // YouTube 视频
+  Spotify: true,          // Spotify 音乐
+  Telegram: true,         // Telegram 通讯
+  Games: true,            // 游戏平台 (Steam/Epic等)
+  X: true,                // X (Twitter)
+  OpenAI: true,           // OpenAI 及其服务
+  AI: true,               // 其他 AI 服务
+  Apple: true,            // Apple 服务
+
+  PayPal: false,          // PayPal 支付
+  Netflix: false,         // Netflix 流媒体
   Emby: false,            // Emby 媒体服务
 
   // 非分流策略配置
-  过滤高倍率节点: false,  // 全局排除高倍率节点（2x 及以上）
+  显示默认隐藏的策略组: false,  // 显示隐藏的地区 url-test 自动选择组
+  生成地区自动选择组: true,     // 为每个地区生成隐藏的 url-test 自动选择组
+  隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
+  过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
+  过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
 };
 
 // --- 预定义规则 ---
@@ -293,16 +309,22 @@ function main(config) {
       activeRegions.push(r.key);
       nodes.forEach(n => matchedByRegion.add(n));
       const autoName = `${r.key}-自动选择`;
-      regionAutoGroups.push({ name: autoName, proxies: nodes, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: r.key, type: "select", icon: `${ico}/${r.icon}`, proxies: [autoName, ...nodes] });
+      if (ruleOptionsEnable.生成地区自动选择组) {
+        regionAutoGroups.push({ name: autoName, proxies: nodes, hidden: !ruleOptionsEnable.显示默认隐藏的策略组, ...autoBaseOption });
+      }
+      const groupProxies = ruleOptionsEnable.生成地区自动选择组 ? [autoName, ...nodes] : nodes;
+      regionGroups.push({ name: r.key, type: "select", icon: `${ico}/${r.icon}`, proxies: groupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
     }
   });
 
   const nodesOther = pNames.filter(n => !matchedByRegion.has(n));
-  if (nodesOther.length > 0) {
+  if (!ruleOptionsEnable.过滤非地区节点 && nodesOther.length > 0) {
     activeRegions.push("Other");
-    regionAutoGroups.push({ name: "Other-自动选择", proxies: nodesOther, hidden: true, ...autoBaseOption });
-    regionGroups.push({ name: "Other", type: "select", icon: `${ico}/Europe_Map.png`, proxies: ["Other-自动选择", ...nodesOther] });
+    if (ruleOptionsEnable.生成地区自动选择组) {
+      regionAutoGroups.push({ name: "Other-自动选择", proxies: nodesOther, hidden: !ruleOptionsEnable.显示默认隐藏的策略组, ...autoBaseOption });
+    }
+    const otherGroupProxies = ruleOptionsEnable.生成地区自动选择组 ? ["Other-自动选择", ...nodesOther] : nodesOther;
+    regionGroups.push({ name: "Other", type: "select", icon: `${ico}/Europe_Map.png`, proxies: otherGroupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
   }
 
   const nodesLowRate = getNodes(lowRateRegex);
@@ -331,18 +353,19 @@ function main(config) {
 
   newConfig["proxy-groups"] = [
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
-    buildGroup("Google", "Google"),
-    buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" }),
+    ...(ruleOptionsEnable.Google ? [buildGroup("Google", "Google")] : []),
+    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" })] : []),
     // Spotify 默认选择 TW
-    buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { defaultSelected: "TW" }),
-    buildGroup("Telegram", "Telegram_X"),
-    buildGroup("Games", "Game", ["Proxies", "直连", ...activeRegions]),
-    buildGroup("PayPal", "PayPal", ["Proxies", "直连", ...activeRegions]),
-    buildGroup("X", "X"),
+    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { defaultSelected: "TW" })] : []),
+    ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", "Telegram_X")] : []),
+    ...(ruleOptionsEnable.Games ? [buildGroup("Games", "Game", ["Proxies", "直连", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", "PayPal", ["Proxies", "直连", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.X ? [buildGroup("X", "X")] : []),
     // OpenAI 与 AI 默认选择 US
-    buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
-    buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" }),
-    buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions]),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" })] : []),
+    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" })] : []),
+    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", "Netflix", ["Proxies", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
     buildGroup("Final", "Final", ["Proxies", "直连"]),
 
@@ -377,28 +400,34 @@ function main(config) {
   newConfig["rule-providers"] = {
     Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
     Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs" },
-    YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" },
-    Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs`, path: "./rules/Spotify.mrs" },
-    Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs`, path: "./rules/Telegram.mrs" },
-    Games: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Games.mrs" },
-    PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs`, path: "./rules/PayPal.mrs" },
-    Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs`, path: "./rules/Twitter.mrs" },
-    OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs`, path: "./rules/OpenAI.mrs" },
-    AI: { ...mrs, url: `${r66}/domain/AI.mrs`, path: "./rules/AI.mrs" },
-    AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
-    Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" },
+    ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
+    ...(ruleOptionsEnable.Spotify ? { Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs`, path: "./rules/Spotify.mrs" } } : {}),
+    ...(ruleOptionsEnable.Telegram ? { Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs`, path: "./rules/Telegram.mrs" } } : {}),
+    ...(ruleOptionsEnable.Games ? { Games: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Games.mrs" } } : {}),
+    ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
+    ...(ruleOptionsEnable.X ? { Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs`, path: "./rules/Twitter.mrs" } } : {}),
+    ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
+    ...(ruleOptionsEnable.AI ? { AI: { ...mrs, url: `${r66}/domain/AI.mrs`, path: "./rules/AI.mrs" } } : {}),
+    ...(ruleOptionsEnable.Apple ? {
+      AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
+      Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" }
+    } : {}),
+    ...(ruleOptionsEnable.Netflix ? {
+      Netflix: { ...mrs, url: `${r66}/domain/Netflix.mrs`, path: "./rules/Netflix.mrs" },
+      NetflixIP: { ...mrsIP, url: `${r66}/ip/Netflix.mrs`, path: "./rules/NetflixIP.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.Emby ? {
       Emby: { ...mrs, url: `${r66}/domain/Emby.mrs`, path: "./rules/Emby.mrs" },
       EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
     } : {}),
-    Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
+    ...(ruleOptionsEnable.Google ? { Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" } } : {}),
     gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./rules/gfw.mrs" },
     'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs`, path: "./rules/ChinaIP.mrs" },
-    AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" },
-    GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" },
+    ...(ruleOptionsEnable.AI ? { AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" } } : {}),
+    ...(ruleOptionsEnable.Google ? { GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" } } : {}),
     ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs`, path: "./rules/ProxyIP.mrs" },
-    TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" },
+    ...(ruleOptionsEnable.Telegram ? { TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" } } : {}),
     PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs" },
     fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
     cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs", path: "./rules/cn.mrs" },
@@ -412,23 +441,27 @@ function main(config) {
   newConfig.rules = [
     "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
-    "RULE-SET,AppleCN,直连",
+    ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
 
     "DOMAIN-SUFFIX,hdslb.com,直连",
 
     // 禁用国外 QUIC 流量
     "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
 
-    "RULE-SET,OpenAI,OpenAI",
-    "RULE-SET,AI,AI",
-    "RULE-SET,YouTube,YouTube",
-    "RULE-SET,Google,Google",
-    "RULE-SET,Spotify,Spotify",
-    "RULE-SET,Telegram,Telegram",
-    "RULE-SET,Games,Games",
-    "RULE-SET,PayPal,PayPal",
-    "RULE-SET,Twitter,X",
-    "RULE-SET,Apple,Apple",
+    ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
+    ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI"] : []),
+    ...(ruleOptionsEnable.YouTube ? ["RULE-SET,YouTube,YouTube"] : []),
+    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google"] : []),
+    ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify"] : []),
+    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram"] : []),
+    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games"] : []),
+    ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
+    ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X"] : []),
+    ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
+    ...(ruleOptionsEnable.Netflix ? [
+      "RULE-SET,Netflix,Netflix",
+      "RULE-SET,NetflixIP,Netflix"
+    ] : []),
     ...(ruleOptionsEnable.Emby ? [
       "RULE-SET,Emby,Emby",
       "RULE-SET,EmbyIP,Emby"
@@ -439,9 +472,9 @@ function main(config) {
     "RULE-SET,cn_additional,直连",
 
     "RULE-SET,PrivateIP,直连,no-resolve",
-    "RULE-SET,AIIP,AI,no-resolve",
-    "RULE-SET,GoogleIP,Google,no-resolve",
-    "RULE-SET,TelegramIP,Telegram,no-resolve",
+    ...(ruleOptionsEnable.AI ? ["RULE-SET,AIIP,AI,no-resolve"] : []),
+    ...(ruleOptionsEnable.Google ? ["RULE-SET,GoogleIP,Google,no-resolve"] : []),
+    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,直连",
 
