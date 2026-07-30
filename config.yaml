@@ -230,6 +230,10 @@ proxy-groups:
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
     proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+  - name: Emby
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png
+    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png
@@ -397,6 +401,9 @@ rule-providers:
   Apple:
     <<: *BehaviorDN
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs
+  Emby:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Emby.mrs
   Google:
     <<: *BehaviorDN
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs
@@ -409,6 +416,9 @@ rule-providers:
   ChinaIP:
     <<: *BehaviorIP
     url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs
+  EmbyIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs
   AIIP:
     <<: *BehaviorIP
     url: https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs
@@ -460,6 +470,14 @@ rules:
   - RULE-SET,PayPal,PayPal
   - RULE-SET,Twitter,X
   - RULE-SET,Apple,Apple
+  - DOMAIN-SUFFIX,nubebelle.com,Emby
+  - PROCESS-NAME,com.mb.android,Emby
+  - PROCESS-NAME,tv.emby.embyatv,Emby
+  - PROCESS-NAME,com.hush.yamby,Emby
+  - PROCESS-NAME,com.jellycine.app,Emby
+  - PROCESS-NAME,com.mountains.hills,Emby
+  - RULE-SET,Emby,Emby
+  - RULE-SET,EmbyIP,Emby
 
   # 国外网站兜底
   - RULE-SET,gfw,Proxies
