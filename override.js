@@ -352,6 +352,22 @@ function main(config) {
     regionGroups.push({ name: "高倍率节点", type: "select", icon: `${ico}/Airport.png`, proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
   }
 
+  // 专门用于适配 Bettbox GUI 读取开关图标的定义
+  const serviceConfigs = [
+    { name: 'Google', icon: `${ico}/Google.png` },
+    { name: 'YouTube', icon: `${ico}/YouTube.png` },
+    { name: 'Spotify', icon: `${ico}/Spotify.png` },
+    { name: 'Telegram', icon: `${ico}/Telegram_X.png` },
+    { name: 'Games', icon: `${ico}/Game.png` },
+    { name: 'PayPal', icon: `${ico}/PayPal.png` },
+    { name: 'X', icon: `${ico}/X.png` },
+    { name: 'OpenAI', icon: `${ico}/ChatGPT.png` },
+    { name: 'AI', icon: `${ico}/AI.png` },
+    { name: 'Apple', icon: `${ico}/Apple.png` },
+    { name: 'Netflix', icon: `${ico}/Netflix.png` },
+    { name: 'Emby', icon: `${ico}/Emby.png` },
+  ];
+
   const masterName = "Auto";
 
   // 策略组工厂函数
