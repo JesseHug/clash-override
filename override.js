@@ -354,18 +354,18 @@ function main(config) {
 
   // 专门用于适配 Bettbox GUI 读取开关图标的定义
   const serviceConfigs = [
-    { name: 'Google', icon: `${ico}/Google.png` },
-    { name: 'YouTube', icon: `${ico}/YouTube.png` },
-    { name: 'Spotify', icon: `${ico}/Spotify.png` },
-    { name: 'Telegram', icon: `${ico}/Telegram_X.png` },
-    { name: 'Games', icon: `${ico}/Game.png` },
-    { name: 'PayPal', icon: `${ico}/PayPal.png` },
-    { name: 'X', icon: `${ico}/X.png` },
-    { name: 'OpenAI', icon: `${ico}/ChatGPT.png` },
-    { name: 'AI', icon: `${ico}/AI.png` },
-    { name: 'Apple', icon: `${ico}/Apple.png` },
-    { name: 'Netflix', icon: `${ico}/Netflix.png` },
-    { name: 'Emby', icon: `${ico}/Emby.png` },
+    { name: 'Google', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google.png' },
+    { name: 'YouTube', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png' },
+    { name: 'Spotify', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png' },
+    { name: 'Telegram', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png' },
+    { name: 'Games', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png' },
+    { name: 'PayPal', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png' },
+    { name: 'X', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png' },
+    { name: 'OpenAI', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png' },
+    { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
+    { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png' },
+    { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png' },
+    { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png' },
   ];
 
   const masterName = "Auto";
