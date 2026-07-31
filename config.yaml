@@ -112,6 +112,10 @@ sniffer:
     - "+.push.apple.com"
 
 # ==================== Hosts 配置 ====================
+# 【说明】
+# 对于使用特殊/私有节点域名的机场，如果节点是通过特殊的域名访问而不是 IP，
+# 你可能需要在这里手动映射。你可以打开机场提供的订阅配置，查看它的 `hosts` 字段。
+# 如果有类似 `proxy-domain.com: [1.2.3.4]` 的内容，请手动将其粘贴到下方。
 hosts:
   dns.alidns.com: [223.5.5.5, 223.6.6.6]
   doh.pub: [1.12.12.12, 120.53.53.53]
@@ -140,7 +144,14 @@ dns:
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-  proxy-server-nameserver: *chinaDNS
+  # 【说明】proxy-server-nameserver 决定了解析节点域名的 DNS。
+  # 如果你的机场使用的是普通的域名节点，保持 *chinaDNS 即可。
+  # 如果你的机场使用了自定义/私有 DNS（比如一些特殊的抗封锁节点），
+  # 你需要去机场下发的配置里查看 `proxy-server-nameserver` 字段，
+  # 并将那些特殊的 DNS 添加到下方的列表里。
+  proxy-server-nameserver: 
+    - *chinaDNS
+    # - "https://private.dns.server/dns-query" # 在此取消注释并填入你的机场私有 DNS
   nameserver: *foreignDNS
   nameserver-policy:
     "rule-set:cn": *chinaDNS
