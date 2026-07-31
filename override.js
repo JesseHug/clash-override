@@ -33,6 +33,7 @@ const ruleOptionsEnable = {
   Emby: false,            // Emby 媒体服务
 
   // 非分流策略配置
+  屏蔽国外QUIC: true,           // 屏蔽国外 QUIC 流量（防止视频卡顿）
   显示默认隐藏的策略组: false,  // 显示隐藏的地区 url-test 自动选择组
   生成地区自动选择组: true,     // 为每个地区生成隐藏的 url-test 自动选择组
   隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
@@ -446,7 +447,9 @@ function main(config) {
     "DOMAIN-SUFFIX,hdslb.com,直连",
 
     // 禁用国外 QUIC 流量
-    "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT",
+    ...(ruleOptionsEnable.屏蔽国外QUIC ? [
+      "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
+    ] : []),
 
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
     ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI"] : []),
