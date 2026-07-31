@@ -276,9 +276,30 @@ function main(config) {
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
-  newConfig['proxies'] = [...proxies, ...directProxies];
-
   // --- 策略组构建 ---
+  const regionMappings = [
+    { key: "HK", flag: "🇭🇰", regex: /港|HK|HongKong|Hong Kong/i, icon: "Hong_Kong.png" },
+    { key: "SG", flag: "🇸🇬", regex: /坡|SG|Singapore/i, icon: "Singapore.png" },
+    { key: "TW", flag: "🇹🇼", regex: /台|TW|Taiwan/i, icon: "Taiwan.png" },
+    { key: "JP", flag: "🇯🇵", regex: /日|JP|Japan/i, icon: "Japan.png" },
+    { key: "US", flag: "🇺🇸", regex: /美|US|UnitedStates|United States/i, icon: "United_States.png" },
+    { key: "MO", flag: "🇲🇴", regex: /澳|MO|Macao|Macau/i, icon: "Macao.png" },
+    { key: "EU", flag: "🇪🇺", regex: /法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
+  ];
+
+  // 为没有国旗的地区节点添加国旗前缀
+  proxies.forEach(proxy => {
+    for (const region of regionMappings) {
+      if (region.regex.test(proxy.name)) {
+        if (!/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
+          proxy.name = `${region.flag} ${proxy.name}`;
+        }
+        break;
+      }
+    }
+  });
+
+  newConfig['proxies'] = [...proxies, ...directProxies];
   const pNames = proxies.map(p => p.name);
   const getNodes = (reg) => {
     const res = pNames.filter(name => reg.test(name));
@@ -288,16 +309,6 @@ function main(config) {
   const healthCheckUrl = "https://g.cn/generate_204";
   const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3 };
   const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
-
-  const regionMappings = [
-    { key: "HK", regex: /港|HK|HongKong|Hong Kong/i, icon: "Hong_Kong.png" },
-    { key: "SG", regex: /坡|SG|Singapore/i, icon: "Singapore.png" },
-    { key: "TW", regex: /台|TW|Taiwan/i, icon: "Taiwan.png" },
-    { key: "JP", regex: /日|JP|Japan/i, icon: "Japan.png" },
-    { key: "US", regex: /美|US|UnitedStates|United States/i, icon: "United_States.png" },
-    { key: "MO", regex: /澳|MO|Macao|Macau/i, icon: "Macao.png" },
-    { key: "EU", regex: /法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
-  ];
 
   const regionGroups = [];
   const regionAutoGroups = [];
