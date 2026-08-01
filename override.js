@@ -423,7 +423,7 @@ function main(config) {
   // 降低内存占用并实现分流
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
-  const r66 = "https://github.com/666OS/rules/raw/release/mihomo";
+  const r66 = "https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo";
 
   newConfig["rule-providers"] = {
     Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
