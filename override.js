@@ -329,12 +329,14 @@ function main(config) {
   const regionGroups = [];
   const regionAutoGroups = [];
   const activeRegions = [];
+  const coreRegions = [];
   const matchedByRegion = new Set();
 
   regionMappings.forEach(r => {
     const nodes = getNodes(r.regex);
     if (nodes[0] !== "DIRECT") {
       activeRegions.push(r.key);
+      coreRegions.push(r.key);
       nodes.forEach(n => matchedByRegion.add(n));
       const autoName = `${r.key}-自动选择`;
       if (ruleOptionsEnable.生成地区自动选择组) {
@@ -404,7 +406,7 @@ function main(config) {
       proxies: [...directProxies.map(p => p.name)]
     },
 
-    { name: masterName, icon: `${ico}/Auto.png`, proxies: activeRegions, ...autoBaseOption },
+    { name: masterName, icon: `${ico}/Auto.png`, proxies: coreRegions, ...autoBaseOption },
     ...regionGroups,
     ...regionAutoGroups
   ];
