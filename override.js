@@ -142,7 +142,7 @@ function matchDomainPattern(pattern, domains) {
 
 // --- 正则缓存加速 ---
 const proxyRegionCache = new Map();
-const anyRegionRegex = new RegExp(regionMappings.map((r) => r.regex.source).join('|'), 'i');
+const anyRegionRegex = new RegExp(regionMappings.map((r) => '(?:' + r.regex.source + ')').join('|'), 'i');
 
 function getMatchedRegions(proxyName) {
   if (proxyRegionCache.has(proxyName)) {
@@ -175,8 +175,11 @@ function filterAndNormalizeProxies(config) {
   const originalProxies = config.proxies || [];
   const originalProxyNames = new Set(originalProxies.map(p => p.name));
 
+  const builtinTypes = new Set(['direct', 'reject', 'rematch']);
+
   let filteredRawProxies = originalProxies.filter(proxy => {
     if (!checkProxy(proxy)) return false;
+    if (builtinTypes.has(String(proxy.type ?? '').toLowerCase())) return false;
     if (excludeFilter.test(proxy.name)) return false;
     if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(proxy.name)) return false;
     return true;
@@ -189,9 +192,10 @@ function filterAndNormalizeProxies(config) {
     const oldName = proxy.name;
     const regions = getMatchedRegions(proxy.name);
     if (regions.length > 0 && !/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
-      proxy.name = `${regions[0].flag} ${proxy.name}`;
+      const newName = `${regions[0].flag} ${proxy.name}`;
+      if (oldName !== newName) renameMap.set(oldName, newName);
+      return { ...proxy, name: newName };
     }
-    if (oldName !== proxy.name) renameMap.set(oldName, proxy.name);
     return proxy;
   });
 
@@ -321,7 +325,7 @@ function buildRegionGroups(proxies) {
   const regionGroups = [];
   const regionAutoGroups = [];
   const activeRegions = [];
-  const coreRegions = [];
+  const coreRegions = []; // 仅包含国家/地区组，不含倍率组，用于 Auto url-test 自动选择
   const matchedByRegion = new Set();
 
   regionMappings.forEach(r => {
@@ -365,7 +369,7 @@ function buildRegionGroups(proxies) {
   return { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico };
 }
 
-function buildProxyGroups(proxies, regionData) {
+function buildProxyGroups(regionData) {
   const { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico } = regionData;
   const masterName = "Auto";
 
@@ -447,7 +451,7 @@ function main(config) {
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
   const regionData = buildRegionGroups(proxies);
-  newConfig["proxy-groups"] = buildProxyGroups(proxies, regionData);
+  newConfig["proxy-groups"] = buildProxyGroups(regionData);
 
   // --- Rule Providers (666OS 体系) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
