@@ -151,16 +151,19 @@ function main(config) {
   };
 
   // 执行节点有效性校验、屏蔽词剔除以及倍率拦截
-  if (Array.isArray(config.proxies)) {
-    config.proxies = config.proxies.filter(proxy => {
-      if (!checkProxy(proxy)) return false; // 踢出缺少 server/port 等关键字段的坏节点
-      if (excludeFilter.test(proxy.name)) return false;
-      if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(proxy.name)) return false;
-      return true;
-    });
-  }
+  const originalProxies = config.proxies || [];
+  const originalProxyNames = new Set(originalProxies.map(p => p.name));
 
-  const proxies = config.proxies || [];
+  let proxies = originalProxies.filter(proxy => {
+    if (!checkProxy(proxy)) return false; // 踢出缺少 server/port 等关键字段的坏节点
+    if (excludeFilter.test(proxy.name)) return false;
+    if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(proxy.name)) return false;
+    return true;
+  });
+
+  const survivingOriginalNames = new Set(proxies.map(p => p.name));
+  const renameMap = new Map();
+
   const isAllDirectOrReject = proxies.every(p => p.type?.toLowerCase() === 'direct' || p.type?.toLowerCase() === 'reject');
   if (!proxies.length || isAllDirectOrReject) {
     throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
@@ -286,6 +289,7 @@ function main(config) {
     '+.mcdn.bilivideo.com': ['0.0.0.0'],
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
     '+.edge.mountaintoys.cn': ['0.0.0.0'],
+    '+.h2.smtcdns.net': ['0.0.0.0'],
     ...proxyServerHosts,
   };
 
@@ -305,6 +309,7 @@ function main(config) {
 
   // 为没有国旗的地区节点添加国旗前缀
   proxies.forEach(proxy => {
+    const oldName = proxy.name;
     for (const region of regionMappings) {
       if (region.regex.test(proxy.name)) {
         if (!/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
@@ -313,6 +318,21 @@ function main(config) {
         break;
       }
     }
+    if (oldName !== proxy.name) renameMap.set(oldName, proxy.name);
+  });
+
+  // 修复 dialer-proxy 引用
+  proxies = proxies.map(proxy => {
+    const target = proxy['dialer-proxy'];
+    if (!target) return proxy;
+    if (renameMap.has(target)) return { ...proxy, 'dialer-proxy': renameMap.get(target) };
+    if (survivingOriginalNames.has(target)) return proxy;
+    if (originalProxyNames.has(target)) {
+      const copy = { ...proxy };
+      delete copy['dialer-proxy'];
+      return copy;
+    }
+    return proxy;
   });
 
   newConfig['proxies'] = [...proxies, ...directProxies];
