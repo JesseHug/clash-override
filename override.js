@@ -74,13 +74,13 @@ const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|�
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
 
 const regionMappings = [
-  { key: "HK", flag: "🇭🇰", regex: /港|HK|HongKong|Hong Kong/i, icon: "Hong_Kong.png" },
-  { key: "SG", flag: "🇸🇬", regex: /坡|SG|Singapore/i, icon: "Singapore.png" },
-  { key: "TW", flag: "🇹🇼", regex: /台|TW|Taiwan/i, icon: "Taiwan.png" },
-  { key: "JP", flag: "🇯🇵", regex: /日|JP|Japan/i, icon: "Japan.png" },
-  { key: "US", flag: "🇺🇸", regex: /美|US|UnitedStates|United States/i, icon: "United_States.png" },
-  { key: "MO", flag: "🇲🇴", regex: /澳|MO|Macao|Macau/i, icon: "Macao.png" },
-  { key: "EU", flag: "🇪🇺", regex: /法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
+  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HK(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
+  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SG(?![A-Za-z])|Singapore/i, icon: "Singapore.png" },
+  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?![A-Za-z])|Taiwan/i, icon: "Taiwan.png" },
+  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|Japan/i, icon: "Japan.png" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
+  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])MO(?![A-Za-z])|Macao|Macau/i, icon: "Macao.png" },
+  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
 ];
 
 // --- 域名匹配工具函数 ---
@@ -234,12 +234,24 @@ function filterAndNormalizeProxies(config) {
   const survivingOriginalNames = new Set(filteredRawProxies.map(p => p.name));
   const renameMap = new Map();
 
+  const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
+
   let proxies = filteredRawProxies.map(proxy => {
     const oldName = proxy.name;
-    const regions = getMatchedRegions(proxy.name);
-    if (regions.length > 0 && !/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
-      const newName = `${regions[0].flag} ${proxy.name}`;
-      if (oldName !== newName) renameMap.set(oldName, newName);
+    const matchedRegions = getMatchedRegions(oldName);
+
+    // 提取已有国旗，移除国旗和多余空格
+    const existingFlag = oldName.match(flagRegex)?.[0];
+    const nameWithoutFlag = oldName.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
+
+    // 如果已有国旗则复用，否则从地区匹配取
+    const regionFlag = existingFlag || matchedRegions.find((r) => r.flag)?.flag;
+    const newName = regionFlag ? `${regionFlag} ${nameWithoutFlag}` : nameWithoutFlag;
+
+    // 预缓存标准化后的名称，供后续 buildRegionGroups 复用
+    if (newName !== oldName) {
+      proxyRegionCache.set(newName, matchedRegions);
+      renameMap.set(oldName, newName);
       return { ...proxy, name: newName };
     }
     return proxy;
@@ -284,10 +296,9 @@ function buildDnsAndHostsConfig(config, proxies) {
     'system',
   ];
 
-  const isCommonDns = (dns) => {
-    const value = String(dns).toLowerCase();
-    return commonDnsList.some((keyword) => value.includes(keyword));
-  };
+  // 预编译为单个正则，避免逐个遍历数组进行子串匹配
+  const commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'));
+  const isCommonDns = (dns) => commonDnsRegex.test(String(dns).toLowerCase());
 
   // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
   const privateDNS = [
@@ -377,7 +388,7 @@ function buildRegionGroups(proxies) {
   };
 
   const healthCheckUrl = "https://g.cn/generate_204";
-  const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3 };
+  const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3, "exclude-type": "DIRECT", "empty-fallback": "REJECT" };
   const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
 
   const regionGroups = [];
