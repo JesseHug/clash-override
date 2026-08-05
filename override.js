@@ -140,6 +140,52 @@ function matchDomainPattern(pattern, domains) {
   return false;
 }
 
+// hosts 匹配优先级：精确 > +. > . > *（同级按出现顺序）
+function hostSpecificity(pattern) {
+  if (pattern.startsWith('+.')) return 2;
+  if (pattern.startsWith('.')) return 1;
+  if (pattern.includes('*')) return 0;
+  return 3;
+}
+
+// 根据订阅 hosts 将节点 server 改写为映射后的地址（域名或 IP）
+// 部分机场通过 hosts 把节点域名映射到实际地址，直接改写 server 后即无需再把机场 hosts 复制进新配置
+function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
+  if (!hosts || typeof hosts !== 'object') return proxies;
+
+  const hostEntries = Object.entries(hosts)
+    .filter(
+      ([domain, value]) =>
+        matchDomainPattern(domain, originalProxyDomains) &&
+        ((typeof value === 'string' && value.length > 0) || (Array.isArray(value) && value.length > 0)),
+    )
+    .sort((a, b) => hostSpecificity(b[0]) - hostSpecificity(a[0]));
+
+  if (hostEntries.length === 0) return proxies;
+
+  const resolve = (server) => {
+    const domains = new Set([server.toLowerCase()]);
+    for (const [domain, value] of hostEntries) {
+      if (!matchDomainPattern(domain, domains)) continue;
+      const candidate = Array.isArray(value) ? value[0] : value;
+      if (typeof candidate === 'string' && candidate.length > 0) return candidate;
+    }
+    return server;
+  };
+
+  return proxies.map((proxy) => {
+    if (typeof proxy.server !== 'string') return proxy;
+    const server = resolve(proxy.server);
+    return server === proxy.server ? proxy : { ...proxy, server };
+  });
+}
+
+// 剥离 DNS 地址的 # 策略组后缀（如 https://xxx/dns-query#proxy → https://xxx/dns-query）
+// 订阅中的 DNS 常带 #策略组 后缀，而对应策略组在新配置中可能不存在，保留会导致内核报错
+function stripDnsSuffix(dns) {
+  return String(dns).split('#')[0];
+}
+
 // --- 正则缓存加速 ---
 const proxyRegionCache = new Map();
 const anyRegionRegex = new RegExp(regionMappings.map((r) => '(?:' + r.regex.source + ')').join('|'), 'i');
@@ -233,7 +279,7 @@ function buildDnsAndHostsConfig(config, proxies) {
     '185.228.168.9', '185.228.169.9', '77.88.8.8', '77.88.8.1',
     '156.154.70.1', '156.154.71.1',
     '127.0.0.1',
-    'alidns', 'doh.pub', 'dot.pub', 'dnspod', 'dns.baidu',
+    'alidns', 'doh.pub', 'dot.pub', 'dns.pub', 'dnspod', 'dns.baidu',
     'dns.google', 'cloudflare', 'quad9', 'opendns', 'nextdns', 'adguard',
     'system',
   ];
@@ -243,25 +289,46 @@ function buildDnsAndHostsConfig(config, proxies) {
     return commonDnsList.some((keyword) => value.includes(keyword));
   };
 
-  const proxyDomains = new Set(
+  // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
+  const privateDNS = [
+    ...new Set(
+      [...(originalDnsConfig['nameserver'] ?? []), ...(originalDnsConfig['proxy-server-nameserver'] ?? [])]
+        .map(stripDnsSuffix)
+        .filter((dns) => dns.length > 0 && !isCommonDns(dns)),
+    ),
+  ];
+
+  // 原节点域名（改写前）
+  const originalProxyDomains = new Set(
     proxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
   );
 
-  const privateDNS = [
-    ...new Set([...(originalDnsConfig['nameserver'] ?? []), ...(originalDnsConfig['proxy-server-nameserver'] ?? [])]),
-  ].filter((dns) => !isCommonDns(dns));
+  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
+  const mappedProxies = applyHostsToProxies(proxies, config.hosts, originalProxyDomains);
 
-  const proxyServerPolicy = {};
-  for (const policy of [
-    originalDnsConfig['nameserver-policy'] ?? {},
-    originalDnsConfig['proxy-server-nameserver-policy'] ?? {},
-  ]) {
-    for (const [domain, dns] of Object.entries(policy)) {
-      if (matchDomainPattern(domain, proxyDomains)) {
-        proxyServerPolicy[domain] = dns;
-      }
-    }
-  }
+  // 映射后的节点地址域名
+  const mappedProxyDomains = new Set(
+    mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
+  );
+
+  // 合并原节点域名与映射后域名
+  const proxyDomains = new Set([...originalProxyDomains, ...mappedProxyDomains]);
+
+  // 提取节点域名对应的 DNS 配置（剥离 # 策略组后缀）
+  const proxyServerPolicy = Object.fromEntries(
+    [originalDnsConfig['nameserver-policy'] ?? {}, originalDnsConfig['proxy-server-nameserver-policy'] ?? {}]
+      .flatMap(Object.entries)
+      .filter(([domain]) => matchDomainPattern(domain, proxyDomains))
+      .map(([domain, dns]) => [
+        domain,
+        Array.isArray(dns) ? dns.map(stripDnsSuffix).filter((d) => d.length > 0) : stripDnsSuffix(dns),
+      ])
+      .filter(([, dns]) => !(Array.isArray(dns) && dns.length === 0))
+  );
+
+  // 继承机场自带的 fake-ip-filter（部分机场节点域名需走真实 IP 解析）
+  const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] ?? [];
+  const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => matchDomainPattern(String(pattern), proxyDomains));
 
   const chinaDNS = ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
   const foreignDNS = ['https://dns.cloudflare.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
@@ -274,8 +341,8 @@ function buildDnsAndHostsConfig(config, proxies) {
     'use-system-hosts': true,
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/16',
-    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter'],
-    'proxy-server-nameserver': [...chinaDNS, ...privateDNS],
+    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter', ...proxyFakeIpFilter],
+    'proxy-server-nameserver': [...(privateDNS.length > 0 ? privateDNS : chinaDNS)],
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
     }),
@@ -287,14 +354,6 @@ function buildDnsAndHostsConfig(config, proxies) {
     'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
   };
 
-  const originalHosts = config.hosts ?? {};
-  const proxyServerHosts = {};
-  for (const [domain, value] of Object.entries(originalHosts)) {
-    if (matchDomainPattern(domain, proxyDomains)) {
-      proxyServerHosts[domain] = value;
-    }
-  }
-
   const hosts = {
     'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
     'doh.pub': ['1.12.12.12', '120.53.53.53'],
@@ -305,10 +364,9 @@ function buildDnsAndHostsConfig(config, proxies) {
     '+.mcdn.bilivideo.cn': ['0.0.0.0'],
     '+.edge.mountaintoys.cn': ['0.0.0.0'],
     '+.h2.smtcdns.net': ['0.0.0.0'],
-    ...proxyServerHosts,
   };
 
-  return { dns, hosts };
+  return { dns, hosts, proxies: mappedProxies };
 }
 
 function buildRegionGroups(proxies) {
@@ -425,7 +483,6 @@ function main(config) {
   const newConfig = {};
 
   const proxies = filterAndNormalizeProxies(config);
-  newConfig['proxies'] = [...proxies, ...directProxies];
   
   newConfig['mixed-port'] = 7890;
   newConfig['allow-lan'] = true;
@@ -443,14 +500,16 @@ function main(config) {
   newConfig['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
   newConfig['profile'] = { 'store-selected': true, 'store-fake-ip': true };
 
-  const { dns, hosts } = buildDnsAndHostsConfig(config, proxies);
+  // dns 和 hosts 相关处理（返回已应用 hosts 映射的节点列表）
+  const { dns, hosts, proxies: mappedProxies } = buildDnsAndHostsConfig(config, proxies);
   newConfig['dns'] = dns;
   newConfig['hosts'] = hosts;
+  newConfig['proxies'] = [...mappedProxies, ...directProxies];
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
-  const regionData = buildRegionGroups(proxies);
+  const regionData = buildRegionGroups(mappedProxies);
   newConfig["proxy-groups"] = buildProxyGroups(regionData);
 
   // --- Rule Providers (666OS 体系) ---
