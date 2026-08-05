@@ -272,50 +272,50 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     proxies: [HK-自动选择]
     include-all: true
-    filter: "(?i)港|HK|HongKong|Hong Kong"
+    filter: '(?i)🇭🇰|香港|(?<![a-z])hk(?![a-z])|hong\s*kong'
   - name: SG
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
     proxies: [SG-自动选择]
     include-all: true
-    filter: "(?i)坡|SG|Singapore"
+    filter: '(?i)🇸🇬|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore'
   - name: TW
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
     proxies: [TW-自动选择]
     include-all: true
-    filter: "(?i)台|TW|Taiwan"
+    filter: '(?i)🇹🇼|台湾|(?<![a-z])tw(?![a-z])|taiwan'
   - name: JP
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
     proxies: [JP-自动选择]
     include-all: true
-    filter: "(?i)日|JP|Japan"
+    filter: '(?i)🇯🇵|日本|(?<![a-z])jp(?![a-z])|japan'
   - name: US
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
     proxies: [US-自动选择]
     include-all: true
-    filter: "(?i)美|US|UnitedStates|United States"
+    filter: '(?i)🇺🇸|美国|(?<![a-z])us(?![a-z])|america|united\s*states'
   - name: MO
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png
     proxies: [MO-自动选择]
     include-all: true
-    filter: "(?i)澳|MO|Macao|Macau"
+    filter: '(?i)🇲🇴|澳门|(?<![a-z])mo(?![a-z])|macao|macau'
   - name: EU
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/European_Union.png
     proxies: [EU-自动选择]
     include-all: true
-    filter: "(?i)法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam"
+    filter: '(?i)🇪🇺|法国|德国|英国|荷兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu)(?![a-z])|europe|frankfurt|london|paris|amsterdam'
   - name: Other
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Europe_Map.png
     proxies: [Other-自动选择]
     include-all: true
     exclude-type: "DIRECT"
-    filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|澳|MO|Macao|Macau|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
+    filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|(?<![a-z])jp(?![a-z])|japan|美国|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu)(?![a-z])|europe|frankfurt|london|paris|amsterdam)).*$'
   - name: 低倍率节点
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png
@@ -334,35 +334,35 @@ proxy-groups:
   - <<: *BaseUT
     name: HK-自动选择
     include-all: true
-    filter: "(?i)港|HK|HongKong|Hong Kong"
+    filter: '(?i)🇭🇰|香港|(?<![a-z])hk(?![a-z])|hong\s*kong'
   - <<: *BaseUT
     name: SG-自动选择
     include-all: true
-    filter: "(?i)坡|SG|Singapore"
+    filter: '(?i)🇸🇬|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore'
   - <<: *BaseUT
     name: TW-自动选择
     include-all: true
-    filter: "(?i)台|TW|Taiwan"
+    filter: '(?i)🇹🇼|台湾|(?<![a-z])tw(?![a-z])|taiwan'
   - <<: *BaseUT
     name: JP-自动选择
     include-all: true
-    filter: "(?i)日|JP|Japan"
+    filter: '(?i)🇯🇵|日本|(?<![a-z])jp(?![a-z])|japan'
   - <<: *BaseUT
     name: US-自动选择
     include-all: true
-    filter: "(?i)美|US|UnitedStates|United States"
+    filter: '(?i)🇺🇸|美国|(?<![a-z])us(?![a-z])|america|united\s*states'
   - <<: *BaseUT
     name: MO-自动选择
     include-all: true
-    filter: "(?i)澳|MO|Macao|Macau"
+    filter: '(?i)🇲🇴|澳门|(?<![a-z])mo(?![a-z])|macao|macau'
   - <<: *BaseUT
     name: EU-自动选择
     include-all: true
-    filter: "(?i)法|德|英|荷|FR|DE|GB|UK|NL|EU|Europe|Frankfurt|London|Paris|Amsterdam"
+    filter: '(?i)🇪🇺|法国|德国|英国|荷兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu)(?![a-z])|europe|frankfurt|london|paris|amsterdam'
   - <<: *BaseUT
     name: Other-自动选择
     include-all: true
-    filter: '^(?!.*(?i)(港|HK|HongKong|坡|SG|Singapore|台|TW|Taiwan|日|JP|Japan|美|US|UnitedStates|澳|MO|Macao|Macau|法|FR|德|DE|英|GB|UK|NL|EU|Europe)).*$'
+    filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|(?<![a-z])jp(?![a-z])|japan|美国|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu)(?![a-z])|europe|frankfurt|london|paris|amsterdam)).*$'
   - <<: *BaseUT
     name: 低倍率节点-自动选择
     include-all: true
