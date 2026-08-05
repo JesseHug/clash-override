@@ -219,7 +219,7 @@ function filterAndNormalizeProxies(config) {
   };
 
   const originalProxies = config.proxies || [];
-  const originalProxyNames = new Set(originalProxies.map(p => p.name));
+
 
   const builtinTypes = new Set(['direct', 'reject', 'rematch']);
 
@@ -231,12 +231,11 @@ function filterAndNormalizeProxies(config) {
     return true;
   });
 
-  const survivingOriginalNames = new Set(filteredRawProxies.map(p => p.name));
   const renameMap = new Map();
 
   const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
 
-  let proxies = filteredRawProxies.map(proxy => {
+  const normalizedProxies = filteredRawProxies.map(proxy => {
     const oldName = proxy.name;
     const matchedRegions = getMatchedRegions(oldName);
 
@@ -257,17 +256,34 @@ function filterAndNormalizeProxies(config) {
     return proxy;
   });
 
-  proxies = proxies.map(proxy => {
+  // 去重：标准化后可能出现同名节点（如去掉重复国旗后撞名），保留首个，避免内核冲突
+  const hasDuplicateNames = new Set(normalizedProxies.map((p) => p.name)).size !== normalizedProxies.length;
+  let deduplicatedProxies = normalizedProxies;
+  if (hasDuplicateNames) {
+    deduplicatedProxies = [];
+    const uniqueNames = new Set();
+    for (const proxy of normalizedProxies) {
+      if (uniqueNames.has(proxy.name)) continue;
+      uniqueNames.add(proxy.name);
+      deduplicatedProxies.push(proxy);
+    }
+  }
+
+  // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
+  const normalizedProxyNames = new Set(deduplicatedProxies.map((p) => p.name));
+
+  // 修复 dialer-proxy 引用：节点被重命名或移除后，更新/删除引用，避免内核报错
+  let proxies = deduplicatedProxies.map(proxy => {
     const target = proxy['dialer-proxy'];
     if (!target) return proxy;
+    // 目标节点被重命名 → 更新引用
     if (renameMap.has(target)) return { ...proxy, 'dialer-proxy': renameMap.get(target) };
-    if (survivingOriginalNames.has(target)) return proxy;
-    if (originalProxyNames.has(target)) {
-      const copy = { ...proxy };
-      delete copy['dialer-proxy'];
-      return copy;
-    }
-    return proxy;
+    // 目标节点存活且未重命名 → 引用依然有效
+    if (normalizedProxyNames.has(target)) return proxy;
+    // 目标节点被过滤移除（或引用目标本就不存在）→ 删除引用
+    const copy = { ...proxy };
+    delete copy['dialer-proxy'];
+    return copy;
   });
 
   const isAllDirectOrReject = proxies.every(p => p.type?.toLowerCase() === 'direct' || p.type?.toLowerCase() === 'reject');
