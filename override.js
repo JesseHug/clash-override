@@ -220,7 +220,6 @@ function filterAndNormalizeProxies(config) {
 
   const originalProxies = config.proxies || [];
 
-
   const builtinTypes = new Set(['direct', 'reject', 'rematch']);
 
   let filteredRawProxies = originalProxies.filter(proxy => {
@@ -233,7 +232,7 @@ function filterAndNormalizeProxies(config) {
 
   const renameMap = new Map();
 
-  const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
+  const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
 
   const normalizedProxies = filteredRawProxies.map(proxy => {
     const oldName = proxy.name;
@@ -469,14 +468,14 @@ function buildProxyGroups(regionData) {
   const groups = [
     buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
     ...(ruleOptionsEnable.Google ? [buildGroup("Google", "Google")] : []),
-    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { defaultSelected: "MO" })] : []),
-    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { defaultSelected: "TW" })] : []),
+    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { "default-selected": "MO" })] : []),
+    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { "default-selected": "TW" })] : []),
     ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", "Telegram_X")] : []),
     ...(ruleOptionsEnable.Games ? [buildGroup("Games", "Game", ["Proxies", "直连", ...activeRegions])] : []),
     ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", "PayPal", ["Proxies", "直连", ...activeRegions])] : []),
     ...(ruleOptionsEnable.X ? [buildGroup("X", "X")] : []),
-    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { defaultSelected: "US" })] : []),
-    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", ...activeRegions], { defaultSelected: "US" })] : []),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", ...activeRegions], { "default-selected": "US" })] : []),
     ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", "Netflix", ["Proxies", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
@@ -495,13 +494,6 @@ function buildProxyGroups(regionData) {
     ...regionGroups,
     ...regionAutoGroups
   ];
-
-  groups.forEach(g => {
-    if (g.defaultSelected !== undefined) {
-      g["default-selected"] = g.defaultSelected;
-      delete g.defaultSelected;
-    }
-  });
 
   return groups;
 }
@@ -576,7 +568,7 @@ function main(config) {
     ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs`, path: "./rules/ProxyIP.mrs" },
     ...(ruleOptionsEnable.Telegram ? { TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" } } : {}),
     PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
-    fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
+    fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
     cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs", path: "./rules/cn.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
