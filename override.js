@@ -90,54 +90,33 @@ function matchDomainPattern(pattern, domains) {
 
   // 精确匹配
   if (!pattern.includes('*') && !pattern.startsWith('+.') && !pattern.startsWith('.')) {
-    return domains.has(pattern);
+    return typeof domains === 'string' ? domains.toLowerCase() === pattern : domains.has(pattern);
   }
+
+  // 通配匹配：统一转为数组遍历（字符串时直接构建单元素数组，避免 Set 中转）
+  const domainList = typeof domains === 'string' ? [domains.toLowerCase()] : [...domains];
 
   // +.example.com
   if (pattern.startsWith('+.')) {
     const suffix = pattern.slice(2);
-    for (const domain of domains) {
-      if (domain === suffix || domain.endsWith(`.${suffix}`)) {
-        return true;
-      }
-    }
-    return false;
+    return domainList.some((domain) => domain === suffix || domain.endsWith(`.${suffix}`));
   }
 
   // .example.com
   if (pattern.startsWith('.')) {
     const suffix = pattern.slice(1);
-    for (const domain of domains) {
-      if (domain !== suffix && domain.endsWith(`.${suffix}`)) {
-        return true;
-      }
-    }
-    return false;
+    return domainList.some((domain) => domain !== suffix && domain.endsWith(`.${suffix}`));
   }
 
   // *.example.com、example.*.com 等
   const patternParts = pattern.split('.');
-  for (const domain of domains) {
+  return domainList.some((domain) => {
     const domainParts = domain.split('.');
-
-    // 标签数量必须一致
-    if (patternParts.length !== domainParts.length) {
-      continue;
-    }
-    let matched = true;
-    for (let i = 0; i < patternParts.length; i++) {
-      if (patternParts[i] !== '*' && patternParts[i] !== domainParts[i]) {
-        matched = false;
-        break;
-      }
-    }
-
-    if (matched) {
-      return true;
-    }
-  }
-
-  return false;
+    return (
+      patternParts.length === domainParts.length &&
+      patternParts.every((part, index) => part === '*' || part === domainParts[index])
+    );
+  });
 }
 
 // hosts 匹配优先级：精确 > +. > . > *（同级按出现顺序）
@@ -148,29 +127,41 @@ function hostSpecificity(pattern) {
   return 3;
 }
 
-// 根据订阅 hosts 将节点 server 改写为映射后的地址（域名或 IP）
-// 部分机场通过 hosts 把节点域名映射到实际地址，直接改写 server 后即无需再把机场 hosts 复制进新配置
-function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
+// 根据订阅 hosts 映射改写节点 server，改写后无需再复制 hosts 进新配置。
+// 支持链式映射（如 a→b、b→c 时节点 a 改写为 c）；
+// 回环映射（a→b、b→a）由内核校验拒绝，此处仅以已访问集合防御性终止
+function applyHostsToProxies(proxies, hosts) {
   if (!hosts || typeof hosts !== 'object') return proxies;
 
+  // 全部有效条目按匹配优先级排序（链式解析需保留中继条目，故不按节点域名预过滤）
   const hostEntries = Object.entries(hosts)
     .filter(
-      ([domain, value]) =>
-        matchDomainPattern(domain, originalProxyDomains) &&
-        ((typeof value === 'string' && value.length > 0) || (Array.isArray(value) && value.length > 0)),
+      ([, value]) => (typeof value === 'string' && value.length > 0) || (Array.isArray(value) && value.length > 0),
     )
     .sort((a, b) => hostSpecificity(b[0]) - hostSpecificity(a[0]));
 
   if (hostEntries.length === 0) return proxies;
 
+  // 取映射目标（数组取首个非空字符串），无有效目标时返回 null
+  const targetOf = (value) => {
+    if (Array.isArray(value)) value = value.find((v) => typeof v === 'string' && v.length > 0);
+    return typeof value === 'string' && value.length > 0 ? value : null;
+  };
+
+  // 解析单个节点域名：沿链式映射逐级改写至最终目标，无匹配时原样返回
   const resolve = (server) => {
-    const domains = new Set([server.toLowerCase()]);
-    for (const [domain, value] of hostEntries) {
-      if (!matchDomainPattern(domain, domains)) continue;
-      const candidate = Array.isArray(value) ? value[0] : value;
-      if (typeof candidate === 'string' && candidate.length > 0) return candidate;
+    const seen = new Set();
+    let current = server.toLowerCase();
+    let result = server;
+    while (!seen.has(current)) {
+      seen.add(current);
+      const entry = hostEntries.find(([pattern]) => matchDomainPattern(pattern, current));
+      const target = entry && targetOf(entry[1]);
+      if (!target) break;
+      result = target;
+      current = target.toLowerCase();
     }
-    return server;
+    return result;
   };
 
   return proxies.map((proxy) => {
@@ -180,10 +171,17 @@ function applyHostsToProxies(proxies, hosts, originalProxyDomains) {
   });
 }
 
-// 剥离 DNS 地址的 # 策略组后缀（如 https://xxx/dns-query#proxy → https://xxx/dns-query）
-// 订阅中的 DNS 常带 #策略组 后缀，而对应策略组在新配置中可能不存在，保留会导致内核报错
+// 剥离 DNS 地址的 # 策略组后缀；#direct（忽略大小写，可带 & 参数）时整条保留，
+// 避免误删内核原生支持的 DIRECT 出口标记
 function stripDnsSuffix(dns) {
-  return String(dns).split('#')[0];
+  const str = String(dns);
+  const hashIndex = str.indexOf('#');
+  if (hashIndex === -1) return str;
+
+  const suffix = str.slice(hashIndex + 1).toLowerCase();
+  if (suffix === 'direct' || suffix.startsWith('direct&')) return str;
+
+  return str.slice(0, hashIndex);
 }
 
 // --- 正则缓存加速 ---
@@ -330,7 +328,7 @@ function buildDnsAndHostsConfig(config, proxies) {
   );
 
   // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
-  const mappedProxies = applyHostsToProxies(proxies, config.hosts, originalProxyDomains);
+  const mappedProxies = applyHostsToProxies(proxies, config.hosts);
 
   // 映射后的节点地址域名
   const mappedProxyDomains = new Set(
