@@ -66,6 +66,28 @@ const directProxies = [
   { name: '🇨🇳 直连 | IPv6优先', type: 'direct', 'ip-version': 'ipv6-prefer' },
 ];
 
+// 此处添加自定义节点，填入下方 [] 内（可选，留空则不生成"自建节点"策略组）
+// 自定义节点不参与节点过滤、hosts 改写；与订阅节点（标准化后）重名时自动添加"自建-"前缀
+// 示例：
+// const customizeProxies = [
+//   {
+//     name: '自建-日本-01',
+//     type: 'vmess',
+//     server: '5.6.7.8',
+//     port: 443,
+//     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+//     alterId: 0,
+//     cipher: 'auto',
+//     tls: true,
+//     network: 'ws',
+//     'ws-opts': {
+//       path: '/path',
+//       headers: { Host: 'example.com' },
+//     },
+//   },
+// ];
+const customizeProxies = [];
+
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
@@ -310,33 +332,51 @@ function buildDnsAndHostsConfig(config, proxies) {
   ];
 
   // 预编译为单个正则，避免逐个遍历数组进行子串匹配
-  const commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'));
-  const isCommonDns = (dns) => commonDnsRegex.test(String(dns).toLowerCase());
+  let commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i');
 
-  // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
-  const privateDNS = [
-    ...new Set(
-      [...(originalDnsConfig['nameserver'] ?? []), ...(originalDnsConfig['proxy-server-nameserver'] ?? [])]
-        .map(stripDnsSuffix)
-        .filter((dns) => dns.length > 0 && !isCommonDns(dns)),
-    ),
-  ];
+  // 仅当原配置 proxy-server-nameserver 有且仅有一个 DNS，且该 DNS 包含非空的 listen 时，
+  // 才根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP），否则跳过改写
+  const proxyServerNameservers = originalDnsConfig['proxy-server-nameserver'] ?? [];
+  const listenValue = originalDnsConfig['listen'];
+  const shouldRewriteByHosts =
+    proxyServerNameservers.length === 1 &&
+    typeof listenValue === 'string' &&
+    listenValue.length > 0 &&
+    proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes(listenValue.toLowerCase()));
+
+  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
+  const mappedProxies = shouldRewriteByHosts ? applyHostsToProxies(proxies, config.hosts) : proxies;
 
   // 原节点域名（改写前）
   const originalProxyDomains = new Set(
     proxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
   );
 
-  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
-  const mappedProxies = applyHostsToProxies(proxies, config.hosts);
+  // 合并改写前/后的节点域名；未执行 hosts 改写时两者一致，直接复用原域名集合避免冗余操作
+  const proxyDomains = shouldRewriteByHosts
+    ? new Set([
+        ...originalProxyDomains,
+        ...mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase()),
+      ])
+    : originalProxyDomains;
 
-  // 映射后的节点地址域名
-  const mappedProxyDomains = new Set(
-    mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
-  );
+  // 命中触发条件时，将 listen 值加入公共 DNS 列表并重建匹配正则，
+  // 使其在私有 DNS 提取时被当作公共 DNS 过滤，避免 listen 地址被误留为私有 DNS
+  if (shouldRewriteByHosts) {
+    commonDnsList.push(String(listenValue));
+    commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i');
+  }
 
-  // 合并原节点域名与映射后域名
-  const proxyDomains = new Set([...originalProxyDomains, ...mappedProxyDomains]);
+  const isCommonDns = (dns) => commonDnsRegex.test(String(dns));
+
+  // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
+  const privateDNS = [
+    ...new Set(
+      [...(originalDnsConfig['nameserver'] ?? []), ...proxyServerNameservers]
+        .map(stripDnsSuffix)
+        .filter((dns) => dns.length > 0 && !isCommonDns(dns)),
+    ),
+  ];
 
   // 提取节点域名对应的 DNS 配置（剥离 # 策略组后缀）
   const proxyServerPolicy = Object.fromEntries(
@@ -391,6 +431,51 @@ function buildDnsAndHostsConfig(config, proxies) {
   };
 
   return { dns, hosts, proxies: mappedProxies };
+}
+
+// 处理自定义节点：标准化名称、与订阅节点重名时添加"自建-"前缀、内部去重，
+// 并构建"自建节点"策略组。自定义节点不参与订阅节点过滤，也不参与 hosts 改写及 DNS 域名处理
+function buildCustomizeGroups(filteredProxies) {
+  if (!customizeProxies.length) {
+    return { customProxies: [], customProxyNames: [], customGroup: null };
+  }
+
+  const usedNames = new Set(filteredProxies.map((p) => p.name));
+  const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
+
+  const customList = [];
+  for (const proxy of customizeProxies) {
+    // 简易标准化：清理国旗和空格
+    const oldName = proxy.name;
+    const matchedRegions = getMatchedRegions(oldName);
+    const existingFlag = oldName.match(flagRegex)?.[0];
+    const nameWithoutFlag = oldName.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
+    const regionFlag = existingFlag || matchedRegions.find((r) => r.flag)?.flag;
+    let name = regionFlag ? `${regionFlag} ${nameWithoutFlag}` : nameWithoutFlag;
+
+    // 重名时添加"自建-"前缀，直至名称唯一
+    while (usedNames.has(name)) {
+      const flag = name.match(flagRegex)?.[0];
+      const rest = name.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
+      name = flag ? `${flag} 自建-${rest}` : `自建-${rest}`;
+    }
+    usedNames.add(name);
+    customList.push(name === proxy.name ? proxy : { ...proxy, name });
+  }
+
+  const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
+  const customGroup = {
+    name: '自建节点',
+    type: 'select',
+    proxies: customList.map((p) => p.name),
+    icon: `${ico}/Server.png`,
+  };
+
+  return {
+    customProxies: customList,
+    customProxyNames: customList.map((p) => p.name),
+    customGroup,
+  };
 }
 
 function buildRegionGroups(proxies) {
@@ -451,20 +536,22 @@ function buildRegionGroups(proxies) {
   return { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico };
 }
 
-function buildProxyGroups(regionData) {
+function buildProxyGroups(regionData, customInfo) {
   const { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico } = regionData;
+  const customProxyNames = (customInfo && customInfo.customProxyNames) || [];
+  const customGroup = (customInfo && customInfo.customGroup) || null;
   const masterName = "Auto";
 
-  const buildGroup = (name, iconName, groupProxies = ["Proxies", ...activeRegions], extra = {}) => ({
-    name,
-    type: "select",
-    icon: `${ico}/${iconName}.png`,
-    proxies: groupProxies,
-    ...extra
-  });
+  const allProxiesNames = [...customProxyNames, ...pNames];
+
+  const buildGroup = (name, iconName, groupProxies, extra) => {
+    if (!groupProxies) groupProxies = ["Proxies", ...activeRegions];
+    if (!extra) extra = {};
+    return { name, type: "select", icon: ico + "/" + iconName + ".png", proxies: groupProxies, ...extra };
+  };
 
   const groups = [
-    buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...pNames]),
+    buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...allProxiesNames]),
     ...(ruleOptionsEnable.Google ? [buildGroup("Google", "Google")] : []),
     ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { "default-selected": "MO" })] : []),
     ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { "default-selected": "TW" })] : []),
@@ -488,7 +575,8 @@ function buildProxyGroups(regionData) {
       proxies: [...directProxies.map(p => p.name)]
     },
 
-    { name: masterName, icon: `${ico}/Auto.png`, proxies: coreRegions, ...autoBaseOption },
+    { name: masterName, icon: ico + "/Auto.png", proxies: coreRegions, ...autoBaseOption },
+    ...(customGroup ? [customGroup] : []),
     ...regionGroups,
     ...regionAutoGroups
   ];
@@ -509,7 +597,6 @@ function main(config) {
   newConfig['bind-address'] = '*';
   newConfig['unified-delay'] = true;
   newConfig['tcp-concurrent'] = true;
-  newConfig['keep-alive-idle'] = 600;
   newConfig['keep-alive-interval'] = 60;
   newConfig['find-process-mode'] = 'strict';
   newConfig['external-controller'] = '127.0.0.1:9090';
@@ -517,17 +604,21 @@ function main(config) {
   newConfig['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
   newConfig['profile'] = { 'store-selected': true, 'store-fake-ip': true };
 
-  // dns 和 hosts 相关处理（返回已应用 hosts 映射的节点列表）
+  // dns 和 hosts 相关处理（仅订阅节点参与 hosts 改写）
   const { dns, hosts, proxies: mappedProxies } = buildDnsAndHostsConfig(config, proxies);
   newConfig['dns'] = dns;
   newConfig['hosts'] = hosts;
-  newConfig['proxies'] = [...mappedProxies, ...directProxies];
+
+  // 处理自定义节点（标准化、解决重名、构建"自建节点"策略组）
+  const { customProxies, customProxyNames, customGroup } = buildCustomizeGroups(mappedProxies);
+
+  newConfig['proxies'] = [...mappedProxies, ...customProxies, ...directProxies];
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
   const regionData = buildRegionGroups(mappedProxies);
-  newConfig["proxy-groups"] = buildProxyGroups(regionData);
+  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup });
 
   // --- Rule Providers (666OS 体系) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
@@ -606,13 +697,13 @@ function main(config) {
     "RULE-SET,gfw,Proxies",
     "RULE-SET,geolocation-cn,直连",
     "RULE-SET,cn_additional,直连",
-    "RULE-SET,PrivateIP,直连,no-resolve",
     ...(ruleOptionsEnable.AI ? ["RULE-SET,AIIP,AI,no-resolve"] : []),
     ...(ruleOptionsEnable.Google ? ["RULE-SET,GoogleIP,Google,no-resolve"] : []),
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,直连",
     "GEOIP,CN,直连",
+    "RULE-SET,PrivateIP,直连",
     "MATCH,Final"
   ];
 
