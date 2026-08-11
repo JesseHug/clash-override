@@ -39,6 +39,7 @@ const ruleOptionsEnable = {
   隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
+  链式代理: false,              // 启用后自建节点经机场节点中转（需配置 customizeProxies）
 };
 
 // 专门用于适配 Bettbox GUI 读取开关图标的定义
@@ -87,6 +88,12 @@ const directProxies = [
 //   },
 // ];
 const customizeProxies = [];
+
+// 链式代理启用时，自定义节点的 dialer-proxy 引用目标
+const dialerProxyName = '链式中转';
+
+// 重名时使用的前缀
+const customPrefix = '自建-';
 
 // --- 节点匹配正则定义 ---
 
@@ -170,8 +177,14 @@ function applyHostsToProxies(proxies, hosts) {
     return typeof value === 'string' && value.length > 0 ? value : null;
   };
 
+  // 解析结果缓存：相同节点域名只解析一次，后续直接复用
+  const resolveCache = new Map();
+
   // 解析单个节点域名：沿链式映射逐级改写至最终目标，无匹配时原样返回
   const resolve = (server) => {
+    const cached = resolveCache.get(server);
+    if (cached !== undefined) return cached;
+
     const seen = new Set();
     let current = server.toLowerCase();
     let result = server;
@@ -183,6 +196,7 @@ function applyHostsToProxies(proxies, hosts) {
       result = target;
       current = target.toLowerCase();
     }
+    resolveCache.set(server, result);
     return result;
   };
 
@@ -433,11 +447,14 @@ function buildDnsAndHostsConfig(config, proxies) {
   return { dns, hosts, proxies: mappedProxies };
 }
 
-// 处理自定义节点：标准化名称、与订阅节点重名时添加"自建-"前缀、内部去重，
-// 并构建"自建节点"策略组。自定义节点不参与订阅节点过滤，也不参与 hosts 改写及 DNS 域名处理
+// 处理自定义节点：标准化名称、与订阅节点重名时添加前缀、内部去重，
+// 并构建"自建节点"（或链式代理时的"链式落地"）策略组。
+// 自定义节点不参与订阅节点过滤，也不参与 hosts 改写及 DNS 域名处理
 function buildCustomizeGroups(filteredProxies) {
+  const chainEnabled = ruleOptionsEnable['\u94fe\u5f0f\u4ee3\u7406'];
+
   if (!customizeProxies.length) {
-    return { customProxies: [], customProxyNames: [], customGroup: null };
+    return { customProxies: [], customProxyNames: [], customGroup: null, chainGroup: null };
   }
 
   const usedNames = new Set(filteredProxies.map((p) => p.name));
@@ -453,28 +470,46 @@ function buildCustomizeGroups(filteredProxies) {
     const regionFlag = existingFlag || matchedRegions.find((r) => r.flag)?.flag;
     let name = regionFlag ? `${regionFlag} ${nameWithoutFlag}` : nameWithoutFlag;
 
-    // 重名时添加"自建-"前缀，直至名称唯一
+    // 重名时添加前缀并重新标准化（国旗自动回到最前），直至名称唯一
     while (usedNames.has(name)) {
       const flag = name.match(flagRegex)?.[0];
       const rest = name.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
-      name = flag ? `${flag} 自建-${rest}` : `自建-${rest}`;
+      name = flag ? `${flag} ${customPrefix}${rest}` : `${customPrefix}${rest}`;
     }
     usedNames.add(name);
-    customList.push(name === proxy.name ? proxy : { ...proxy, name });
+
+    let customProxy = name === proxy.name ? proxy : { ...proxy, name };
+    // 链式代理启用时强制添加/覆盖 dialer-proxy，使自定义节点经"链式中转"策略组中转
+    if (chainEnabled && customProxy['dialer-proxy'] !== dialerProxyName) {
+      customProxy = { ...customProxy, 'dialer-proxy': dialerProxyName };
+    }
+    customList.push(customProxy);
   }
 
   const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
   const customGroup = {
-    name: '自建节点',
+    name: chainEnabled ? '\u94fe\u5f0f\u843d\u5730' : '\u81ea\u5efa\u8282\u70b9',
     type: 'select',
     proxies: customList.map((p) => p.name),
     icon: `${ico}/Server.png`,
   };
 
+  // 链式代理：构建"链式中转"策略组（仅包含订阅节点，不含自定义节点，避免 dialer-proxy 回环）
+  const filteredProxyNames = filteredProxies.map((p) => p.name);
+  const chainGroup = (chainEnabled && customList.length > 0)
+    ? {
+        name: dialerProxyName,
+        type: 'select',
+        proxies: filteredProxyNames,
+        icon: `${ico}/Bypass.png`,
+      }
+    : null;
+
   return {
     customProxies: customList,
     customProxyNames: customList.map((p) => p.name),
     customGroup,
+    chainGroup,
   };
 }
 
@@ -540,6 +575,7 @@ function buildProxyGroups(regionData, customInfo) {
   const { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico } = regionData;
   const customProxyNames = (customInfo && customInfo.customProxyNames) || [];
   const customGroup = (customInfo && customInfo.customGroup) || null;
+  const chainGroup = (customInfo && customInfo.chainGroup) || null;
   const masterName = "Auto";
 
   const allProxiesNames = [...customProxyNames, ...pNames];
@@ -577,6 +613,7 @@ function buildProxyGroups(regionData, customInfo) {
 
     { name: masterName, icon: ico + "/Auto.png", proxies: coreRegions, ...autoBaseOption },
     ...(customGroup ? [customGroup] : []),
+    ...(chainGroup ? [chainGroup] : []),
     ...regionGroups,
     ...regionAutoGroups
   ];
@@ -609,8 +646,8 @@ function main(config) {
   newConfig['dns'] = dns;
   newConfig['hosts'] = hosts;
 
-  // 处理自定义节点（标准化、解决重名、构建"自建节点"策略组）
-  const { customProxies, customProxyNames, customGroup } = buildCustomizeGroups(mappedProxies);
+  // 处理自定义节点（标准化、解决重名、构建策略组）
+  const { customProxies, customProxyNames, customGroup, chainGroup } = buildCustomizeGroups(mappedProxies);
 
   newConfig['proxies'] = [...mappedProxies, ...customProxies, ...directProxies];
 
@@ -618,7 +655,7 @@ function main(config) {
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
   const regionData = buildRegionGroups(mappedProxies);
-  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup });
+  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainGroup: chainGroup });
 
   // --- Rule Providers (666OS 体系) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
