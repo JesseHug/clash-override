@@ -57,18 +57,8 @@ mode: rule
 log-level: warning
 ipv6: true
 keep-alive-interval: 60
-keep-alive-idle: 600
 unified-delay: true
 tcp-concurrent: true
-
-# ==================== 客户端指纹伪装 ====================
-global-client-fingerprint: chrome
-
-geox-url:
-  geoip: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
-  mmdb: "https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb"
-
-geodata-mode: true
 
 ntp:
   enable: true
