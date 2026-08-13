@@ -153,17 +153,17 @@ dns:
 
 # ==================== 代理提供者 ====================
 proxy-providers:
-  服务商一:
+  01_服务商一:
     <<: [*proxy_providers_common, *global_exclude_filter]
     url: "https://example.com/sub?token=your_token_here"
     override:
       additional-prefix: "[一] "
-  服务商二:
+  02_服务商二:
     <<: [*proxy_providers_common, *global_exclude_filter]
     url: "https://example2.com/sub?token=your_token_here"
     override:
       additional-prefix: "[二] "
-  服务商三:
+  03_服务商三:
     <<: [*proxy_providers_common, *global_exclude_filter]
     url: "https://example3.com/sub?token=your_token_here"
     override:

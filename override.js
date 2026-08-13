@@ -326,6 +326,25 @@ function filterAndNormalizeProxies(config) {
     throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
   }
 
+  // 最后对节点进行排序，确保多 provider（如 [一], [二], [三] 或 [1], [2]）时按数字顺序排列
+  // 解决 clash 内核因 provider 异步下载完成导致的节点乱序问题
+  const numMap = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
+  const getPrefixRank = (name) => {
+    const match = name.match(/^\[([一二三四五六七八九十\d]+)\]/);
+    if (match) {
+      const val = match[1];
+      return numMap[val] !== undefined ? numMap[val] : parseInt(val, 10);
+    }
+    return 99999;
+  };
+
+  proxies.sort((a, b) => {
+    const rankA = getPrefixRank(a.name);
+    const rankB = getPrefixRank(b.name);
+    if (rankA !== rankB) return rankA - rankB;
+    return 0;
+  });
+
   return proxies;
 }
 
