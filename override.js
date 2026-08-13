@@ -38,6 +38,7 @@ const ruleOptionsEnable = {
   生成地区自动选择组: true,     // 为每个地区生成隐藏的 url-test 自动选择组
   隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
+  一倍率归入低倍率: true,         // 将1x、1.0x等一倍率节点也归入低倍率组
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
   链式代理: false,              // 启用后自建节点经机场节点中转（需配置 customizeProxies）
 };
@@ -100,6 +101,7 @@ const customPrefix = '自建-';
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
 const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|traffic|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|⚠️|@|Expire|http|com/iu;
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
+const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/u;
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
 
 const regionMappings = [
@@ -555,7 +557,10 @@ function buildRegionGroups(proxies) {
     regionGroups.push({ name: "Other", type: "select", icon: `${ico}/Europe_Map.png`, proxies: otherGroupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
   }
 
-  const nodesLowRate = getNodes(lowRateRegex);
+  const finalLowRateRegex = ruleOptionsEnable.一倍率归入低倍率 
+    ? new RegExp(`(?:${lowRateRegex.source})|(?:${oneRateRegex.source})`, 'u') 
+    : lowRateRegex;
+  const nodesLowRate = getNodes(finalLowRateRegex);
   const nodesHighRate = getNodes(highRateRegex);
   if (nodesLowRate[0] !== "DIRECT") {
     activeRegions.push("低倍率节点");

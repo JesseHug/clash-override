@@ -312,7 +312,7 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png
     proxies: [低倍率节点-自动选择]
     include-all: true
-    filter: '^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)'
+    filter: '^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性|(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉])|[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))'
   - name: 高倍率节点
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
@@ -357,7 +357,7 @@ proxy-groups:
   - <<: *BaseUT
     name: 低倍率节点-自动选择
     include-all: true
-    filter: '^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)'
+    filter: '^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性|(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉])|[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))'
   - <<: *BaseUT
     name: 高倍率节点-自动选择
     include-all: true
