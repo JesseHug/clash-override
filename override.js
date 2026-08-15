@@ -114,7 +114,7 @@ const regionMappings = [
   { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "Japan.png" },
   { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
   { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "Macao.png" },
-  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
+  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "European_Union.png" }
 ];
 
 // --- 域名匹配工具函数 ---

@@ -295,7 +295,7 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/European_Union.png
     proxies: [EU-自动选择]
     include-all: true
-    filter: '(?i)🇪🇺|法国|德国|英国|荷兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu)(?![a-z])|europe|frankfurt|london|paris|amsterdam'
+    filter: '(?i)🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv'
   - name: Other
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Europe_Map.png
@@ -345,7 +345,7 @@ proxy-groups:
   - <<: *BaseUT
     name: EU-自动选择
     include-all: true
-    filter: '(?i)🇪🇺|法国|德国|英国|荷兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu)(?![a-z])|europe|frankfurt|london|paris|amsterdam'
+    filter: '(?i)🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv'
   - <<: *BaseUT
     name: Other-自动选择
     include-all: true
