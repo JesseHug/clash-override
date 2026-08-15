@@ -566,7 +566,7 @@ function buildRegionGroups(proxies, customProxies) {
 
   if (ruleOptionsEnable.生成倍率组) {
     const finalLowRateRegex = ruleOptionsEnable.一倍率归入低倍率 
-      ? new RegExp(`(?:${lowRateRegex.source})|(?:${oneRateRegex.source})`, 'u') 
+      ? new RegExp(`^(?!.*(?:剩|期|客户端|软件))(?!.*(?:${highRateRegex.source})).*$`, 'u') 
       : lowRateRegex;
     const nodesLowRate = getNodes(finalLowRateRegex);
     const nodesHighRate = getNodes(highRateRegex);
