@@ -40,6 +40,8 @@ const ruleOptionsEnable = {
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
   一倍率归入低倍率: true,         // 将1x、1.0x等一倍率节点也归入低倍率组
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
+  代理IPV4优先: false,          // 开启后所有订阅节点强制 ipv4-prefer
+  代理IPV6优先: false,          // 开启后所有订阅节点强制 ipv6-prefer（与上条互斥，同时开启则不生效）
   链式代理: false,              // 启用后自建节点经机场节点中转（需配置 customizeProxies）
 };
 
@@ -429,8 +431,9 @@ function buildDnsAndHostsConfig(config, proxies) {
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] ?? [];
   const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => matchDomainPattern(String(pattern), proxyDomains));
 
-  const chinaDNS = ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
-  const foreignDNS = ['https://dns.cloudflare.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
+  const chinaDNS = ['223.5.5.5', '119.29.29.29'];
+  const chinaDohDNS = ['https://223.5.5.5/dns-query#DIRECT', 'https://1.12.12.12/dns-query#DIRECT'];
+  const foreignDNS = ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
 
   const dns = {
     enable: true,
@@ -439,24 +442,23 @@ function buildDnsAndHostsConfig(config, proxies) {
     'cache-algorithm': 'arc',
     'use-system-hosts': true,
     'enhanced-mode': 'fake-ip',
-    'fake-ip-range': '198.18.0.1/16',
+    'fake-ip-range': '198.18.0.1/15',
+    'fake-ip-range6': '2001:2::1/48',
     'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter', ...proxyFakeIpFilter],
-    'proxy-server-nameserver': [...(privateDNS.length > 0 ? privateDNS : chinaDNS)],
+    'proxy-server-nameserver': privateDNS.length > 0 ? privateDNS : chinaDohDNS,
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
     }),
-    'default-nameserver': ['223.5.5.5', '119.29.29.29'],
-    nameserver: [...foreignDNS],
+    'default-nameserver': chinaDNS,
+    nameserver: foreignDNS,
     'nameserver-policy': {
-      'rule-set:cn': [...chinaDNS],
+      'rule-set:cn': chinaDNS,
     },
-    'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
+    'direct-nameserver': ['system', ...chinaDNS],
   };
 
   const hosts = {
-    'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
-    'doh.pub': ['1.12.12.12', '120.53.53.53'],
-    'dns.cloudflare.com': ['1.1.1.1', '1.0.0.1'],
+    'cloudflare-dns.com': ['1.1.1.1', '1.0.0.1'],
     'dns.google': ['8.8.8.8', '8.8.4.4'],
     'services.googleapis.cn': ['services.googleapis.com'],
     '+.mcdn.bilivideo.com': ['0.0.0.0'],
@@ -534,8 +536,9 @@ function buildCustomizeGroups(filteredProxies) {
   };
 }
 
-function buildRegionGroups(proxies) {
-  const pNames = proxies.map(p => p.name);
+function buildRegionGroups(proxies, customProxies) {
+  const allProxies = [...proxies, ...customProxies];
+  const pNames = allProxies.map(p => p.name);
   const getNodes = (reg) => {
     const res = pNames.filter(name => reg.test(name));
     return res.length > 0 ? res : ["DIRECT"];
@@ -673,12 +676,24 @@ function main(config) {
   // 处理自定义节点（标准化、解决重名、构建策略组）
   const { customProxies, customProxyNames, customGroup, chainGroup } = buildCustomizeGroups(mappedProxies);
 
-  newConfig['proxies'] = [...mappedProxies, ...customProxies, ...directProxies];
+  // IP 版本偏好：给订阅节点注入 ip-version（自定义节点和直连节点不受影响）
+  const ipv4Prefer = ruleOptionsEnable['代理IPV4优先'];
+  const ipv6Prefer = ruleOptionsEnable['代理IPV6优先'];
+  let finalMappedProxies = mappedProxies;
+  if ((ipv4Prefer || ipv6Prefer) && !(ipv4Prefer && ipv6Prefer)) {
+    const ipVersion = ipv4Prefer ? 'ipv4-prefer' : 'ipv6-prefer';
+    finalMappedProxies = mappedProxies.map(p => {
+      if (p.type === 'direct') return p;
+      return { ...p, 'ip-version': ipVersion };
+    });
+  }
+
+  newConfig['proxies'] = [...finalMappedProxies, ...customProxies, ...directProxies];
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
   newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
-  const regionData = buildRegionGroups(mappedProxies);
+  const regionData = buildRegionGroups(finalMappedProxies, customProxies);
   newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainGroup: chainGroup });
 
   // --- Rule Providers (666OS 体系) ---
