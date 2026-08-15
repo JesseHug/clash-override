@@ -101,18 +101,18 @@ const customPrefix = '自建-';
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
-const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|traffic|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|⚠️|@|Expire|http|com/iu;
+const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
 const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/u;
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
 
 const regionMappings = [
-  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HK(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
-  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SG(?![A-Za-z])|Singapore/i, icon: "Singapore.png" },
-  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?![A-Za-z])|Taiwan/i, icon: "Taiwan.png" },
-  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|Japan/i, icon: "Japan.png" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
-  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])MO(?![A-Za-z])|Macao|Macau/i, icon: "Macao.png" },
+  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
+  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "Singapore.png" },
+  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "Taiwan.png" },
+  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "Japan.png" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
+  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "Macao.png" },
   { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam/i, icon: "European_Union.png" }
 ];
 
@@ -371,38 +371,22 @@ function buildDnsAndHostsConfig(config, proxies) {
   // 预编译为单个正则，避免逐个遍历数组进行子串匹配
   let commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i');
 
-  // 仅当原配置 proxy-server-nameserver 有且仅有一个 DNS，且该 DNS 包含非空的 listen 时，
-  // 才根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP），否则跳过改写
   const proxyServerNameservers = originalDnsConfig['proxy-server-nameserver'] ?? [];
-  const listenValue = originalDnsConfig['listen'];
-  const shouldRewriteByHosts =
-    proxyServerNameservers.length === 1 &&
-    typeof listenValue === 'string' &&
-    listenValue.length > 0 &&
-    proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes(listenValue.toLowerCase()));
 
-  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
-  const mappedProxies = shouldRewriteByHosts ? applyHostsToProxies(proxies, config.hosts) : proxies;
+  // 无条件根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
+  // 部分机场（如花云）直接使用 hosts 域名映射而不声明私有 DNS，因此不能加条件守卫
+  const mappedProxies = applyHostsToProxies(proxies, config.hosts);
 
   // 原节点域名（改写前）
   const originalProxyDomains = new Set(
     proxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
   );
 
-  // 合并改写前/后的节点域名；未执行 hosts 改写时两者一致，直接复用原域名集合避免冗余操作
-  const proxyDomains = shouldRewriteByHosts
-    ? new Set([
-        ...originalProxyDomains,
-        ...mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase()),
-      ])
-    : originalProxyDomains;
-
-  // 命中触发条件时，将 listen 值加入公共 DNS 列表并重建匹配正则，
-  // 使其在私有 DNS 提取时被当作公共 DNS 过滤，避免 listen 地址被误留为私有 DNS
-  if (shouldRewriteByHosts) {
-    commonDnsList.push(String(listenValue));
-    commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i');
-  }
+  // 合并改写前/后的节点域名
+  const proxyDomains = new Set([
+    ...originalProxyDomains,
+    ...mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase()),
+  ]);
 
   const isCommonDns = (dns) => commonDnsRegex.test(String(dns));
 
