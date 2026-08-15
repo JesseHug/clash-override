@@ -39,6 +39,7 @@ const ruleOptionsEnable = {
   隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
   一倍率归入低倍率: true,         // 将1x、1.0x等一倍率节点也归入低倍率组
+  生成倍率组: true,               // 是否生成低倍率/高倍率策略组（关闭后界面更简洁）
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
   代理IPV4优先: false,          // 开启后所有订阅节点强制 ipv4-prefer
   代理IPV6优先: false,          // 开启后所有订阅节点强制 ipv6-prefer（与上条互斥，同时开启则不生效）
@@ -563,20 +564,22 @@ function buildRegionGroups(proxies, customProxies) {
     regionGroups.push({ name: "Other", type: "select", icon: `${ico}/Europe_Map.png`, proxies: otherGroupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
   }
 
-  const finalLowRateRegex = ruleOptionsEnable.一倍率归入低倍率 
-    ? new RegExp(`(?:${lowRateRegex.source})|(?:${oneRateRegex.source})`, 'u') 
-    : lowRateRegex;
-  const nodesLowRate = getNodes(finalLowRateRegex);
-  const nodesHighRate = getNodes(highRateRegex);
-  if (nodesLowRate[0] !== "DIRECT") {
-    activeRegions.push("低倍率节点");
-    regionAutoGroups.push({ name: "低倍率节点-自动选择", proxies: nodesLowRate, hidden: true, ...autoBaseOption });
-    regionGroups.push({ name: "低倍率节点", type: "select", icon: `${ico}/Available_1.png`, proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
-  }
-  if (nodesHighRate[0] !== "DIRECT") {
-    activeRegions.push("高倍率节点");
-    regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
-    regionGroups.push({ name: "高倍率节点", type: "select", icon: `${ico}/Airport.png`, proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+  if (ruleOptionsEnable.生成倍率组) {
+    const finalLowRateRegex = ruleOptionsEnable.一倍率归入低倍率 
+      ? new RegExp(`(?:${lowRateRegex.source})|(?:${oneRateRegex.source})`, 'u') 
+      : lowRateRegex;
+    const nodesLowRate = getNodes(finalLowRateRegex);
+    const nodesHighRate = getNodes(highRateRegex);
+    if (nodesLowRate[0] !== "DIRECT") {
+      activeRegions.push("低倍率节点");
+      regionAutoGroups.push({ name: "低倍率节点-自动选择", proxies: nodesLowRate, hidden: true, ...autoBaseOption });
+      regionGroups.push({ name: "低倍率节点", type: "select", icon: `${ico}/Available_1.png`, proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
+    }
+    if (nodesHighRate[0] !== "DIRECT") {
+      activeRegions.push("高倍率节点");
+      regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
+      regionGroups.push({ name: "高倍率节点", type: "select", icon: `${ico}/Airport.png`, proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+    }
   }
 
   return { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico };
