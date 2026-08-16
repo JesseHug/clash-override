@@ -373,28 +373,49 @@ function buildDnsAndHostsConfig(config, proxies) {
   let commonDnsRegex = new RegExp(commonDnsList.map((dns) => dns.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i');
 
   const proxyServerNameservers = originalDnsConfig['proxy-server-nameserver'] ?? [];
+  const listenValue = originalDnsConfig['listen'];
 
-  // 无条件根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
-  // 部分机场（如花云）直接使用 hosts 域名映射而不声明私有 DNS，因此不能加条件守卫
-  const mappedProxies = applyHostsToProxies(proxies, config.hosts);
+  // hosts 改写条件：
+  // 1. proxy-server-nameserver 仅 1 条且该 DNS 包含非空的 listen 值（旧写法：如 198.18.0.1:53）
+  // 2. proxy-server-nameserver 仅 1 条且包含 127.0.0.1，且 listen 包含 0.0.0.0（新写法：本地监听）
+  const matchesLocalDnsListener =
+    proxyServerNameservers.length === 1 &&
+    typeof listenValue === 'string' &&
+    listenValue.includes('0.0.0.0') &&
+    proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes('127.0.0.1'));
+
+  const shouldRewriteByHosts =
+    proxyServerNameservers.length === 1 &&
+    typeof listenValue === 'string' &&
+    listenValue.length > 0 &&
+    (proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes(listenValue.toLowerCase())) ||
+      matchesLocalDnsListener);
+
+  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
+  const mappedProxies = shouldRewriteByHosts ? applyHostsToProxies(proxies, config.hosts) : proxies;
 
   // 原节点域名（改写前）
   const originalProxyDomains = new Set(
     proxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase())
   );
 
-  // 合并改写前/后的节点域名
-  const proxyDomains = new Set([
-    ...originalProxyDomains,
-    ...mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase()),
-  ]);
+  // 合并改写前/后的节点域名；未执行 hosts 改写时两者一致，直接复用原域名集合避免冗余操作
+  const proxyDomains = shouldRewriteByHosts
+    ? new Set([
+        ...originalProxyDomains,
+        ...mappedProxies.filter((p) => typeof p.server === 'string').map((p) => p.server.toLowerCase()),
+      ])
+    : originalProxyDomains;
+
+  // 命中触发条件时，私有 DNS 提取时直接置空，避免本地监听 DNS 被误留为私有 DNS
+  const privateProxyServerNameservers = shouldRewriteByHosts ? [] : proxyServerNameservers;
 
   const isCommonDns = (dns) => commonDnsRegex.test(String(dns));
 
   // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
   const privateDNS = [
     ...new Set(
-      [...(originalDnsConfig['nameserver'] ?? []), ...proxyServerNameservers]
+      [...(originalDnsConfig['nameserver'] ?? []), ...privateProxyServerNameservers]
         .map(stripDnsSuffix)
         .filter((dns) => dns.length > 0 && !isCommonDns(dns)),
     ),
@@ -748,12 +769,6 @@ function main(config) {
       "RULE-SET,NetflixIP,Netflix"
     ] : []),
     ...(ruleOptionsEnable.Emby ? [
-      "DOMAIN-SUFFIX,nubebelle.com,Emby",
-      "PROCESS-NAME,com.mb.android,Emby",
-      "PROCESS-NAME,tv.emby.embyatv,Emby",
-      "PROCESS-NAME,com.hush.yamby,Emby",
-      "PROCESS-NAME,com.jellycine.app,Emby",
-      "PROCESS-NAME,com.mountains.hills,Emby",
       "RULE-SET,Emby,Emby",
       "RULE-SET,EmbyIP,Emby"
     ] : []),
