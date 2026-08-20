@@ -111,8 +111,8 @@ const regionMappings = [
   { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
   { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "Singapore.png" },
   { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "Taiwan.png" },
-  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "Japan.png" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
+  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "Japan.png" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
   { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "Macao.png" },
   { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "European_Union.png" }
 ];
@@ -450,7 +450,7 @@ function buildDnsAndHostsConfig(config, proxies) {
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/15',
     'fake-ip-range6': '2001:2::1/48',
-    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter', ...proxyFakeIpFilter],
+    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter', 'rule-set:geolocation-cn', ...proxyFakeIpFilter],
     'proxy-server-nameserver': privateDNS.length > 0 ? privateDNS : chinaDohDNS,
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
