@@ -411,6 +411,9 @@ rule-providers:
   Google:
     <<: *BehaviorDN
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs
+  Gemini:
+    <<: *BehaviorDN
+    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Gemini.mrs
   GoogleFCM:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs
@@ -475,6 +478,7 @@ rules:
   - RULE-SET,YouTube,YouTube
   - RULE-SET,Google,Google
   - RULE-SET,GoogleIP,Google,no-resolve
+  - RULE-SET,Gemini,Google
   - RULE-SET,Spotify,Spotify
   - RULE-SET,Telegram,Telegram
   - RULE-SET,TelegramIP,Telegram,no-resolve

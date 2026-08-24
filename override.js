@@ -744,7 +744,10 @@ function main(config) {
       Emby: { ...mrs, url: `${r66}/domain/Emby.mrs`, path: "./rules/Emby.mrs" },
       EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.Google ? { Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" } } : {}),
+    ...(ruleOptionsEnable.Google ? {
+      Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
+      Gemini: { ...mrs, url: `${r66}/domain/Gemini.mrs`, path: "./rules/Gemini.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs", path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
     gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./rules/gfw.mrs" },
     'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
@@ -771,7 +774,7 @@ function main(config) {
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
     ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI", "RULE-SET,AIIP,AI,no-resolve"] : []),
     ...(ruleOptionsEnable.YouTube ? ["RULE-SET,YouTube,YouTube"] : []),
-    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve"] : []),
+    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve", "RULE-SET,Gemini,Google"] : []),
     ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify"] : []),
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games"] : []),
