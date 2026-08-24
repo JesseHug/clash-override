@@ -27,6 +27,7 @@ const ruleOptionsEnable = {
   OpenAI: true,           // OpenAI 及其服务
   AI: true,               // 其他 AI 服务
   Apple: true,            // Apple 服务
+  FCM: true,              // Google FCM 推送（默认直连）
 
   PayPal: false,          // PayPal 支付
   Netflix: false,         // Netflix 流媒体
@@ -60,6 +61,7 @@ const serviceConfigs = [
   { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png' },
   { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png' },
   { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png' },
+  { name: 'FCM', icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png' },
 ];
 
 // --- 预定义规则 ---
@@ -102,7 +104,7 @@ const customPrefix = '自建-';
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
-const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
+const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
 const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/u;
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
@@ -644,6 +646,7 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", "Netflix", ["Proxies", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: "https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png", proxies: ["Proxies", "直连", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
     buildGroup("Final", "Final", ["Proxies", "直连", ...activeRegions]),
@@ -742,6 +745,7 @@ function main(config) {
       EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Google ? { Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" } } : {}),
+    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs", path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
     gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./rules/gfw.mrs" },
     'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs`, path: "./rules/ChinaIP.mrs" },
@@ -763,19 +767,20 @@ function main(config) {
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
       "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
     ] : []),
+    ...(ruleOptionsEnable.FCM ? ["RULE-SET,GoogleFCM,FCM"] : []),
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
-    ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI"] : []),
+    ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI", "RULE-SET,AIIP,AI,no-resolve"] : []),
     ...(ruleOptionsEnable.YouTube ? ["RULE-SET,YouTube,YouTube"] : []),
-    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google"] : []),
+    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve"] : []),
     ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify"] : []),
-    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram"] : []),
+    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
     ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
     ...(ruleOptionsEnable.Netflix ? [
       "RULE-SET,Netflix,Netflix",
-      "RULE-SET,NetflixIP,Netflix"
+      "RULE-SET,NetflixIP,Netflix,no-resolve"
     ] : []),
     ...(ruleOptionsEnable.Emby ? [
       "RULE-SET,Emby,Emby",
@@ -784,9 +789,6 @@ function main(config) {
     "RULE-SET,gfw,Proxies",
     "RULE-SET,geolocation-cn,直连",
     "RULE-SET,cn_additional,直连",
-    ...(ruleOptionsEnable.AI ? ["RULE-SET,AIIP,AI,no-resolve"] : []),
-    ...(ruleOptionsEnable.Google ? ["RULE-SET,GoogleIP,Google,no-resolve"] : []),
-    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,直连",
     "GEOIP,CN,直连",
