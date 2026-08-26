@@ -387,6 +387,9 @@ rule-providers:
   Games:
     <<: *BehaviorDN
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs
+  SteamASN:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/asn/AS32590.mrs
   PayPal:
     <<: *BehaviorDN
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs
@@ -483,6 +486,7 @@ rules:
   - RULE-SET,Telegram,Telegram
   - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,Games,Games
+  - RULE-SET,SteamASN,Games,no-resolve
   - RULE-SET,PayPal,PayPal
   - RULE-SET,Twitter,X
   - RULE-SET,Apple,Apple

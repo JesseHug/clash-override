@@ -727,7 +727,10 @@ function main(config) {
     ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
     ...(ruleOptionsEnable.Spotify ? { Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs`, path: "./rules/Spotify.mrs" } } : {}),
     ...(ruleOptionsEnable.Telegram ? { Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs`, path: "./rules/Telegram.mrs" } } : {}),
-    ...(ruleOptionsEnable.Games ? { Games: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Games.mrs" } } : {}),
+    ...(ruleOptionsEnable.Games ? {
+      Games: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Games.mrs" },
+      SteamASN: { ...mrsIP, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/asn/AS32590.mrs", path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
     ...(ruleOptionsEnable.X ? { Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs`, path: "./rules/Twitter.mrs" } } : {}),
     ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
@@ -777,7 +780,7 @@ function main(config) {
     ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve", "RULE-SET,Gemini,Google"] : []),
     ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify"] : []),
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
-    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games"] : []),
+    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamASN,Games,no-resolve"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
     ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
