@@ -735,7 +735,10 @@ function main(config) {
       SteamASN: { ...mrsIP, url: `${rBett}/asn/AS32590.mrs`, path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
     } : {}),
     ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${rBett}/geo/geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
-    ...(ruleOptionsEnable.X ? { Twitter: { ...mrs, url: `${rBett}/geo/geosite/twitter.mrs`, path: "./rules/Twitter.mrs" } } : {}),
+    ...(ruleOptionsEnable.X ? {
+      Twitter: { ...mrs, url: `${rBett}/geo/geosite/twitter.mrs`, path: "./rules/Twitter.mrs" },
+      TwitterIP: { ...mrsIP, url: `${rBett}/geo/geoip/twitter.mrs`, path: "./rules/TwitterIP.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${rBett}/geo/geosite/openai.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
     ...(ruleOptionsEnable.AI ? {
       AI: { ...mrs, url: `${rBett}/geo/geosite/category-ai-!cn.mrs`, path: "./rules/AI.mrs" },
@@ -759,7 +762,7 @@ function main(config) {
       Gemini: { ...mrs, url: `${rBett}/geo/geosite/google-gemini.mrs`, path: "./rules/Gemini.mrs" }
     } : {}),
     ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${rBett}/geo/geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
-    gfw: { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/gfw.mrs" },
+    'geolocation-!cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/geolocation-!cn.mrs" },
     'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
     PrivateIP: { ...mrsIP, url: `${rBett}/geo/geoip/private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
@@ -783,7 +786,7 @@ function main(config) {
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamASN,Games,no-resolve"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
-    ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X"] : []),
+    ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X", "RULE-SET,TwitterIP,X,no-resolve"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
     ...(ruleOptionsEnable.Netflix ? [
       "RULE-SET,Netflix,Netflix",
@@ -793,7 +796,7 @@ function main(config) {
       "RULE-SET,Emby,Emby",
       "RULE-SET,EmbyIP,Emby"
     ] : []),
-    "RULE-SET,gfw,Proxies",
+    "RULE-SET,geolocation-!cn,Proxies",
     "RULE-SET,geolocation-cn,直连",
     "RULE-SET,cn_additional,直连",
     "RULE-SET,ChinaIP,直连",

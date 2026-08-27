@@ -396,6 +396,9 @@ rule-providers:
   Twitter:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs
+  TwitterIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs
   OpenAI:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/openai.mrs
@@ -435,7 +438,7 @@ rule-providers:
   GoogleFCM:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs
-  gfw:
+  geolocation-!cn:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs
   geolocation-cn:
@@ -485,13 +488,14 @@ rules:
   - RULE-SET,SteamASN,Games,no-resolve
   - RULE-SET,PayPal,PayPal
   - RULE-SET,Twitter,X
+  - RULE-SET,TwitterIP,X,no-resolve
   - RULE-SET,Apple,Apple
   - DOMAIN-SUFFIX,nubebelle.com,Emby
   - RULE-SET,Emby,Emby
   - RULE-SET,EmbyIP,Emby
 
   # 国外网站兜底
-  - RULE-SET,gfw,Proxies
+  - RULE-SET,geolocation-!cn,Proxies
 
   # 国内域名
   - RULE-SET,geolocation-cn,直连
