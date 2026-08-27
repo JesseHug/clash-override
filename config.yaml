@@ -369,54 +369,69 @@ proxy-groups:
 # ==================== 规则集 ====================
 
 rule-providers:
-  Direct:
-    <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Direct.mrs
   Private:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Private.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs
   YouTube:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/YouTube.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs
   Spotify:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Spotify.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs
   Telegram:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Telegram.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs
+  TelegramIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs
   Games:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games-!cn.mrs
   SteamASN:
     <<: *BehaviorIP
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/asn/AS32590.mrs
   PayPal:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/paypal.mrs
   Twitter:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Twitter.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs
   OpenAI:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/OpenAI.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/openai.mrs
   AI:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/AI.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs
+  AIIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/ai.mrs
   AppleCN:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/AppleCN.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs
   Apple:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Apple.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs
+  Netflix:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs
+  NetflixIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs
   Emby:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Emby.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-emby.mrs
+  EmbyIP:
+    <<: *BehaviorIP
+    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs
   Google:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Google.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs
+  GoogleIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs
   Gemini:
     <<: *BehaviorDN
-    url: https://github.com/666OS/rules/raw/release/mihomo/domain/Gemini.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google-gemini.mrs
   GoogleFCM:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs
@@ -428,25 +443,10 @@ rule-providers:
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs
   ChinaIP:
     <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs
-  EmbyIP:
-    <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs
-  AIIP:
-    <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/AI.mrs
-  GoogleIP:
-    <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Google.mrs
-  ProxyIP:
-    <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Proxy.mrs
-  TelegramIP:
-    <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Telegram.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs
   PrivateIP:
     <<: *BehaviorIP
-    url: https://github.com/666OS/rules/raw/release/mihomo/ip/Private.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs
   fakeip_filter:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs
@@ -460,7 +460,6 @@ rule-providers:
 # ==================== 路由规则 ====================
 rules:
   # 直连 & 私有网络
-  - RULE-SET,Direct,直连
   - RULE-SET,Private,直连
   - RULE-SET,AppleCN,直连
 
@@ -499,7 +498,6 @@ rules:
   - RULE-SET,cn_additional,直连
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
-  - RULE-SET,ProxyIP,Proxies,no-resolve
   - RULE-SET,ChinaIP,直连
 
   # GeoIP 兜底

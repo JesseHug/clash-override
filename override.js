@@ -716,57 +716,59 @@ function main(config) {
   const regionData = buildRegionGroups(finalMappedProxies, customProxies);
   newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainGroup: chainGroup });
 
-  // --- Rule Providers (666OS 体系) ---
+  // --- Rule Providers (优先 bett-rules，EmbyIP 保留 666OS) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
+  const rBett = "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta";
   const r66 = "https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo";
 
   newConfig["rule-providers"] = {
-    Direct: { ...mrs, url: `${r66}/domain/Direct.mrs`, path: "./rules/Direct.mrs" },
-    Private: { ...mrs, url: `${r66}/domain/Private.mrs`, path: "./rules/Private.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
-    ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${r66}/domain/YouTube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
-    ...(ruleOptionsEnable.Spotify ? { Spotify: { ...mrs, url: `${r66}/domain/Spotify.mrs`, path: "./rules/Spotify.mrs" } } : {}),
-    ...(ruleOptionsEnable.Telegram ? { Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs`, path: "./rules/Telegram.mrs" } } : {}),
-    ...(ruleOptionsEnable.Games ? {
-      Games: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Games.mrs" },
-      SteamASN: { ...mrsIP, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/asn/AS32590.mrs", path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
+    Private: { ...mrs, url: `${rBett}/geo/geosite/private.mrs`, path: "./rules/Private.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
+    ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${rBett}/geo/geosite/youtube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
+    ...(ruleOptionsEnable.Spotify ? { Spotify: { ...mrs, url: `${rBett}/geo/geosite/spotify.mrs`, path: "./rules/Spotify.mrs" } } : {}),
+    ...(ruleOptionsEnable.Telegram ? {
+      Telegram: { ...mrs, url: `${rBett}/geo/geosite/telegram.mrs`, path: "./rules/Telegram.mrs" },
+      TelegramIP: { ...mrsIP, url: `${rBett}/geo/geoip/telegram.mrs`, path: "./rules/TelegramIP.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
-    ...(ruleOptionsEnable.X ? { Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs`, path: "./rules/Twitter.mrs" } } : {}),
-    ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${r66}/domain/OpenAI.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
-    ...(ruleOptionsEnable.AI ? { AI: { ...mrs, url: `${r66}/domain/AI.mrs`, path: "./rules/AI.mrs" } } : {}),
+    ...(ruleOptionsEnable.Games ? {
+      Games: { ...mrs, url: `${rBett}/geo/geosite/category-games-!cn.mrs`, path: "./rules/Games.mrs" },
+      SteamASN: { ...mrsIP, url: `${rBett}/asn/AS32590.mrs`, path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
+    } : {}),
+    ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${rBett}/geo/geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
+    ...(ruleOptionsEnable.X ? { Twitter: { ...mrs, url: `${rBett}/geo/geosite/twitter.mrs`, path: "./rules/Twitter.mrs" } } : {}),
+    ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${rBett}/geo/geosite/openai.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
+    ...(ruleOptionsEnable.AI ? {
+      AI: { ...mrs, url: `${rBett}/geo/geosite/category-ai-!cn.mrs`, path: "./rules/AI.mrs" },
+      AIIP: { ...mrsIP, url: `${rBett}/geo/geoip/ai.mrs`, path: "./rules/AIIP.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.Apple ? {
-      AppleCN: { ...mrs, url: `${r66}/domain/AppleCN.mrs`, path: "./rules/AppleCN.mrs" },
-      Apple: { ...mrs, url: `${r66}/domain/Apple.mrs`, path: "./rules/Apple.mrs" }
+      AppleCN: { ...mrs, url: `${rBett}/geo/geosite/apple@cn.mrs`, path: "./rules/AppleCN.mrs" },
+      Apple: { ...mrs, url: `${rBett}/geo/geosite/apple.mrs`, path: "./rules/Apple.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Netflix ? {
-      Netflix: { ...mrs, url: `${r66}/domain/Netflix.mrs`, path: "./rules/Netflix.mrs" },
-      NetflixIP: { ...mrsIP, url: `${r66}/ip/Netflix.mrs`, path: "./rules/NetflixIP.mrs" }
+      Netflix: { ...mrs, url: `${rBett}/geo/geosite/netflix.mrs`, path: "./rules/Netflix.mrs" },
+      NetflixIP: { ...mrsIP, url: `${rBett}/geo/geoip/netflix.mrs`, path: "./rules/NetflixIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Emby ? {
-      Emby: { ...mrs, url: `${r66}/domain/Emby.mrs`, path: "./rules/Emby.mrs" },
+      Emby: { ...mrs, url: `${rBett}/geo/geosite/category-emby.mrs`, path: "./rules/Emby.mrs" },
       EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Google ? {
-      Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
-      Gemini: { ...mrs, url: `${r66}/domain/Gemini.mrs`, path: "./rules/Gemini.mrs" }
+      Google: { ...mrs, url: `${rBett}/geo/geosite/google.mrs`, path: "./rules/Google.mrs" },
+      GoogleIP: { ...mrsIP, url: `${rBett}/geo/geoip/google.mrs`, path: "./rules/GoogleIP.mrs" },
+      Gemini: { ...mrs, url: `${rBett}/geo/geosite/google-gemini.mrs`, path: "./rules/Gemini.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs", path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
-    gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs", path: "./rules/gfw.mrs" },
-    'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
-    ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs`, path: "./rules/ChinaIP.mrs" },
-    ...(ruleOptionsEnable.AI ? { AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" } } : {}),
-    ...(ruleOptionsEnable.Google ? { GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" } } : {}),
-    ProxyIP: { ...mrsIP, url: `${r66}/ip/Proxy.mrs`, path: "./rules/ProxyIP.mrs" },
-    ...(ruleOptionsEnable.Telegram ? { TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" } } : {}),
-    PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
+    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${rBett}/geo/geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
+    gfw: { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/gfw.mrs" },
+    'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
+    ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
+    PrivateIP: { ...mrsIP, url: `${rBett}/geo/geoip/private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
     fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
-    cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs", path: "./rules/cn.mrs" },
+    cn: { ...mrs, url: `${rBett}/geo/geosite/cn.mrs`, path: "./rules/cn.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
 
   newConfig.rules = [
-    "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
@@ -794,7 +796,6 @@ function main(config) {
     "RULE-SET,gfw,Proxies",
     "RULE-SET,geolocation-cn,直连",
     "RULE-SET,cn_additional,直连",
-    "RULE-SET,ProxyIP,Proxies,no-resolve",
     "RULE-SET,ChinaIP,直连",
     "GEOIP,CN,直连",
     "RULE-SET,PrivateIP,直连",
