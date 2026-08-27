@@ -389,7 +389,7 @@ rule-providers:
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/Games.mrs
   SteamASN:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/asn/AS32590.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/asn/AS32590.mrs
   PayPal:
     <<: *BehaviorDN
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/PayPal.mrs
@@ -419,13 +419,13 @@ rule-providers:
     url: https://github.com/666OS/rules/raw/release/mihomo/domain/Gemini.mrs
   GoogleFCM:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs
   gfw:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs
   geolocation-cn:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs
   ChinaIP:
     <<: *BehaviorIP
     url: https://github.com/666OS/rules/raw/release/mihomo/ip/China.mrs
@@ -452,7 +452,7 @@ rule-providers:
     url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs
   cn:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs
   cn_additional:
     <<: *BehaviorDN
     url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
@@ -463,9 +463,6 @@ rules:
   - RULE-SET,Direct,直连
   - RULE-SET,Private,直连
   - RULE-SET,AppleCN,直连
-
-  # Bilibili 静态资源
-  - DOMAIN-SUFFIX,hdslb.com,直连
 
   # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT

@@ -729,7 +729,7 @@ function main(config) {
     ...(ruleOptionsEnable.Telegram ? { Telegram: { ...mrs, url: `${r66}/domain/Telegram.mrs`, path: "./rules/Telegram.mrs" } } : {}),
     ...(ruleOptionsEnable.Games ? {
       Games: { ...mrs, url: `${r66}/domain/Games.mrs`, path: "./rules/Games.mrs" },
-      SteamASN: { ...mrsIP, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/asn/AS32590.mrs", path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
+      SteamASN: { ...mrsIP, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/asn/AS32590.mrs", path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
     } : {}),
     ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${r66}/domain/PayPal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
     ...(ruleOptionsEnable.X ? { Twitter: { ...mrs, url: `${r66}/domain/Twitter.mrs`, path: "./rules/Twitter.mrs" } } : {}),
@@ -751,9 +751,9 @@ function main(config) {
       Google: { ...mrs, url: `${r66}/domain/Google.mrs`, path: "./rules/Google.mrs" },
       Gemini: { ...mrs, url: `${r66}/domain/Gemini.mrs`, path: "./rules/Gemini.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs", path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
-    gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./rules/gfw.mrs" },
-    'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
+    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs", path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
+    gfw: { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs", path: "./rules/gfw.mrs" },
+    'geolocation-cn': { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs", path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${r66}/ip/China.mrs`, path: "./rules/ChinaIP.mrs" },
     ...(ruleOptionsEnable.AI ? { AIIP: { ...mrsIP, url: `${r66}/ip/AI.mrs`, path: "./rules/AIIP.mrs" } } : {}),
     ...(ruleOptionsEnable.Google ? { GoogleIP: { ...mrsIP, url: `${r66}/ip/Google.mrs`, path: "./rules/GoogleIP.mrs" } } : {}),
@@ -761,7 +761,7 @@ function main(config) {
     ...(ruleOptionsEnable.Telegram ? { TelegramIP: { ...mrsIP, url: `${r66}/ip/Telegram.mrs`, path: "./rules/TelegramIP.mrs" } } : {}),
     PrivateIP: { ...mrsIP, url: `${r66}/ip/Private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
     fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
-    cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs", path: "./rules/cn.mrs" },
+    cn: { ...mrs, url: "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs", path: "./rules/cn.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
 
@@ -769,7 +769,6 @@ function main(config) {
     "RULE-SET,Direct,直连",
     "RULE-SET,Private,直连",
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
-    "DOMAIN-SUFFIX,hdslb.com,直连",
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
       "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
     ] : []),
