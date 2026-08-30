@@ -748,6 +748,7 @@ function main(config) {
       TelegramIP: { ...mrsIP, url: `${rBett}/geo/geoip/telegram.mrs`, path: "./rules/TelegramIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Games ? {
+      GamesCN: { ...mrs, url: `${rBett}/geo/geosite/category-games@cn.mrs`, path: "./rules/GamesCN.mrs" },
       Games: { ...mrs, url: `${rBett}/geo/geosite/category-games-!cn.mrs`, path: "./rules/Games.mrs" },
       SteamASN: { ...mrsIP, url: `${rBett}/asn/AS32590.mrs`, path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
     } : {}),
@@ -790,6 +791,7 @@ function main(config) {
 
   newConfig.rules = [
     "RULE-SET,Private,直连",
+    ...(ruleOptionsEnable.Games ? ["RULE-SET,GamesCN,直连"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
       "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"

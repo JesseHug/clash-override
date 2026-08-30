@@ -384,6 +384,9 @@ rule-providers:
   TelegramIP:
     <<: *BehaviorIP
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs
+  GamesCN:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs
   Games:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games-!cn.mrs
@@ -464,6 +467,7 @@ rule-providers:
 rules:
   # 直连 & 私有网络
   - RULE-SET,Private,直连
+  - RULE-SET,GamesCN,直连
   - RULE-SET,AppleCN,直连
 
   # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
