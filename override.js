@@ -363,19 +363,39 @@ function filterAndNormalizeProxies(config) {
 function buildDnsAndHostsConfig(config, proxies) {
   const originalDnsConfig = config.dns ?? {};
   
+  // 常见的公共 DNS，用于过滤订阅中的公共 DNS
   const commonDnsList = [
+    // IPv4（国内）
     '223.5.5.5', '223.6.6.6', '119.29.29.29', '1.12.12.12', '120.53.53.53',
     '114.114.114.114', '180.76.76.76', '1.2.4.8', '116.116.116.116',
     '101.226.4.6', '123.125.81.6', '180.184.1.1', '180.184.2.2',
+
+    // IPv6（国内）
+    '2400:3200::1', '2400:3200:baba::1', '2402:4e00::', '2400:da00::6666',
+
+    // IPv4（国外）
     '1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4', '9.9.9.9',
     '149.112.112.112', '208.67.222.222', '208.67.220.220',
     '94.140.14.14', '94.140.15.15', '76.76.2.0', '76.76.10.0',
     '185.228.168.9', '185.228.169.9', '77.88.8.8', '77.88.8.1',
     '156.154.70.1', '156.154.71.1',
-    '127.0.0.1',
+
+    // IPv6（国外）
+    '2606:4700:4700::1111', '2606:4700:4700::1001',
+    '2001:4860:4860::8888', '2001:4860:4860::8844',
+    '2620:fe::fe', '2620:fe::9',
+    '2620:119:35::35', '2620:119:53::53',
+    '2a10:50c0::bad1:ff', '2a10:50c0::bad2:ff',
+    '2a10:50c0::ad1:ff', '2a10:50c0::ad2:ff',
+    '2a0d:2a00:1::2', '2a0d:2a00:2::2',
+    '2a02:6b8::feed:0ff', '2a02:6b8:0:1::feed:0ff',
+    '2610:a1:1018::1', '2610:a1:1019::1',
+
+    // 关键词（国内）
     'alidns', 'doh.pub', 'dot.pub', 'dns.pub', 'dnspod', 'dns.baidu',
-    'dns.google', 'cloudflare', 'quad9', 'opendns', 'nextdns', 'adguard',
-    'system',
+
+    // 关键词（国外）
+    'dns.google', 'dns.cloudflare', 'cloudflare-dns', 'quad9', 'opendns', 'nextdns', 'adguard',
   ];
 
   // 预编译为单个正则，避免逐个遍历数组进行子串匹配
@@ -384,21 +404,13 @@ function buildDnsAndHostsConfig(config, proxies) {
   const proxyServerNameservers = originalDnsConfig['proxy-server-nameserver'] ?? [];
   const listenValue = originalDnsConfig['listen'];
 
-  // hosts 改写条件：
-  // 1. proxy-server-nameserver 仅 1 条且该 DNS 包含非空的 listen 值（旧写法：如 198.18.0.1:53）
-  // 2. proxy-server-nameserver 仅 1 条且包含 127.0.0.1，且 listen 包含 0.0.0.0（新写法：本地监听）
-  const matchesLocalDnsListener =
-    proxyServerNameservers.length === 1 &&
-    typeof listenValue === 'string' &&
-    listenValue.includes('0.0.0.0') &&
-    proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes('127.0.0.1'));
-
   const shouldRewriteByHosts =
     proxyServerNameservers.length === 1 &&
     typeof listenValue === 'string' &&
     listenValue.length > 0 &&
     (proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes(listenValue.toLowerCase())) ||
-      matchesLocalDnsListener);
+      (listenValue.includes('0.0.0.0') &&
+        proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes('127.0.0.1'))));
 
   // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
   const mappedProxies = shouldRewriteByHosts ? applyHostsToProxies(proxies, config.hosts) : proxies;
@@ -414,7 +426,12 @@ function buildDnsAndHostsConfig(config, proxies) {
   // 命中触发条件时，私有 DNS 提取时直接置空，避免本地监听 DNS 被误留为私有 DNS
   const privateProxyServerNameservers = shouldRewriteByHosts ? [] : proxyServerNameservers;
 
-  const isCommonDns = (dns) => commonDnsRegex.test(String(dns));
+  const isCommonDns = (dns) => {
+    const value = String(dns).trim().toLowerCase();
+    if (value === 'system' || value === 'system://') return true;
+
+    return commonDnsRegex.test(value);
+  };
 
   // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
   const privateDNS = [
