@@ -622,12 +622,12 @@ function buildRegionGroups(proxies, customProxies) {
     if (nodesLowRate[0] !== "DIRECT") {
       activeRegions.push("低倍率节点");
       regionAutoGroups.push({ name: "低倍率节点-自动选择", proxies: nodesLowRate, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "低倍率节点", type: "select", icon: `${ico}/Available_1.png`, proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
+      regionGroups.push({ name: "低倍率节点", type: "select", icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/x0.1.png", proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
     }
     if (nodesHighRate[0] !== "DIRECT") {
       activeRegions.push("高倍率节点");
       regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "高倍率节点", type: "select", icon: `${ico}/Airport.png`, proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+      regionGroups.push({ name: "高倍率节点", type: "select", icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/x2.0.png", proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
     }
   }
 
@@ -650,7 +650,7 @@ function buildProxyGroups(regionData, customInfo) {
   };
 
   const groups = [
-    buildGroup("Proxies", "Global", [masterName, ...activeRegions, ...allProxiesNames]),
+    buildGroup("Proxies", "Proxy", [masterName, ...activeRegions, ...allProxiesNames]),
     ...(ruleOptionsEnable.Google ? [buildGroup("Google", "Google")] : []),
     ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { "default-selected": "MO" })] : []),
     ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { "default-selected": "TW" })] : []),
@@ -671,7 +671,7 @@ function buildProxyGroups(regionData, customInfo) {
     {
       name: "直连",
       type: "select",
-      icon: `${ico}/China_Map.png`,
+      icon: `${ico}/China.png`,
       proxies: [...directProxies.map(p => p.name)]
     },
 
