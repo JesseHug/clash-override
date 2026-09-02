@@ -170,7 +170,7 @@ proxy-providers:
 proxy-groups:
   - name: Proxies
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     proxies:
       - Auto
       - HK
@@ -245,7 +245,7 @@ proxy-groups:
 
   - name: 直连
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China.png
     proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先']
 
   - name: Auto
@@ -311,13 +311,13 @@ proxy-groups:
     filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv)).*$'
   - name: 低倍率节点
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/x0.1.png
     proxies: [低倍率节点-自动选择]
     include-all: true
     filter: '^(?!.*(?:剩|期|客户端|软件))(?!.*(?:(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉])))).*$'
   - name: 高倍率节点
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/x2.0.png
     proxies: [高倍率节点-自动选择]
     include-all: true
     filter: '(?u)(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))'
