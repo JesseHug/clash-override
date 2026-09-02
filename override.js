@@ -784,7 +784,7 @@ function main(config) {
     'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
     PrivateIP: { ...mrsIP, url: `${rBett}/geo/geoip/private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
-    fakeip_filter: { ...mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs", path: "./rules/fakeip_filter.mrs" },
+    fakeip_filter: { ...mrs, url: `${rBett}/geo/geosite/fakeip-filter.mrs`, path: "./rules/fakeip_filter.mrs", "path-in-bundle": "geo/geosite/fakeip-filter.mrs" },
     cn: { ...mrs, url: `${rBett}/geo/geosite/cn.mrs`, path: "./rules/cn.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
