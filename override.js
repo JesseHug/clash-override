@@ -578,7 +578,7 @@ function buildRegionGroups(proxies, customProxies) {
     return res.length > 0 ? res : ["DIRECT"];
   };
 
-  const healthCheckUrl = "https://g.cn/generate_204";
+  const healthCheckUrl = "https://www.apple.com/library/test/success.html";
   const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3, "exclude-type": "DIRECT", "empty-fallback": "REJECT" };
   const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
 
