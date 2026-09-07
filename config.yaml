@@ -13,7 +13,7 @@ proxy_providers_common: &proxy_providers_common
   health-check: { enable: true, url: https://www.apple.com/library/test/success.html, interval: 600, lazy: true }
 
 global_exclude_filter: &global_exclude_filter
-  exclude-filter: '(?i)(群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|t\.me\/\+|expire|http|com|traffic)'
+  exclude-filter: '(?i)(群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|expire|http|com|traffic)'
 
 BehaviorDN: &BehaviorDN
   type: http
@@ -67,6 +67,7 @@ ntp:
   port: 123
   interval: 60
 
+# ==================== 外部控制 & 面板 ====================
 external-controller: '127.0.0.1:9090'
 external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
 external-ui-name: zashboard
@@ -116,7 +117,7 @@ hosts:
   "+.h2.smtcdns.net": ["0.0.0.0"]
 
 # ==================== DNS 配置 ====================
-chinaDNS: &chinaDNS [223.5.5.5, 119.29.29.29]
+chinaDNS: &chinaDNS ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT']
 chinaDohDNS: &chinaDohDNS ['https://223.5.5.5/dns-query#DIRECT', 'https://1.12.12.12/dns-query#DIRECT']
 foreignDNS: &foreignDNS ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies']
 
@@ -145,8 +146,8 @@ dns:
     "rule-set:cn": *chinaDNS
   direct-nameserver:
     - system
-    - 223.5.5.5
-    - 119.29.29.29
+    - '223.5.5.5#DIRECT'
+    - '119.29.29.29#DIRECT'
 
 # ==================== 代理提供者 ====================
 proxy-providers:
@@ -378,6 +379,9 @@ rule-providers:
   Spotify:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs
+  SpotifyIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs
   Telegram:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs
@@ -390,9 +394,9 @@ rule-providers:
   Games:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games-!cn.mrs
-  SteamASN:
+  SteamIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/asn/AS32590.mrs
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs
   PayPal:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/paypal.mrs
@@ -486,10 +490,11 @@ rules:
   - RULE-SET,GoogleIP,Google,no-resolve
   - RULE-SET,Gemini,Google
   - RULE-SET,Spotify,Spotify
+  - RULE-SET,SpotifyIP,Spotify,no-resolve
   - RULE-SET,Telegram,Telegram
   - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,Games,Games
-  - RULE-SET,SteamASN,Games,no-resolve
+  - RULE-SET,SteamIP,Games,no-resolve
   - RULE-SET,PayPal,PayPal
   - RULE-SET,Twitter,X
   - RULE-SET,TwitterIP,X,no-resolve

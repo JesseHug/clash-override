@@ -41,6 +41,8 @@ const ruleOptionsEnable = {
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
   一倍率归入低倍率: true,         // 将1x、1.0x等一倍率节点也归入低倍率组
   生成倍率组: true,               // 是否生成低倍率/高倍率策略组（关闭后界面更简洁）
+  过滤低倍率节点: false,        // 是否全局排除低倍率节点
+  过滤重复节点: false,          // 是否按连接目标（服务器地址+端口）过滤重复节点
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
   代理IPV4优先: false,          // 开启后所有订阅节点强制 ipv4-prefer
   代理IPV6优先: false,          // 开启后所有订阅节点强制 ipv6-prefer（与上条互斥，同时开启则不生效）
@@ -104,7 +106,7 @@ const customPrefix = '自建-';
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
-const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
+const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
 const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/u;
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
@@ -214,17 +216,18 @@ function applyHostsToProxies(proxies, hosts) {
   });
 }
 
-// 剥离 DNS 地址的 # 策略组后缀；#direct（忽略大小写，可带 & 参数）时整条保留，
-// 避免误删内核原生支持的 DIRECT 出口标记
+// 剥离 DNS 地址的 # 策略组后缀；
+// 参数包含 direct 或 直连 时，强制规范化为 #DIRECT
 function stripDnsSuffix(dns) {
   const str = String(dns);
   const hashIndex = str.indexOf('#');
   if (hashIndex === -1) return str;
 
+  const prefix = str.slice(0, hashIndex).trim();
   const suffix = str.slice(hashIndex + 1).toLowerCase();
-  if (suffix === 'direct' || suffix.startsWith('direct&')) return str;
+  if (suffix.includes('direct') || suffix.includes('直连')) return prefix + '#DIRECT';
 
-  return str.slice(0, hashIndex);
+  return prefix;
 }
 
 /**
@@ -232,6 +235,55 @@ function stripDnsSuffix(dns) {
  */
 function isIpAddress(server) {
   return /^\d{1,3}(\.\d{1,3}){3}$/.test(server) || server.includes(':');
+}
+
+/**
+ * 简化节点域名策略：将相同 DNS 的节点域名按后缀归类，至少三段的域名可合并为 +. 后缀形式
+ */
+function simplifyDomainPolicy(policy) {
+  const groups = new Map();
+
+  for (const [domain, dns] of Object.entries(policy)) {
+    const dnsKey = JSON.stringify(dns);
+
+    if (domain.startsWith('+.') || domain.startsWith('.') || domain.includes('*')) {
+      groups.set(`keep:${domain}`, [{ domain, dns, dnsKey }]);
+      continue;
+    }
+
+    const parts = domain.split('.');
+
+    if (parts.length < 3) {
+      groups.set(`keep:${domain}`, [{ domain, dns, dnsKey }]);
+      continue;
+    }
+
+    const suffix = parts.slice(-2).join('.');
+
+    if (!groups.has(suffix)) {
+      groups.set(suffix, []);
+    }
+
+    groups.get(suffix).push({ domain, dns, dnsKey });
+  }
+
+  const result = {};
+
+  for (const [, domains] of groups) {
+    const firstDnsKey = domains[0].dnsKey;
+    const sameDns = domains.every(({ dnsKey }) => dnsKey === firstDnsKey);
+
+    if (domains.length >= 2 && sameDns) {
+      const suffix = domains[0].domain.split('.').slice(-2).join('.');
+      result[`+.${suffix}`] = domains[0].dns;
+    } else {
+      for (const { domain, dns } of domains) {
+        result[domain] = dns;
+      }
+    }
+  }
+
+  return result;
 }
 
 // --- 正则缓存加速 ---
@@ -274,6 +326,7 @@ function filterAndNormalizeProxies(config) {
     if (!checkProxy(proxy)) return false;
     if (builtinTypes.has(String(proxy.type ?? '').toLowerCase())) return false;
     if (excludeFilter.test(proxy.name)) return false;
+    if (ruleOptionsEnable.过滤低倍率节点 && lowRateRegex.test(proxy.name)) return false;
     if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(proxy.name)) return false;
     return true;
   });
@@ -303,17 +356,27 @@ function filterAndNormalizeProxies(config) {
     return proxy;
   });
 
-  // 去重：标准化后可能出现同名节点（如去掉重复国旗后撞名），保留首个，避免内核冲突
-  const hasDuplicateNames = new Set(normalizedProxies.map((p) => p.name)).size !== normalizedProxies.length;
-  let deduplicatedProxies = normalizedProxies;
-  if (hasDuplicateNames) {
-    deduplicatedProxies = [];
-    const uniqueNames = new Set();
-    for (const proxy of normalizedProxies) {
-      if (uniqueNames.has(proxy.name)) continue;
-      uniqueNames.add(proxy.name);
-      deduplicatedProxies.push(proxy);
+  // 去重处理：
+  // 1. 若开启 过滤重复节点，按连接目标 (server + port) 去重，剔除完全相同的物理服务器节点
+  // 2. 无论是否开启该选项，均按节点名称 (name) 去重，防止重名导致内核冲突
+  const filterDuplicateTarget = ruleOptionsEnable.过滤重复节点;
+  const uniqueTargets = new Set();
+  const uniqueNames = new Set();
+  const deduplicatedProxies = [];
+
+  for (const proxy of normalizedProxies) {
+    // 按连接目标 (server:port) 去重
+    if (filterDuplicateTarget && typeof proxy.server === 'string' && proxy.port) {
+      const targetKey = `${proxy.server.toLowerCase().trim()}:${proxy.port}`;
+      if (uniqueTargets.has(targetKey)) continue;
+      uniqueTargets.add(targetKey);
     }
+
+    // 按节点名称去重
+    if (uniqueNames.has(proxy.name)) continue;
+    uniqueNames.add(proxy.name);
+
+    deduplicatedProxies.push(proxy);
   }
 
   // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
@@ -443,7 +506,7 @@ function buildDnsAndHostsConfig(config, proxies) {
   ];
 
   // 提取节点域名对应的 DNS 配置（剥离 # 策略组后缀）
-  const proxyServerPolicy = Object.fromEntries(
+  const matchedProxyPolicy = Object.fromEntries(
     [originalDnsConfig['nameserver-policy'] ?? {}, originalDnsConfig['proxy-server-nameserver-policy'] ?? {}]
       .flatMap(Object.entries)
       .filter(([domain]) => matchDomainPattern(domain, proxyDomains))
@@ -455,17 +518,20 @@ function buildDnsAndHostsConfig(config, proxies) {
   );
 
   // 无节点专属 DNS 策略且存在私有 DNS 时，将节点域名统一映射到私有 DNS
-  if (privateDNS.length > 0 && Object.keys(proxyServerPolicy).length === 0) {
+  if (privateDNS.length > 0 && Object.keys(matchedProxyPolicy).length === 0) {
     for (const domain of proxyDomains) {
-      proxyServerPolicy[domain] = privateDNS;
+      matchedProxyPolicy[domain] = privateDNS;
     }
   }
+
+  // 压缩相同 DNS 的节点二级子域策略为 +.domain.com 规则
+  const proxyServerPolicy = simplifyDomainPolicy(matchedProxyPolicy);
 
   // 继承机场自带的 fake-ip-filter（部分机场节点域名需走真实 IP 解析）
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] ?? [];
   const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => matchDomainPattern(String(pattern), proxyDomains));
 
-  const chinaDNS = ['223.5.5.5', '119.29.29.29'];
+  const chinaDNS = ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT'];
   const chinaDohDNS = ['https://223.5.5.5/dns-query#DIRECT', 'https://1.12.12.12/dns-query#DIRECT'];
   const foreignDNS = ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
 
@@ -742,7 +808,10 @@ function main(config) {
   newConfig["rule-providers"] = {
     Private: { ...mrs, url: `${rBett}/geo/geosite/private.mrs`, path: "./rules/Private.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
     ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${rBett}/geo/geosite/youtube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
-    ...(ruleOptionsEnable.Spotify ? { Spotify: { ...mrs, url: `${rBett}/geo/geosite/spotify.mrs`, path: "./rules/Spotify.mrs" } } : {}),
+    ...(ruleOptionsEnable.Spotify ? {
+      Spotify: { ...mrs, url: `${rBett}/geo/geosite/spotify.mrs`, path: "./rules/Spotify.mrs" },
+      SpotifyIP: { ...mrsIP, url: `${rBett}/geo/geoip/spotify.mrs`, path: "./rules/SpotifyIP.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.Telegram ? {
       Telegram: { ...mrs, url: `${rBett}/geo/geosite/telegram.mrs`, path: "./rules/Telegram.mrs" },
       TelegramIP: { ...mrsIP, url: `${rBett}/geo/geoip/telegram.mrs`, path: "./rules/TelegramIP.mrs" }
@@ -750,7 +819,7 @@ function main(config) {
     ...(ruleOptionsEnable.Games ? {
       GamesCN: { ...mrs, url: `${rBett}/geo/geosite/category-games@cn.mrs`, path: "./rules/GamesCN.mrs" },
       Games: { ...mrs, url: `${rBett}/geo/geosite/category-games-!cn.mrs`, path: "./rules/Games.mrs" },
-      SteamASN: { ...mrsIP, url: `${rBett}/asn/AS32590.mrs`, path: "./rules/SteamASN.mrs", "path-in-bundle": "asn/AS32590.mrs" }
+      SteamIP: { ...mrsIP, url: `${rBett}/geo/geoip/steam.mrs`, path: "./rules/SteamIP.mrs", "path-in-bundle": "geo/geoip/steam.mrs" }
     } : {}),
     ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${rBett}/geo/geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
     ...(ruleOptionsEnable.X ? {
@@ -801,9 +870,9 @@ function main(config) {
     ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI", "RULE-SET,AIIP,AI,no-resolve"] : []),
     ...(ruleOptionsEnable.YouTube ? ["RULE-SET,YouTube,YouTube"] : []),
     ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve", "RULE-SET,Gemini,Google"] : []),
-    ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify"] : []),
+    ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify", "RULE-SET,SpotifyIP,Spotify,no-resolve"] : []),
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
-    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamASN,Games,no-resolve"] : []),
+    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamIP,Games,no-resolve"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
     ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X", "RULE-SET,TwitterIP,X,no-resolve"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
