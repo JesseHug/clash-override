@@ -107,9 +107,9 @@ const customPrefix = '自建-';
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
 const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
-const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|(?<=[ \[\(|倍×xX✕✖⨉\-])0[*×xX✕✖⨉]|(?<=[ \[\(|倍×xX✕✖⨉\-])[*×xX✕✖⨉]0(?=[ \)\]]|倍|$)|下载|低倍|实验性|(?<![A-Za-z])free(?![A-Za-z]))/iu;
-const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:(?<=[ \[\(|倍×xX✕✖⨉\-])[*×xX✕✖⨉]\s*(?:1|1\.0+)(?=[ \)\]]|倍|$))/iu;
-const highRateRegex = /(?<=[ \[\(|倍×xX✕✖⨉\-])((?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉])))/iu;
+const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性|(?<![A-Za-z])free(?![A-Za-z]))/i;
+const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/i;
+const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/i;
 
 const regionMappings = [
   { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
@@ -692,7 +692,7 @@ function buildRegionGroups(proxies, customProxies) {
 
   if (ruleOptionsEnable.生成倍率组) {
     const finalLowRateRegex = ruleOptionsEnable.一倍率归入低倍率 
-      ? new RegExp(`^(?!.*(?:剩|期|客户端|软件))(?!.*(?:${highRateRegex.source})).*$`, 'u') 
+      ? new RegExp(`^(?!.*(?:剩|期|客户端|软件))(?!.*(?:${highRateRegex.source})).*$`, 'i') 
       : lowRateRegex;
     const nodesLowRate = getNodes(finalLowRateRegex);
     const nodesHighRate = getNodes(highRateRegex);
