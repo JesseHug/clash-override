@@ -35,8 +35,23 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 
 ## 致谢
 
-- [AIsouler/MyClash](https://github.com/AIsouler/MyClash) — 本项目的基础与主要参考来源
-- [666OS/rules](https://github.com/666OS/rules) — 规则集
-- [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)
-- [wwqgtxx/clash-rules](https://github.com/wwqgtxx/clash-rules)
-- [Koolson/Qure](https://github.com/Koolson/Qure) — 图标集
+感谢以下开源项目及所有上游项目（排名不分先后）：
+
+### 核心与面板
+- [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo) — 内核支持
+- [AIsouler/MyClash](https://github.com/AIsouler/MyClash) — 本项目的基础与核心逻辑来源
+- [Zephyruso/zashboard](https://github.com/Zephyruso/zashboard) — Web 仪表盘（External UI）
+
+### 规则集
+- [appshubcc/bett-rules](https://github.com/appshubcc/bett-rules) — 高性能 mrs 规则集主要来源
+- [666OS/rules](https://github.com/666OS/rules) — EmbyIP 规则集来源
+- [YiXuanZX/rules](https://github.com/YiXuanZX/rules) — 规则参考
+- [217heidai/adblockfilters](https://github.com/217heidai/adblockfilters) — 广告拦截规则
+
+### 图标集
+- [Koolson/Qure](https://github.com/Koolson/Qure) — 策略组与地区彩色图标集
+- [lixing0016/lige-icon](https://github.com/lixing0016/lige-icon) — 高低倍率节点图标
+- [MiToverG422/Qure](https://github.com/MiToverG422/Qure) — FCM 策略组图标
+
+### 脚本参考
+- [dahaha-365/YaNet](https://github.com/dahaha-365/YaNet) — 脚本逻辑参考
