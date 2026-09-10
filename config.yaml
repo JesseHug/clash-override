@@ -134,6 +134,7 @@ dns:
     - rule-set:Private
     - rule-set:fakeip_filter
     - rule-set:geolocation-cn
+    - rule-set:GoogleFCM
   default-nameserver: *chinaDNS
   # 【说明】proxy-server-nameserver 决定了解析节点域名的 DNS。
   # 如果你的机场使用的是普通的域名节点，保持 *chinaDohDNS 即可。
@@ -471,6 +472,7 @@ rule-providers:
 rules:
   # 直连 & 私有网络
   - RULE-SET,Private,直连
+  - RULE-SET,geolocation-cn,直连
   - RULE-SET,GamesCN,直连
   - RULE-SET,AppleCN,直连
 
@@ -507,7 +509,6 @@ rules:
   - RULE-SET,geolocation-!cn,Proxies
 
   # 国内域名
-  - RULE-SET,geolocation-cn,直连
   - RULE-SET,cn_additional,直连
 
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）

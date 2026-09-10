@@ -107,9 +107,9 @@ const customPrefix = '自建-';
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
 const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
-const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性)/;
-const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/u;
-const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/u;
+const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|(?<=[ \[\(|倍×xX✕✖⨉\-])0[*×xX✕✖⨉]|(?<=[ \[\(|倍×xX✕✖⨉\-])[*×xX✕✖⨉]0(?=[ \)\]]|倍|$)|下载|低倍|实验性|(?<![A-Za-z])free(?![A-Za-z]))/iu;
+const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:(?<=[ \[\(|倍×xX✕✖⨉\-])[*×xX✕✖⨉]\s*(?:1|1\.0+)(?=[ \)\]]|倍|$))/iu;
+const highRateRegex = /(?<=[ \[\(|倍×xX✕✖⨉\-])((?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉])))/iu;
 
 const regionMappings = [
   { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
@@ -524,8 +524,13 @@ function buildDnsAndHostsConfig(config, proxies) {
     }
   }
 
-  // 压缩相同 DNS 的节点二级子域策略为 +.domain.com 规则
-  const proxyServerPolicy = simplifyDomainPolicy(matchedProxyPolicy);
+  // 压缩相同 DNS 的节点二级子域策略为 +.domain.com 规则（仅当所有节点均被命中时才泛域名化，避免误伤同主域其他节点）
+  const matchedPolicyDomains = Object.keys(matchedProxyPolicy);
+  const proxyServerPolicy =
+    proxyDomains.size === matchedPolicyDomains.length &&
+    matchedPolicyDomains.every((domain) => proxyDomains.has(domain.toLowerCase()))
+      ? simplifyDomainPolicy(matchedProxyPolicy)
+      : matchedProxyPolicy;
 
   // 继承机场自带的 fake-ip-filter（部分机场节点域名需走真实 IP 解析）
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] ?? [];
@@ -544,7 +549,13 @@ function buildDnsAndHostsConfig(config, proxies) {
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/15',
     'fake-ip-range6': '2001:2::1/48',
-    'fake-ip-filter': ['rule-set:Private', 'rule-set:fakeip_filter', 'rule-set:geolocation-cn', ...proxyFakeIpFilter],
+    'fake-ip-filter': [
+      'rule-set:Private',
+      'rule-set:fakeip_filter',
+      'rule-set:geolocation-cn',
+      ...(ruleOptionsEnable['FCM'] ? ['rule-set:GoogleFCM'] : []),
+      ...proxyFakeIpFilter,
+    ],
     'proxy-server-nameserver': chinaDohDNS,
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
@@ -860,6 +871,7 @@ function main(config) {
 
   newConfig.rules = [
     "RULE-SET,Private,直连",
+    "RULE-SET,geolocation-cn,直连",
     ...(ruleOptionsEnable.Games ? ["RULE-SET,GamesCN,直连"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
@@ -885,7 +897,6 @@ function main(config) {
       "RULE-SET,EmbyIP,Emby"
     ] : []),
     "RULE-SET,geolocation-!cn,Proxies",
-    "RULE-SET,geolocation-cn,直连",
     "RULE-SET,cn_additional,直连",
     "RULE-SET,ChinaIP,直连",
     "GEOIP,CN,直连",

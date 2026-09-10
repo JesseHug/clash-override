@@ -1,2 +1,10 @@
 used/
 .claude/
+.vscode/
+*.txt
+*.yaml
+!config.yaml
+*.exe
+*.bak
+AIsouler_Script_43e3c51.js
+AIsouler_repo/
