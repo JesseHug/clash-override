@@ -880,7 +880,9 @@ function main(config) {
     "RULE-SET,MicrosoftCN,直连",
     "RULE-SET,NvidiaCN,直连",
     "RULE-SET,EpicGames,直连",
+    "DOMAIN,fsend.cn,直连",
     "DOMAIN,international-gfe.download.nvidia.com,直连",
+    "DOMAIN-SUFFIX,hdslb.com,直连",
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
       "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
     ] : []),
