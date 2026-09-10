@@ -860,6 +860,9 @@ function main(config) {
       Gemini: { ...mrs, url: `${rBett}/geo/geosite/google-gemini.mrs`, path: "./rules/Gemini.mrs" }
     } : {}),
     ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${rBett}/geo/geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
+    MicrosoftCN: { ...mrs, url: `${rBett}/geo/geosite/microsoft@cn.mrs`, path: "./rules/MicrosoftCN.mrs" },
+    NvidiaCN: { ...mrs, url: `${rBett}/geo/geosite/nvidia@cn.mrs`, path: "./rules/NvidiaCN.mrs" },
+    EpicGames: { ...mrs, url: `${rBett}/geo/geosite/epicgames.mrs`, path: "./rules/EpicGames.mrs" },
     'geolocation-!cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/geolocation-!cn.mrs" },
     'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
@@ -874,6 +877,10 @@ function main(config) {
     "RULE-SET,geolocation-cn,直连",
     ...(ruleOptionsEnable.Games ? ["RULE-SET,GamesCN,直连"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
+    "RULE-SET,MicrosoftCN,直连",
+    "RULE-SET,NvidiaCN,直连",
+    "RULE-SET,EpicGames,直连",
+    "DOMAIN,international-gfe.download.nvidia.com,直连",
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
       "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
     ] : []),
