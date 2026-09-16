@@ -12,3 +12,8 @@ AIsouler_repo/
 fetch-proxy/
 installer.py
 substore_setup.sh
+# Sub-Store, WebDAV, Age keys & credentials
+*.json
+*.key
+*.age
+*age*
