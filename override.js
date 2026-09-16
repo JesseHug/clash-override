@@ -29,9 +29,9 @@ const ruleOptionsEnable = {
   Apple: true,            // Apple 服务
   FCM: true,              // Google FCM 推送（默认直连）
 
-  PayPal: false,          // PayPal 支付
-  Netflix: false,         // Netflix 流媒体
-  Emby: false,            // Emby 媒体服务
+  PayPal: true,           // PayPal 支付
+  Netflix: true,          // Netflix 流媒体
+  Emby: true,             // Emby 媒体服务
 
   // 非分流策略配置
   屏蔽国外QUIC: true,           // 屏蔽国外 QUIC 流量（防止视频卡顿）
