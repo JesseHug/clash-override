@@ -536,9 +536,10 @@ function buildDnsAndHostsConfig(config, proxies) {
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] ?? [];
   const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => matchDomainPattern(String(pattern), proxyDomains));
 
-  const chinaDNS = ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT'];
-  const chinaDohDNS = ['https://223.5.5.5/dns-query#DIRECT', 'https://1.12.12.12/dns-query#DIRECT'];
+  const chinaDNS = ['system', '223.5.5.5#DIRECT', '119.29.29.29#DIRECT'];
   const foreignDNS = ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
+  const defaultDNS = ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://1.12.12.12#DIRECT'];
+  const proxyServerDNS = ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
 
   const dns = {
     enable: true,
@@ -556,19 +557,20 @@ function buildDnsAndHostsConfig(config, proxies) {
       ...(ruleOptionsEnable['FCM'] ? ['rule-set:GoogleFCM'] : []),
       ...proxyFakeIpFilter,
     ],
-    'proxy-server-nameserver': chinaDohDNS,
+    'default-nameserver': defaultDNS,
+    'proxy-server-nameserver': proxyServerDNS,
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
     }),
-    'default-nameserver': chinaDNS,
     nameserver: foreignDNS,
     'nameserver-policy': {
       'rule-set:cn': chinaDNS,
     },
-    'direct-nameserver': ['system', ...chinaDNS],
+    'direct-nameserver': chinaDNS,
   };
 
   const hosts = {
+    'doh.pub': ['1.12.12.12', '120.53.53.53'],
     'cloudflare-dns.com': ['1.1.1.1', '1.0.0.1'],
     'dns.google': ['8.8.8.8', '8.8.4.4'],
     'services.googleapis.cn': 'services.googleapis.com',
@@ -721,26 +723,33 @@ function buildProxyGroups(regionData, customInfo) {
   const allProxiesNames = [...customProxyNames, ...pNames];
 
   const buildGroup = (name, iconName, groupProxies, extra) => {
-    if (!groupProxies) groupProxies = ["Proxies", ...activeRegions];
+    if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...activeRegions];
     if (!extra) extra = {};
     return { name, type: "select", icon: ico + "/" + iconName + ".png", proxies: groupProxies, ...extra };
   };
 
+  const defaultProxyGroup = {
+    name: "默认代理",
+    type: "select",
+    icon: `${ico}/Global.png`,
+    proxies: allProxiesNames.length > 0 ? allProxiesNames : ["DIRECT"]
+  };
+
   const groups = [
-    buildGroup("Proxies", "Proxy", [masterName, ...activeRegions, ...allProxiesNames]),
+    buildGroup("Proxies", "Proxy", [masterName, "默认代理", ...activeRegions]),
     ...(ruleOptionsEnable.Google ? [buildGroup("Google", "Google")] : []),
-    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", ...activeRegions], { "default-selected": "MO" })] : []),
-    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", ...activeRegions], { "default-selected": "TW" })] : []),
+    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "MO" })] : []),
+    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", "默认代理", ...activeRegions], { "default-selected": "TW" })] : []),
     ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", "Telegram_X")] : []),
-    ...(ruleOptionsEnable.Games ? [buildGroup("Games", "Game", ["Proxies", "直连", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", "PayPal", ["Proxies", "直连", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Games ? [buildGroup("Games", "Game", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", "PayPal", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.X ? [buildGroup("X", "X")] : []),
-    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", "ChatGPT", ["Proxies", ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", "Apple", ["Proxies", "直连", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", "Netflix", ["Proxies", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: "https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png", proxies: ["Proxies", "直连", ...activeRegions], "default-selected": "直连" }] : []),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", "ChatGPT", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", "Apple", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", "Netflix", ["Proxies", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: "https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png", proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
     buildGroup("Final", "Final", ["Proxies", "直连", ...activeRegions]),
@@ -753,6 +762,7 @@ function buildProxyGroups(regionData, customInfo) {
     },
 
     { name: masterName, icon: ico + "/Auto.png", proxies: coreRegions, ...autoBaseOption },
+    defaultProxyGroup,
     ...(customGroup ? [customGroup] : []),
     ...(chainGroup ? [chainGroup] : []),
     ...regionGroups,
@@ -844,7 +854,8 @@ function main(config) {
     } : {}),
     ...(ruleOptionsEnable.Apple ? {
       AppleCN: { ...mrs, url: `${rBett}/geo/geosite/apple@cn.mrs`, path: "./rules/AppleCN.mrs" },
-      Apple: { ...mrs, url: `${rBett}/geo/geosite/apple.mrs`, path: "./rules/Apple.mrs" }
+      Apple: { ...mrs, url: `${rBett}/geo/geosite/apple.mrs`, path: "./rules/Apple.mrs" },
+      AppleIP: { ...mrsIP, url: `${rBett}/geo/geoip/apple.mrs`, path: "./rules/AppleIP.mrs", "path-in-bundle": "geo/geoip/apple.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Netflix ? {
       Netflix: { ...mrs, url: `${rBett}/geo/geosite/netflix.mrs`, path: "./rules/Netflix.mrs" },
@@ -896,7 +907,7 @@ function main(config) {
     ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamIP,Games,no-resolve"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
     ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X", "RULE-SET,TwitterIP,X,no-resolve"] : []),
-    ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
+    ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple", "RULE-SET,AppleIP,Apple,no-resolve"] : []),
     ...(ruleOptionsEnable.Netflix ? [
       "RULE-SET,Netflix,Netflix",
       "RULE-SET,NetflixIP,Netflix,no-resolve"

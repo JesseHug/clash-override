@@ -110,6 +110,7 @@ sniffer:
 hosts:
   cloudflare-dns.com: [1.1.1.1, 1.0.0.1]
   dns.google: [8.8.8.8, 8.8.4.4]
+  doh.pub: [1.12.12.12, 120.53.53.53]
   services.googleapis.cn: services.googleapis.com
   "+.mcdn.bilivideo.com": ["0.0.0.0"]
   "+.mcdn.bilivideo.cn": ["0.0.0.0"]
@@ -117,8 +118,9 @@ hosts:
   "+.h2.smtcdns.net": ["0.0.0.0"]
 
 # ==================== DNS 配置 ====================
-chinaDNS: &chinaDNS ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT']
-chinaDohDNS: &chinaDohDNS ['https://223.5.5.5/dns-query#DIRECT', 'https://1.12.12.12/dns-query#DIRECT']
+chinaDNS: &chinaDNS ['system', '223.5.5.5#DIRECT', '119.29.29.29#DIRECT']
+defaultDNS: &defaultDNS ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://1.12.12.12#DIRECT']
+proxyServerDNS: &proxyServerDNS ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://doh.pub/dns-query#DIRECT']
 foreignDNS: &foreignDNS ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies']
 
 dns:
@@ -135,20 +137,17 @@ dns:
     - rule-set:fakeip_filter
     - rule-set:geolocation-cn
     - rule-set:GoogleFCM
-  default-nameserver: *chinaDNS
+  default-nameserver: *defaultDNS
   # 【说明】proxy-server-nameserver 决定了解析节点域名的 DNS。
-  # 如果你的机场使用的是普通的域名节点，保持 *chinaDohDNS 即可。
+  # 如果你的机场使用的是普通的域名节点，保持 *proxyServerDNS 即可。
   # 如果你的机场使用了自定义/私有 DNS（比如一些特殊的抗封锁节点），
   # 你需要去机场下发的配置里查看 `proxy-server-nameserver` 字段，
   # 并将那些特殊的 DNS 添加到下方的列表里。
-  proxy-server-nameserver: *chinaDohDNS
+  proxy-server-nameserver: *proxyServerDNS
   nameserver: *foreignDNS
   nameserver-policy:
     "rule-set:cn": *chinaDNS
-  direct-nameserver:
-    - system
-    - '223.5.5.5#DIRECT'
-    - '119.29.29.29#DIRECT'
+  direct-nameserver: *chinaDNS
 
 # ==================== 代理提供者 ====================
 proxy-providers:
@@ -175,6 +174,7 @@ proxy-groups:
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     proxies:
       - Auto
+      - 默认代理
       - HK
       - JP
       - SG
@@ -185,61 +185,59 @@ proxy-groups:
       - Other
       - 低倍率节点
       - 高倍率节点
-    include-all: true
-    exclude-type: "DIRECT"
   - name: Google
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: YouTube
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
     default-selected: MO
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Spotify
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
     default-selected: TW
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Telegram
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Games
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: PayPal
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: X
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: OpenAI
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
     default-selected: US
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: AI
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png
     default-selected: US
-    proxies: [Proxies, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Apple
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Emby
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: FCM
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png
     default-selected: 直连
-    proxies: [Proxies, 直连, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png
@@ -260,6 +258,13 @@ proxy-groups:
     timeout: 3000
     icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png
     proxies: [HK, JP, SG, TW, US, MO, EU, Other]
+
+  # ==================== 默认全部节点策略组 ====================
+  - name: 默认代理
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
+    include-all: true
+    exclude-type: "DIRECT"
 
   # 地区策略组（手动 select + 隐藏 url-test 自动选择）
   - name: HK
@@ -422,6 +427,9 @@ rule-providers:
   Apple:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs
+  AppleIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/apple.mrs
   Netflix:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs
@@ -519,6 +527,7 @@ rules:
   - RULE-SET,Twitter,X
   - RULE-SET,TwitterIP,X,no-resolve
   - RULE-SET,Apple,Apple
+  - RULE-SET,AppleIP,Apple,no-resolve
   - DOMAIN-SUFFIX,nubebelle.com,Emby
   - RULE-SET,Emby,Emby
   - RULE-SET,EmbyIP,Emby
