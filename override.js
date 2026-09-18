@@ -538,7 +538,7 @@ function buildDnsAndHostsConfig(config, proxies) {
 
   const chinaDNS = ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT'];
   const foreignDNS = ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
-  const defaultDNS = ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://1.12.12.12#DIRECT'];
+  const defaultDNS = ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://1.12.12.12/dns-query#DIRECT'];
   const proxyServerDNS = ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
 
   const dns = {
