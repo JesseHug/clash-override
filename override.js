@@ -815,7 +815,7 @@ function main(config) {
   newConfig['proxies'] = [...finalMappedProxies, ...customProxies, ...directProxies];
 
   newConfig['ntp'] = { enable: true, 'write-to-system': false, server: 'ntp.aliyun.com', port: 123, interval: 60 };
-  newConfig['tun'] = { enable: true, stack: 'system', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
+  newConfig['tun'] = { enable: true, stack: 'mips', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
   const regionData = buildRegionGroups(finalMappedProxies, customProxies);
   newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainGroup: chainGroup });

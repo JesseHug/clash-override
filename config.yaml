@@ -80,7 +80,7 @@ profile:
 # ==================== TUN 模式 ====================
 tun:
   enable: false
-  stack: system
+  stack: mips
   dns-hijack:
     - "any:53"
     - "tcp://any:53"
