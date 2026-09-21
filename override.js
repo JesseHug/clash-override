@@ -51,19 +51,19 @@ const ruleOptionsEnable = {
 
 // 专门用于适配 Bettbox GUI 读取开关图标的定义
 const serviceConfigs = [
-  { name: 'Google', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google.png' },
-  { name: 'YouTube', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png' },
-  { name: 'Spotify', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png' },
-  { name: 'Telegram', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png' },
-  { name: 'Games', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png' },
+  { name: 'Google', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Google.svg' },
+  { name: 'YouTube', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg' },
+  { name: 'Spotify', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg' },
+  { name: 'Telegram', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg' },
+  { name: 'Games', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg' },
   { name: 'PayPal', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png' },
-  { name: 'X', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png' },
-  { name: 'OpenAI', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png' },
+  { name: 'X', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg' },
+  { name: 'OpenAI', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/ChatGPT.svg' },
   { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
-  { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png' },
-  { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png' },
-  { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png' },
-  { name: 'FCM', icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png' },
+  { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg' },
+  { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg' },
+  { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
+  { name: 'FCM', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
 ];
 
 // --- 预定义规则 ---
@@ -112,13 +112,13 @@ const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*
 const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/i;
 
 const regionMappings = [
-  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "Hong_Kong.png" },
-  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "Singapore.png" },
-  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "Taiwan.png" },
-  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "Japan.png" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "United_States.png" },
-  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "Macao.png" },
-  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "European_Union.png" }
+  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg" },
+  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg" },
+  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg" },
+  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
+  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png" },
+  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/European_Union.png" }
 ];
 
 // --- 域名匹配工具函数 ---
@@ -627,7 +627,7 @@ function buildCustomizeGroups(filteredProxies) {
     name: chainEnabled ? '\u94fe\u5f0f\u843d\u5730' : '\u81ea\u5efa\u8282\u70b9',
     type: 'select',
     proxies: customList.map((p) => p.name),
-    icon: `${ico}/Server.png`,
+    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Server.svg',
   };
 
   // 链式代理：构建"链式中转"策略组（仅包含订阅节点，不含自定义节点，避免 dialer-proxy 回环）
@@ -637,7 +637,7 @@ function buildCustomizeGroups(filteredProxies) {
         name: dialerProxyName,
         type: 'select',
         proxies: filteredProxyNames,
-        icon: `${ico}/Bypass.png`,
+        icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bypass.svg',
       }
     : null;
 
@@ -678,7 +678,7 @@ function buildRegionGroups(proxies, customProxies) {
         regionAutoGroups.push({ name: autoName, proxies: nodes, hidden: !ruleOptionsEnable.显示默认隐藏的策略组, ...autoBaseOption });
       }
       const groupProxies = ruleOptionsEnable.生成地区自动选择组 ? [autoName, ...nodes] : nodes;
-      regionGroups.push({ name: r.key, type: "select", icon: `${ico}/${r.icon}`, proxies: groupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
+      regionGroups.push({ name: r.key, type: "select", icon: r.icon.startsWith("http") ? r.icon : `${ico}/${r.icon}`, proxies: groupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
     }
   });
 
@@ -722,34 +722,37 @@ function buildProxyGroups(regionData, customInfo) {
 
   const allProxiesNames = [...customProxyNames, ...pNames];
 
-  const buildGroup = (name, iconName, groupProxies, extra) => {
+  const icoSvg = "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg";
+
+  const buildGroup = (name, iconTarget, groupProxies, extra) => {
     if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...activeRegions];
     if (!extra) extra = {};
-    return { name, type: "select", icon: ico + "/" + iconName + ".png", proxies: groupProxies, ...extra };
+    const icon = iconTarget.startsWith("http") ? iconTarget : `${ico}/${iconTarget}.png`;
+    return { name, type: "select", icon, proxies: groupProxies, ...extra };
   };
 
   const defaultProxyGroup = {
     name: "默认代理",
     type: "select",
-    icon: `${ico}/Global.png`,
+    icon: `${icoSvg}/Global.svg`,
     proxies: allProxiesNames.length > 0 ? allProxiesNames : ["DIRECT"]
   };
 
   const groups = [
-    buildGroup("Proxies", "Proxy", [masterName, "默认代理", ...activeRegions]),
-    ...(ruleOptionsEnable.Google ? [buildGroup("Google", "Google")] : []),
-    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", "YouTube", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "MO" })] : []),
-    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", "Spotify", ["Proxies", "直连", "默认代理", ...activeRegions], { "default-selected": "TW" })] : []),
-    ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", "Telegram_X")] : []),
-    ...(ruleOptionsEnable.Games ? [buildGroup("Games", "Game", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    buildGroup("Proxies", `${icoSvg}/Proxy.svg`, [masterName, "默认代理", ...activeRegions]),
+    ...(ruleOptionsEnable.Google ? [buildGroup("Google", `${icoSvg}/Google.svg`)] : []),
+    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", `${icoSvg}/YouTube.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "MO" })] : []),
+    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", `${icoSvg}/Spotify.svg`, ["Proxies", "直连", "默认代理", ...activeRegions], { "default-selected": "TW" })] : []),
+    ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${icoSvg}/Telegram.svg`)] : []),
+    ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", "PayPal", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.X ? [buildGroup("X", "X")] : []),
-    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", "ChatGPT", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.X ? [buildGroup("X", `${icoSvg}/Twitter.svg`)] : []),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/ChatGPT.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
     ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", "Apple", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", "Netflix", ["Proxies", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", "Emby", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: "https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png", proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
+    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${icoSvg}/Apple.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${icoSvg}/Netflix.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
     buildGroup("Final", "Final", ["Proxies", "直连", ...activeRegions]),
@@ -757,11 +760,11 @@ function buildProxyGroups(regionData, customInfo) {
     {
       name: "直连",
       type: "select",
-      icon: `${ico}/China.png`,
+      icon: `${icoSvg}/China.svg`,
       proxies: [...directProxies.map(p => p.name)]
     },
 
-    { name: masterName, icon: ico + "/Auto.png", proxies: coreRegions, ...autoBaseOption },
+    { name: masterName, icon: `${icoSvg}/Auto.svg`, proxies: coreRegions, ...autoBaseOption },
     defaultProxyGroup,
     ...(customGroup ? [customGroup] : []),
     ...(chainGroup ? [chainGroup] : []),

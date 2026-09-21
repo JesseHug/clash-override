@@ -17,3 +17,6 @@ installer.py
 *.key
 *.age
 *age*
+VPS_NOTES.md
+backup_rn/
+local_*.js

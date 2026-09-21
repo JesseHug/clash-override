@@ -171,7 +171,7 @@ proxy-providers:
 proxy-groups:
   - name: Proxies
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Proxy.svg
     proxies:
       - Auto
       - 默认代理
@@ -187,25 +187,25 @@ proxy-groups:
       - 高倍率节点
   - name: Google
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Google.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: YouTube
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg
     default-selected: MO
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Spotify
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg
     default-selected: TW
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Telegram
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram_X.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Games
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: PayPal
     <<: *BaseSelect
@@ -213,11 +213,11 @@ proxy-groups:
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: X
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: OpenAI
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/ChatGPT.svg
     default-selected: US
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: AI
@@ -227,15 +227,15 @@ proxy-groups:
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Apple
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Emby
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: FCM
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg
     default-selected: 直连
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
@@ -245,7 +245,7 @@ proxy-groups:
 
   - name: 直连
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/China.svg
     proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先']
 
   - name: Auto
@@ -256,44 +256,44 @@ proxy-groups:
     lazy: true
     max-failed-times: 3
     timeout: 3000
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Auto.svg
     proxies: [HK, JP, SG, TW, US, MO, EU, Other]
 
   # ==================== 默认全部节点策略组 ====================
   - name: 默认代理
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Global.svg
     include-all: true
     exclude-type: "DIRECT"
 
   # 地区策略组（手动 select + 隐藏 url-test 自动选择）
   - name: HK
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg
     proxies: [HK-自动选择]
     include-all: true
     filter: '(?i)🇭🇰|香港|(?<![a-z])hk(?![a-z])|hong\s*kong'
   - name: SG
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg
     proxies: [SG-自动选择]
     include-all: true
     filter: '(?i)🇸🇬|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore'
   - name: TW
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg
     proxies: [TW-自动选择]
     include-all: true
     filter: '(?i)🇹🇼|台湾|(?<![a-z])tw(?![a-z])|taiwan'
   - name: JP
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg
     proxies: [JP-自动选择]
     include-all: true
     filter: '(?i)🇯🇵|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan'
   - name: US
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/America.svg
     proxies: [US-自动选择]
     include-all: true
     filter: '(?i)🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states'
