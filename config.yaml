@@ -233,6 +233,10 @@ proxy-groups:
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+  - name: Meta
+    <<: *BaseSelect
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: FCM
     <<: *BaseSelect
     icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg
@@ -442,6 +446,12 @@ rule-providers:
   EmbyIP:
     <<: *BehaviorIP
     url: https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs
+  Meta:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/meta.mrs
+  MetaIP:
+    <<: *BehaviorIP
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/facebook.mrs
   Google:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs
@@ -531,6 +541,8 @@ rules:
   - DOMAIN-SUFFIX,nubebelle.com,Emby
   - RULE-SET,Emby,Emby
   - RULE-SET,EmbyIP,Emby
+  - RULE-SET,Meta,Meta
+  - RULE-SET,MetaIP,Meta,no-resolve
 
   # 国外网站兜底
   - RULE-SET,geolocation-!cn,Proxies

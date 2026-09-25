@@ -32,6 +32,7 @@ const ruleOptionsEnable = {
   PayPal: true,           // PayPal 支付
   Netflix: true,          // Netflix 流媒体
   Emby: true,             // Emby 媒体服务
+  Meta: true,             // Meta 服务 (Facebook/Instagram/WhatsApp)
 
   // 非分流策略配置
   屏蔽国外QUIC: true,           // 屏蔽国外 QUIC 流量（防止视频卡顿）
@@ -63,6 +64,7 @@ const serviceConfigs = [
   { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg' },
   { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg' },
   { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
+  { name: 'Meta', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg' },
   { name: 'FCM', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
 ];
 
@@ -752,6 +754,7 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${icoSvg}/Apple.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${icoSvg}/Netflix.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${icoSvg}/Meta.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
@@ -868,6 +871,10 @@ function main(config) {
       Emby: { ...mrs, url: `${rBett}/geo/geosite/category-emby.mrs`, path: "./rules/Emby.mrs" },
       EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
     } : {}),
+    ...(ruleOptionsEnable.Meta ? {
+      Meta: { ...mrs, url: `${rBett}/geo/geosite/meta.mrs`, path: "./rules/Meta.mrs" },
+      MetaIP: { ...mrsIP, url: `${rBett}/geo/geoip/facebook.mrs`, path: "./rules/MetaIP.mrs" }
+    } : {}),
     ...(ruleOptionsEnable.Google ? {
       Google: { ...mrs, url: `${rBett}/geo/geosite/google.mrs`, path: "./rules/Google.mrs" },
       GoogleIP: { ...mrsIP, url: `${rBett}/geo/geoip/google.mrs`, path: "./rules/GoogleIP.mrs" },
@@ -918,6 +925,10 @@ function main(config) {
     ...(ruleOptionsEnable.Emby ? [
       "RULE-SET,Emby,Emby",
       "RULE-SET,EmbyIP,Emby"
+    ] : []),
+    ...(ruleOptionsEnable.Meta ? [
+      "RULE-SET,Meta,Meta",
+      "RULE-SET,MetaIP,Meta,no-resolve"
     ] : []),
     "RULE-SET,geolocation-!cn,Proxies",
     "RULE-SET,cn_additional,直连",
