@@ -57,9 +57,9 @@ const serviceConfigs = [
   { name: 'Spotify', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg' },
   { name: 'Telegram', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg' },
   { name: 'Games', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg' },
-  { name: 'PayPal', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png' },
+  { name: 'PayPal', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg' },
   { name: 'X', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg' },
-  { name: 'OpenAI', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/ChatGPT.svg' },
+  { name: 'OpenAI', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg' },
   { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
   { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg' },
   { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg' },
@@ -566,9 +566,12 @@ function buildDnsAndHostsConfig(config, proxies) {
     }),
     nameserver: foreignDNS,
     'nameserver-policy': {
+      'rule-set:Private': 'system',
+      'rule-set:douyin': ['system', '180.184.1.1', '180.184.2.2'],
       'rule-set:cn': chinaDNS,
     },
     'direct-nameserver': chinaDNS,
+    'direct-nameserver-follow-policy': true,
   };
 
   const hosts = {
@@ -747,9 +750,9 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", `${icoSvg}/Spotify.svg`, ["Proxies", "直连", "默认代理", ...activeRegions], { "default-selected": "TW" })] : []),
     ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${icoSvg}/Telegram.svg`)] : []),
     ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", "PayPal", ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${icoSvg}/PayPal.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.X ? [buildGroup("X", `${icoSvg}/Twitter.svg`)] : []),
-    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/ChatGPT.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/OpenAI.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
     ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
     ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${icoSvg}/Apple.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${icoSvg}/Netflix.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
@@ -890,6 +893,7 @@ function main(config) {
     PrivateIP: { ...mrsIP, url: `${rBett}/geo/geoip/private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
     fakeip_filter: { ...mrs, url: `${rBett}/geo/geosite/fakeip-filter.mrs`, path: "./rules/fakeip_filter.mrs", "path-in-bundle": "geo/geosite/fakeip-filter.mrs" },
     cn: { ...mrs, url: `${rBett}/geo/geosite/cn.mrs`, path: "./rules/cn.mrs" },
+    douyin: { ...mrs, url: `${rBett}/geo/geosite/douyin.mrs`, path: "./rules/douyin.mrs", "path-in-bundle": "geo/geosite/douyin.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
   };
 

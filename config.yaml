@@ -146,8 +146,11 @@ dns:
   proxy-server-nameserver: *proxyServerDNS
   nameserver: *foreignDNS
   nameserver-policy:
+    "rule-set:Private": "system"
+    "rule-set:douyin": ["system", "180.184.1.1", "180.184.2.2"]
     "rule-set:cn": *chinaDNS
   direct-nameserver: *chinaDNS
+  direct-nameserver-follow-policy: true
 
 # ==================== 代理提供者 ====================
 proxy-providers:
@@ -209,7 +212,7 @@ proxy-groups:
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: PayPal
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: X
     <<: *BaseSelect
@@ -217,7 +220,7 @@ proxy-groups:
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: OpenAI
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/ChatGPT.svg
+    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg
     default-selected: US
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: AI
@@ -482,6 +485,9 @@ rule-providers:
   cn:
     <<: *BehaviorDN
     url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs
+  douyin:
+    <<: *BehaviorDN
+    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/douyin.mrs
   cn_additional:
     <<: *BehaviorDN
     url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
