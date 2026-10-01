@@ -731,7 +731,7 @@ function buildProxyGroups(regionData, customInfo) {
   const chainGroup = (customInfo && customInfo.chainGroup) || null;
   const masterName = "Auto";
 
-  const allProxiesNames = [...customProxyNames, ...pNames];
+  const allProxiesNames = [...pNames, ...customProxyNames];
 
   const icoSvg = "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg";
 
