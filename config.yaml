@@ -174,7 +174,7 @@ proxy-providers:
 proxy-groups:
   - name: Proxies
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Proxy.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Proxy.svg
     proxies:
       - Auto
       - 默认代理
@@ -190,69 +190,74 @@ proxy-groups:
       - 高倍率节点
   - name: Google
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Google.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Google.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: YouTube
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg
     default-selected: MO
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Spotify
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg
     default-selected: TW
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Telegram
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Games
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: PayPal
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+  - name: Patreon
+    <<: *BaseSelect
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg
+    default-selected: HK
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: X
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: OpenAI
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg
     default-selected: US
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: AI
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/AI.png
     default-selected: US
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Apple
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Emby
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Meta
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg
     proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: FCM
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg
     default-selected: 直连
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Final.png
     proxies: [Proxies, 直连]
 
   - name: 直连
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/China.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/China.svg
     proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先']
 
   - name: Auto
@@ -263,78 +268,78 @@ proxy-groups:
     lazy: true
     max-failed-times: 3
     timeout: 3000
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Auto.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Auto.svg
     proxies: [HK, JP, SG, TW, US, MO, EU, Other]
 
   # ==================== 默认全部节点策略组 ====================
   - name: 默认代理
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Global.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Global.svg
     include-all: true
     exclude-type: "DIRECT"
 
   # 地区策略组（手动 select + 隐藏 url-test 自动选择）
   - name: HK
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg
     proxies: [HK-自动选择]
     include-all: true
     filter: '(?i)🇭🇰|香港|(?<![a-z])hk(?![a-z])|hong\s*kong'
   - name: SG
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg
     proxies: [SG-自动选择]
     include-all: true
     filter: '(?i)🇸🇬|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore'
   - name: TW
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg
     proxies: [TW-自动选择]
     include-all: true
     filter: '(?i)🇹🇼|台湾|(?<![a-z])tw(?![a-z])|taiwan'
   - name: JP
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg
     proxies: [JP-自动选择]
     include-all: true
     filter: '(?i)🇯🇵|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan'
   - name: US
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/America.svg
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg
     proxies: [US-自动选择]
     include-all: true
     filter: '(?i)🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states'
   - name: MO
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Macao.png
     proxies: [MO-自动选择]
     include-all: true
     filter: '(?i)🇲🇴|澳门|(?<![a-z])mo(?![a-z])|macao|macau'
   - name: EU
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/European_Union.png
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/European_Union.png
     proxies: [EU-自动选择]
     include-all: true
     filter: '(?i)🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv'
   - name: Other
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Europe_Map.png
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Europe_Map.png
     proxies: [Other-自动选择]
     include-all: true
     exclude-type: "DIRECT"
     filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv)).*$'
   - name: 低倍率节点
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png
+    icon: https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png
     proxies: [低倍率节点-自动选择]
     include-all: true
-    filter: '^(?!.*(?:剩|期|客户端|软件))(?!.*(?:(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉])))).*$'
+    filter: '^(?!.*(?:剩|期|客户端|软件))(?!.*(?:(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉])))).*$'
   - name: 高倍率节点
     <<: *BaseSelect
-    icon: https://fastly.jsdelivr.net/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png
+    icon: https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png
     proxies: [高倍率节点-自动选择]
     include-all: true
-    filter: '(?u)(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))'
+    filter: '(?u)(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉]))'
 
 
   # 隐藏的 url-test 自动选择组（include-all + filter 动态注入节点）
@@ -373,11 +378,11 @@ proxy-groups:
   - <<: *BaseUT
     name: 低倍率节点-自动选择
     include-all: true
-    filter: '^(?!.*(?:剩|期|客户端|软件))(?!.*(?:(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉])))).*$'
+    filter: '^(?!.*(?:剩|期|客户端|软件))(?!.*(?:(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉])))).*$'
   - <<: *BaseUT
     name: 高倍率节点-自动选择
     include-all: true
-    filter: '(?u)(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))'
+    filter: '(?u)(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉]))'
 
 
 # ==================== 规则集 ====================
@@ -385,123 +390,126 @@ proxy-groups:
 rule-providers:
   Private:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs
   YouTube:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs
   Spotify:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs
   SpotifyIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs
   Telegram:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs
   TelegramIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs
   GamesCN:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs
   Games:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games-!cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-games-!cn.mrs
   SteamIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs
   PayPal:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/paypal.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/paypal.mrs
+  Patreon:
+    <<: *BehaviorDN
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/patreon.mrs
   Twitter:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs
   TwitterIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs
   OpenAI:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/openai.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/openai.mrs
   AI:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs
   AIIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/ai.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/ai.mrs
   AppleCN:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs
   Apple:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs
   AppleIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/apple.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/apple.mrs
   Netflix:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs
   NetflixIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs
   Emby:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-emby.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-emby.mrs
   EmbyIP:
     <<: *BehaviorIP
     url: https://github.com/666OS/rules/raw/release/mihomo/ip/Emby.mrs
   Meta:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/meta.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/meta.mrs
   MetaIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/facebook.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/facebook.mrs
   Google:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs
   GoogleIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs
   Gemini:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google-gemini.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/google-gemini.mrs
   GoogleFCM:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs
   geolocation-!cn:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs
   geolocation-cn:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs
   ChinaIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs
   PrivateIP:
     <<: *BehaviorIP
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs
   fakeip_filter:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs
   cn:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs
   douyin:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/douyin.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/douyin.mrs
   cn_additional:
     <<: *BehaviorDN
     url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
   MicrosoftCN:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs
     path: ./ruleset/MicrosoftCN.mrs
   NvidiaCN:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs
     path: ./ruleset/NvidiaCN.mrs
   EpicGames:
     <<: *BehaviorDN
-    url: https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs
     path: ./ruleset/EpicGames.mrs
 
 # ==================== 路由规则 ====================
@@ -540,6 +548,7 @@ rules:
   - RULE-SET,Games,Games
   - RULE-SET,SteamIP,Games,no-resolve
   - RULE-SET,PayPal,PayPal
+  - RULE-SET,Patreon,Patreon
   - RULE-SET,Twitter,X
   - RULE-SET,TwitterIP,X,no-resolve
   - RULE-SET,Apple,Apple

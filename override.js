@@ -30,6 +30,7 @@ const ruleOptionsEnable = {
   FCM: true,              // Google FCM 推送（默认直连）
 
   PayPal: true,           // PayPal 支付
+  Patreon: true,          // Patreon 创作者赞助平台
   Netflix: true,          // Netflix 流媒体
   Emby: true,             // Emby 媒体服务
   Meta: true,             // Meta 服务 (Facebook/Instagram/WhatsApp)
@@ -47,25 +48,25 @@ const ruleOptionsEnable = {
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
   代理IPV4优先: false,          // 开启后所有订阅节点强制 ipv4-prefer
   代理IPV6优先: false,          // 开启后所有订阅节点强制 ipv6-prefer（与上条互斥，同时开启则不生效）
-  链式代理: false,              // 启用后自建节点经机场节点中转（需配置 customizeProxies）
 };
 
 // 专门用于适配 Bettbox GUI 读取开关图标的定义
 const serviceConfigs = [
-  { name: 'Google', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Google.svg' },
-  { name: 'YouTube', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg' },
-  { name: 'Spotify', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg' },
-  { name: 'Telegram', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg' },
-  { name: 'Games', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg' },
-  { name: 'PayPal', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg' },
-  { name: 'X', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg' },
-  { name: 'OpenAI', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg' },
-  { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
-  { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg' },
-  { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg' },
-  { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
-  { name: 'Meta', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg' },
-  { name: 'FCM', icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
+  { name: 'Google', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Google.svg' },
+  { name: 'YouTube', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg' },
+  { name: 'Spotify', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg' },
+  { name: 'Telegram', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg' },
+  { name: 'Games', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg' },
+  { name: 'PayPal', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg' },
+  { name: 'Patreon', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg' },
+  { name: 'X', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg' },
+  { name: 'OpenAI', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg' },
+  { name: 'AI', icon: 'https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
+  { name: 'Apple', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg' },
+  { name: 'Netflix', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg' },
+  { name: 'Emby', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
+  { name: 'Meta', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg' },
+  { name: 'FCM', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
 ];
 
 /**
@@ -105,28 +106,25 @@ const directProxies = [
 // ];
 const customizeProxies = [];
 
-// 链式代理启用时，自定义节点的 dialer-proxy 引用目标
-const dialerProxyName = '链式中转';
-
 // 重名时使用的前缀
 const customPrefix = '自建-';
 
 // --- 节点匹配正则定义 ---
 
 // 定义全局排除节点的正则表达式，用于剔除无关或失效的信息节点
-const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用(?:官网|地址|网址|域名|发布|群|渠道)|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
+const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用(?:官网|地址|网址|域名|发布|群|渠道)|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|\bexpire\b|\bhttps?:\/\/|\.com|\btraffic\b/iu;
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性|(?<![A-Za-z])free(?![A-Za-z]))/i;
 const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/i;
-const highRateRegex = /(?:[*×xX✕✖⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨉]))/i;
+const highRateRegex = /(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉]))/i;
 
 const regionMappings = [
-  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg" },
-  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg" },
-  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg" },
-  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
-  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png" },
-  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/European_Union.png" }
+  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg" },
+  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg" },
+  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg" },
+  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
+  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Macao.png" },
+  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/European_Union.png" }
 ];
 
 // --- 域名匹配工具函数 ---
@@ -595,13 +593,11 @@ function buildDnsAndHostsConfig(config, proxies) {
 }
 
 // 处理自定义节点：标准化名称、与订阅节点重名时添加前缀、内部去重，
-// 并构建"自建节点"（或链式代理时的"链式落地"）策略组。
+// 并构建"自建节点"策略组。
 // 自定义节点不参与订阅节点过滤，也不参与 hosts 改写及 DNS 域名处理
 function buildCustomizeGroups(filteredProxies) {
-  const chainEnabled = ruleOptionsEnable['\u94fe\u5f0f\u4ee3\u7406'];
-
   if (!customizeProxies.length) {
-    return { customProxies: [], customProxyNames: [], customGroup: null, chainGroup: null };
+    return { customProxies: [], customProxyNames: [], customGroup: null };
   }
 
   const usedNames = new Set(filteredProxies.map((p) => p.name));
@@ -625,38 +621,20 @@ function buildCustomizeGroups(filteredProxies) {
     }
     usedNames.add(name);
 
-    let customProxy = name === proxy.name ? proxy : { ...proxy, name };
-    // 链式代理启用时强制添加/覆盖 dialer-proxy，使自定义节点经"链式中转"策略组中转
-    if (chainEnabled && customProxy['dialer-proxy'] !== dialerProxyName) {
-      customProxy = { ...customProxy, 'dialer-proxy': dialerProxyName };
-    }
-    customList.push(customProxy);
+    customList.push(name === proxy.name ? proxy : { ...proxy, name });
   }
 
-  const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
   const customGroup = {
-    name: chainEnabled ? '\u94fe\u5f0f\u843d\u5730' : '\u81ea\u5efa\u8282\u70b9',
+    name: '自建节点',
     type: 'select',
     proxies: customList.map((p) => p.name),
-    icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Server.svg',
+    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Server.svg',
   };
-
-  // 链式代理：构建"链式中转"策略组（仅包含订阅节点，不含自定义节点，避免 dialer-proxy 回环）
-  const filteredProxyNames = filteredProxies.map((p) => p.name);
-  const chainGroup = (chainEnabled && customList.length > 0)
-    ? {
-        name: dialerProxyName,
-        type: 'select',
-        proxies: filteredProxyNames,
-        icon: 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/Bypass.svg',
-      }
-    : null;
 
   return {
     customProxies: customList,
     customProxyNames: customList.map((p) => p.name),
     customGroup,
-    chainGroup,
   };
 }
 
@@ -670,7 +648,7 @@ function buildRegionGroups(proxies, customProxies) {
 
   const healthCheckUrl = "https://www.apple.com/library/test/success.html";
   const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3, "exclude-type": "DIRECT", "empty-fallback": "REJECT" };
-  const ico = "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color";
+  const ico = "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color";
 
   const regionGroups = [];
   const regionAutoGroups = [];
@@ -712,12 +690,12 @@ function buildRegionGroups(proxies, customProxies) {
     if (nodesLowRate[0] !== "DIRECT") {
       activeRegions.push("低倍率节点");
       regionAutoGroups.push({ name: "低倍率节点-自动选择", proxies: nodesLowRate, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "低倍率节点", type: "select", icon: "https://fastly.jsdelivr.net/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png", proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
+      regionGroups.push({ name: "低倍率节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png", proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
     }
     if (nodesHighRate[0] !== "DIRECT") {
       activeRegions.push("高倍率节点");
       regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "高倍率节点", type: "select", icon: "https://fastly.jsdelivr.net/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png", proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+      regionGroups.push({ name: "高倍率节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png", proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
     }
   }
 
@@ -728,12 +706,11 @@ function buildProxyGroups(regionData, customInfo) {
   const { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico } = regionData;
   const customProxyNames = (customInfo && customInfo.customProxyNames) || [];
   const customGroup = (customInfo && customInfo.customGroup) || null;
-  const chainGroup = (customInfo && customInfo.chainGroup) || null;
   const masterName = "Auto";
 
   const allProxiesNames = [...pNames, ...customProxyNames];
 
-  const icoSvg = "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg";
+  const icoSvg = "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg";
 
   const buildGroup = (name, iconTarget, groupProxies, extra) => {
     if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...activeRegions];
@@ -757,6 +734,7 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${icoSvg}/Telegram.svg`)] : []),
     ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${icoSvg}/PayPal.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Patreon ? [buildGroup("Patreon", `${icoSvg}/Patreon.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "HK" })] : []),
     ...(ruleOptionsEnable.X ? [buildGroup("X", `${icoSvg}/Twitter.svg`)] : []),
     ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/OpenAI.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
     ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
@@ -779,7 +757,6 @@ function buildProxyGroups(regionData, customInfo) {
     { name: masterName, icon: `${icoSvg}/Auto.svg`, proxies: coreRegions, ...autoBaseOption },
     defaultProxyGroup,
     ...(customGroup ? [customGroup] : []),
-    ...(chainGroup ? [chainGroup] : []),
     ...regionGroups,
     ...regionAutoGroups
   ];
@@ -813,7 +790,7 @@ function main(config) {
   newConfig['hosts'] = hosts;
 
   // 处理自定义节点（标准化、解决重名、构建策略组）
-  const { customProxies, customProxyNames, customGroup, chainGroup } = buildCustomizeGroups(mappedProxies);
+  const { customProxies, customProxyNames, customGroup } = buildCustomizeGroups(mappedProxies);
 
   // IP 版本偏好：给订阅节点注入 ip-version（自定义节点和直连节点不受影响）
   const ipv4Prefer = ruleOptionsEnable['代理IPV4优先'];
@@ -833,13 +810,13 @@ function main(config) {
   newConfig['tun'] = { enable: true, stack: 'mips', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
   const regionData = buildRegionGroups(finalMappedProxies, customProxies);
-  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainGroup: chainGroup });
+  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup });
 
   // --- Rule Providers (优先 bett-rules，EmbyIP 保留 666OS) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
-  const rBett = "https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta";
-  const r66 = "https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo";
+  const rBett = "https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta";
+  const r66 = "https://cdn.jsdmirror.com/gh/666OS/rules@release/mihomo";
 
   newConfig["rule-providers"] = {
     Private: { ...mrs, url: `${rBett}/geo/geosite/private.mrs`, path: "./rules/Private.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
@@ -858,6 +835,7 @@ function main(config) {
       SteamIP: { ...mrsIP, url: `${rBett}/geo/geoip/steam.mrs`, path: "./rules/SteamIP.mrs", "path-in-bundle": "geo/geoip/steam.mrs" }
     } : {}),
     ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${rBett}/geo/geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
+    ...(ruleOptionsEnable.Patreon ? { Patreon: { ...mrs, url: `${rBett}/geo/geosite/patreon.mrs`, path: "./rules/Patreon.mrs", "path-in-bundle": "geo/geosite/patreon.mrs" } } : {}),
     ...(ruleOptionsEnable.X ? {
       Twitter: { ...mrs, url: `${rBett}/geo/geosite/twitter.mrs`, path: "./rules/Twitter.mrs" },
       TwitterIP: { ...mrsIP, url: `${rBett}/geo/geoip/twitter.mrs`, path: "./rules/TwitterIP.mrs" }
@@ -926,6 +904,7 @@ function main(config) {
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamIP,Games,no-resolve"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
+    ...(ruleOptionsEnable.Patreon ? ["RULE-SET,Patreon,Patreon"] : []),
     ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X", "RULE-SET,TwitterIP,X,no-resolve"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple", "RULE-SET,AppleIP,Apple,no-resolve"] : []),
     ...(ruleOptionsEnable.Netflix ? [
