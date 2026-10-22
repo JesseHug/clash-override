@@ -10,16 +10,28 @@ Mihomo（Clash Meta）覆写脚本与全量配置文件。
 
 ## 覆写脚本
 
-复制链接导入到 Bettbox 远程覆写：
+适用于 Bettbox / Clash Verge Rev / Mihomo Party 等客户端对机场原始订阅进行远程覆写：
+
+### 极简版覆写 (Lite - 推荐)
+
+自动将机场订阅一键重构为【国内】、【国外】、【AI】三大核心策略组（加自动测速与兜底），界面极度清爽：
+
+```
+https://raw.githubusercontent.com/JesseHug/clash-override/master/overrideLite.js
+```
+
+### 全量版覆写 (Full)
+
+包含精细化服务分流（Google、YouTube、Telegram、Spotify、Games 等）与全地区选择组：
 
 ```
 https://raw.githubusercontent.com/JesseHug/clash-override/master/override.js
 ```
 
 > [!IMPORTANT]
-> - 仅适用于覆写机场提供的配置文件，请勿用于覆写自己编写的配置文件
+> - 仅适用于覆写机场提供的原始订阅配置文件，请勿用于覆写自己编写的配置文件
 > - 已解决机场使用私有 DNS 导致无法解析节点域名的问题
-> - 支持 Bettbox GUI 开关：Emby 分流、全局过滤高倍率节点
+> - 全量版支持 Bettbox GUI 开关：Emby 分流、全局过滤高倍率节点等
 
 ## 配置文件
 
