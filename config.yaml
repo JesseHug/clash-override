@@ -308,7 +308,7 @@ proxy-groups:
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg
     proxies: [US-自动选择]
     include-all: true
-    filter: '(?i)🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states'
+    filter: '(?i)🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![a-z])us(?![a-z])|america|united\s*states'
   - name: MO
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Macao.png
@@ -327,7 +327,7 @@ proxy-groups:
     proxies: [Other-自动选择]
     include-all: true
     exclude-type: "DIRECT"
-    filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv)).*$'
+    filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv)).*$'
   - name: 低倍率节点
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png
@@ -362,7 +362,7 @@ proxy-groups:
   - <<: *BaseUT
     name: US-自动选择
     include-all: true
-    filter: '(?i)🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states'
+    filter: '(?i)🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![a-z])us(?![a-z])|america|united\s*states'
   - <<: *BaseUT
     name: MO-自动选择
     include-all: true
@@ -374,7 +374,7 @@ proxy-groups:
   - <<: *BaseUT
     name: Other-自动选择
     include-all: true
-    filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv)).*$'
+    filter: '^(?!.*(?i)(香港|(?<![a-z])hk(?![a-z])|hong\s*kong|新加坡|狮城|(?<![a-z])sg(?![a-z])|singapore|台湾|(?<![a-z])tw(?![a-z])|taiwan|日本|东京|大阪|京都|(?<![a-z])jp(?![a-z])|japan|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![a-z])us(?![a-z])|america|united\s*states|澳门|(?<![a-z])mo(?![a-z])|macao|macau|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![a-z])(?:fr|de|gb|uk|nl|eu|it|es|hu|ua)(?![a-z])|europe|frankfurt|london|paris|amsterdam|milan|madrid|kyiv)).*$'
   - <<: *BaseUT
     name: 低倍率节点-自动选择
     include-all: true
@@ -514,6 +514,15 @@ rule-providers:
 
 # ==================== 路由规则 ====================
 rules:
+  # 公共 DNS 直连过滤
+  - IP-CIDR,223.5.5.5/32,直连,no-resolve
+  - IP-CIDR,223.6.6.6/32,直连,no-resolve
+  - IP-CIDR,119.29.29.29/32,直连,no-resolve
+  - IP-CIDR,180.184.1.1/32,直连,no-resolve
+  - IP-CIDR,180.184.2.2/32,直连,no-resolve
+  - IP-CIDR,114.114.114.114/32,直连,no-resolve
+  - IP-CIDR,114.114.115.115/32,直连,no-resolve
+
   # 直连 & 私有网络
   - RULE-SET,Private,直连
   - RULE-SET,geolocation-cn,直连
@@ -524,7 +533,15 @@ rules:
   - RULE-SET,EpicGames,直连
   - DOMAIN,fsend.cn,直连
   - DOMAIN,international-gfe.download.nvidia.com,直连
+  - DOMAIN-SUFFIX,ctaiot.com,直连
   - DOMAIN-SUFFIX,hdslb.com,直连
+
+  # 显式定义规则集下载域名规则，避免出现鸡蛋问题
+  - DOMAIN-SUFFIX,github.com,Proxies
+  - DOMAIN-SUFFIX,githubusercontent.com,Proxies
+  - DOMAIN-SUFFIX,jsdelivr.net,Proxies
+  - DOMAIN-SUFFIX,jsdelivr.com,Proxies
+  - DOMAIN-SUFFIX,jsdmirror.com,Proxies
 
   # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT

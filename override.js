@@ -122,7 +122,7 @@ const regionMappings = [
   { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg" },
   { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg" },
   { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
   { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Macao.png" },
   { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/European_Union.png" }
 ];
@@ -301,8 +301,10 @@ function getMatchedRegions(proxyName) {
     return proxyRegionCache.get(proxyName);
   }
 
-  const regions = anyRegionRegex.test(proxyName)
-    ? regionMappings.filter((region) => region.regex.test(proxyName))
+  // 移除空白字符、零宽字符及不可见字符，避免干扰地区/国旗正则匹配
+  const cleanName = proxyName ? proxyName.replace(/[\s\u200B-\u200D\uFEFF]/g, '') : '';
+  const regions = anyRegionRegex.test(cleanName)
+    ? regionMappings.filter((region) => region.regex.test(cleanName))
     : [];
   proxyRegionCache.set(proxyName, regions);
 
@@ -331,9 +333,10 @@ function filterAndNormalizeProxies(config) {
   let filteredRawProxies = originalProxies.filter(proxy => {
     if (!checkProxy(proxy)) return false;
     if (builtinTypes.has(String(proxy.type ?? '').toLowerCase())) return false;
-    if (excludeFilter.test(proxy.name)) return false;
-    if (ruleOptionsEnable.过滤低倍率节点 && lowRateRegex.test(proxy.name)) return false;
-    if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(proxy.name)) return false;
+    const cleanForFilter = proxy.name ? proxy.name.replace(/[\u200B-\u200D\uFEFF]/g, '') : '';
+    if (excludeFilter.test(cleanForFilter)) return false;
+    if (ruleOptionsEnable.过滤低倍率节点 && lowRateRegex.test(cleanForFilter)) return false;
+    if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(cleanForFilter)) return false;
     return true;
   });
 
@@ -345,9 +348,9 @@ function filterAndNormalizeProxies(config) {
     const oldName = proxy.name;
     const matchedRegions = getMatchedRegions(oldName);
 
-    // 提取已有国旗，移除国旗和多余空格
+    // 提取已有国旗，移除国旗、零宽/不可见字符和多余空格
     const existingFlag = oldName.match(flagRegex)?.[0];
-    const nameWithoutFlag = oldName.replace(flagRegex, '').replace(/\s+/g, ' ').trim();
+    const nameWithoutFlag = oldName.replace(flagRegex, '').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim();
 
     // 如果已有国旗则复用，否则从地区匹配取
     const regionFlag = existingFlag || matchedRegions.find((r) => r.flag)?.flag;
@@ -642,7 +645,10 @@ function buildRegionGroups(proxies, customProxies) {
   const allProxies = [...proxies, ...customProxies];
   const pNames = allProxies.map(p => p.name);
   const getNodes = (reg) => {
-    const res = pNames.filter(name => reg.test(name));
+    const res = pNames.filter(name => {
+      const cleanName = name ? name.replace(/[\s\u200B-\u200D\uFEFF]/g, '') : '';
+      return reg.test(cleanName);
+    });
     return res.length > 0 ? res : ["DIRECT"];
   };
 
@@ -882,6 +888,15 @@ function main(config) {
   };
 
   newConfig.rules = [
+    // 公共 DNS 直连过滤
+    "IP-CIDR,223.5.5.5/32,直连,no-resolve",
+    "IP-CIDR,223.6.6.6/32,直连,no-resolve",
+    "IP-CIDR,119.29.29.29/32,直连,no-resolve",
+    "IP-CIDR,180.184.1.1/32,直连,no-resolve",
+    "IP-CIDR,180.184.2.2/32,直连,no-resolve",
+    "IP-CIDR,114.114.114.114/32,直连,no-resolve",
+    "IP-CIDR,114.114.115.115/32,直连,no-resolve",
+
     "RULE-SET,Private,直连",
     "RULE-SET,geolocation-cn,直连",
     ...(ruleOptionsEnable.Games ? ["RULE-SET,GamesCN,直连"] : []),
@@ -891,7 +906,15 @@ function main(config) {
     "RULE-SET,EpicGames,直连",
     "DOMAIN,fsend.cn,直连",
     "DOMAIN,international-gfe.download.nvidia.com,直连",
+    "DOMAIN-SUFFIX,ctaiot.com,直连",
     "DOMAIN-SUFFIX,hdslb.com,直连",
+
+    // 显式定义规则集下载域名规则，避免出现鸡蛋问题
+    "DOMAIN-SUFFIX,github.com,Proxies",
+    "DOMAIN-SUFFIX,githubusercontent.com,Proxies",
+    "DOMAIN-SUFFIX,jsdelivr.net,Proxies",
+    "DOMAIN-SUFFIX,jsdelivr.com,Proxies",
+    "DOMAIN-SUFFIX,jsdmirror.com,Proxies",
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
       "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
     ] : []),

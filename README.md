@@ -23,13 +23,24 @@ https://raw.githubusercontent.com/JesseHug/clash-override/master/override.js
 
 ## 配置文件
 
-复制链接导入代理客户端，替换 `proxy-providers` 中的订阅 URL：
+### 极简版配置 (Lite - 推荐)
+
+仅保留【国内】、【国外】、【AI】三大核心分流策略组（外加自动测速与兜底），界面极简轻量，加载飞速：
+
+```
+https://raw.githubusercontent.com/JesseHug/clash-override/master/configLite.yaml
+```
+
+### 全量版配置 (Full)
+
+包含精细化服务分流（Google、YouTube、Telegram、Spotify、Games 等）与地区策略组：
 
 ```
 https://raw.githubusercontent.com/JesseHug/clash-override/master/config.yaml
 ```
 
 > [!IMPORTANT]
+> - 导入代理客户端后，请将 `proxy-providers` 中的订阅 URL 替换为您自己的机场订阅链接
 > - 对于使用私有 DNS 的机场，需手动将私有 DNS 填入配置文件
 > - 未匹配到节点的策略组将回退到 REJECT
 
