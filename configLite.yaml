@@ -1,7 +1,9 @@
 # =========================================================
-#  Mihomo / Clash 极简分流模板 (Lite)
+#  Mihomo / Stash / Shadowrocket 通用极简分流模板 (Lite)
 #  专为转发面板 / 订阅中心 (如 FLYX、Sub-Store 等) 设计
-#  特点：纯粹三大核心策略组【国内】、【国外】、【AI】
+#  特点：
+#    1. 纯粹三大核心策略组【国内】、【国外】、【AI】
+#    2. 规则集全部采用 YAML 格式，全平台通用兼容 (Mihomo / Stash / Shadowrocket)
 # =========================================================
 
 # --- 基础配置 ---
@@ -70,8 +72,9 @@ dns:
   fake-ip-range: 198.18.0.1/15
   fake-ip-filter:
     - "rule-set:private"
-    - "rule-set:fakeip_filter"
     - "rule-set:geolocation-cn"
+    - "+.lan"
+    - "+.local"
   default-nameserver:
     - 114.114.114.114
     - 223.5.5.5
@@ -90,92 +93,71 @@ dns:
     - 223.5.5.5
     - 119.29.29.29
 
-# --- 规则集 ---
+# --- 规则集 (YAML 格式，全客户端通用) ---
 rule-providers:
   private:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs
-    path: ./ruleset/private.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.yaml
+    path: ./ruleset/private.yaml
   private_ip:
     type: http
     behavior: ipcidr
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs
-    path: ./ruleset/private_ip.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.yaml
+    path: ./ruleset/private_ip.yaml
   geolocation-cn:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs
-    path: ./ruleset/geolocation-cn.mrs
-  cn_ip:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs
-    path: ./ruleset/cn_ip.mrs
-  cn_additional:
-    type: http
-    behavior: domain
-    format: mrs
-    interval: 86400
-    url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
-    path: ./ruleset/cn-additional-list.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.yaml
+    path: ./ruleset/geolocation-cn.yaml
   cn:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs
-    path: ./ruleset/cn.mrs
-  fakeip_filter:
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cn.yaml
+    path: ./ruleset/cn.yaml
+  cn_ip:
     type: http
-    behavior: domain
-    format: mrs
+    behavior: ipcidr
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs
-    path: ./ruleset/fakeip-filter.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.yaml
+    path: ./ruleset/cn_ip.yaml
   games_cn:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs
-    path: ./ruleset/category-games@cn.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-games@cn.yaml
+    path: ./ruleset/games_cn.yaml
   category-ads:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ads.mrs
-    path: ./ruleset/category-ads.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ads-all.yaml
+    path: ./ruleset/category-ads.yaml
   ai:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs
-    path: ./ruleset/ai.mrs
-  ai_ip:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/ai.mrs
-    path: ./ruleset/ai_ip.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ai-!cn.yaml
+    path: ./ruleset/ai.yaml
   geolocation-!cn:
     type: http
     behavior: domain
-    format: mrs
+    format: yaml
     interval: 86400
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs
-    path: ./ruleset/geolocation-!cn.mrs
+    url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-!cn.yaml
+    path: ./ruleset/geolocation-!cn.yaml
 
 # --- 路由分流规则 ---
 rules:
@@ -197,17 +179,15 @@ rules:
 
   # 国内服务直连
   - RULE-SET,geolocation-cn,国内
-  - RULE-SET,cn_additional,国内
+  - RULE-SET,cn,国内
   - RULE-SET,games_cn,国内
   - DOMAIN-SUFFIX,cn,国内
 
-  # 拦截广告与国外 QUIC
-  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT
+  # 广告拦截
   - RULE-SET,category-ads,REJECT
 
   # AI 智能服务
   - RULE-SET,ai,AI
-  - RULE-SET,ai_ip,AI,no-resolve
 
   # 国外代理流量
   - RULE-SET,geolocation-!cn,国外
