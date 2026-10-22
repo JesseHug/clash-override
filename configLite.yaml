@@ -1,321 +1,211 @@
 # =========================================================
-#  Mihomo 极简配置 (Lite)
-#  仓库：https://github.com/JesseHug/clash-override
-#  配置链接：https://raw.githubusercontent.com/JesseHug/clash-override/master/configLite.yaml
-#  特点：仅保留【国内】、【国外】、【AI】三大核心分流，极度纯粹轻量
+#  Mihomo / Clash 极简分流模板 (Lite)
+#  专为转发面板 / 订阅中心 (如 FLYX、Sub-Store 等) 设计
+#  特点：纯粹三大核心策略组【国内】、【国外】、【AI】
 # =========================================================
 
-# --- 锚点定义 (通用属性) ---
-proxy_providers_common: &proxy_providers_common
-  type: http
-  interval: 86400
-  proxy: DIRECT
-  exclude-type: 'DIRECT|REJECT|REMATCH'
-  health-check: { enable: true, url: https://www.apple.com/library/test/success.html, interval: 600, lazy: true }
-
-global_exclude_filter: &global_exclude_filter
-  exclude-filter: '(?i)(群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用(?:官网|地址|网址|域名|发布|群|渠道)|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|电报|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|优惠|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|过滤|⚠️|@|t\.me\/\+|expire|http|com|traffic)'
-
-rule_providers_domain: &rule_providers_domain
-  type: http
-  behavior: domain
-  format: mrs
-  interval: 86400
-
-rule_providers_ip: &rule_providers_ip
-  type: http
-  behavior: ipcidr
-  format: mrs
-  interval: 86400
-
-group_common_select: &group_common_select
-  type: select
-  empty-fallback: REJECT
-
-group_common_auto: &group_common_auto
-  type: url-test
-  interval: 300
-  timeout: 3000
-  tolerance: 50
-  lazy: true
-  max-failed-times: 3
-  empty-fallback: REJECT
-  url: 'https://www.apple.com/library/test/success.html'
-  include-all: true
-  exclude-type: 'DIRECT'
-
-# ==================== 直连节点定义 ====================
-proxies:
-  - { name: '🇨🇳 直连 | 双栈', type: direct }
-  - { name: '🇨🇳 直连 | IPv4优先', type: direct, ip-version: ipv4-prefer }
-  - { name: '🇨🇳 直连 | IPv6优先', type: direct, ip-version: ipv6-prefer }
-  - { name: '🇨🇳 直连 | 仅IPv4', type: direct, ip-version: ipv4 }
-  - { name: '🇨🇳 直连 | 仅IPv6', type: direct, ip-version: ipv6 }
-
-# ==================== 基础全局配置 ====================
+# --- 基础配置 ---
 mixed-port: 7890
 allow-lan: true
 bind-address: '*'
-find-process-mode: strict
 mode: rule
 log-level: warning
 ipv6: true
-keep-alive-interval: 60
 unified-delay: true
 tcp-concurrent: true
 
-ntp:
-  enable: true
-  write-to-system: false
-  server: ntp.aliyun.com
-  port: 123
-  interval: 60
+# 面板节点占位符 (转发面板在下发订阅时会自动注入节点列表)
+proxies: []
 
-# ==================== 外部控制 & 面板 ====================
-external-controller: '127.0.0.1:9090'
-external-ui: ui
-external-ui-url: 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip'
-external-ui-name: zashboard
+# --- 策略组配置 ---
+proxy-groups:
+  - name: 国外
+    type: select
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Proxy.svg
+    proxies:
+      - 自动选择
+      - DIRECT
+    include-all: true
+    exclude-type: DIRECT
 
-profile:
-  store-selected: true
-  store-fake-ip: true
+  - name: 国内
+    type: select
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/China.svg
+    proxies:
+      - DIRECT
+      - 国外
 
-# ==================== TUN 模式 ====================
-tun:
-  enable: false
-  stack: mips
-  auto-route: true
-  strict-route: true
-  auto-redirect: true
-  auto-detect-interface: true
-  dns-hijack:
-    - 'any:53'
-    - 'tcp://any:53'
+  - name: AI
+    type: select
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg
+    proxies:
+      - 国外
+      - 自动选择
+    include-all: true
+    exclude-type: DIRECT
 
-# ==================== 域名嗅探 ====================
-sniffer:
-  enable: true
-  sniff:
-    TLS:
-      ports: [443, 8443]
-    HTTP:
-      ports: [80, 8080-8880]
-      override-destination: true
-  skip-domain:
-    - "Mijia Cloud"
-    - "+.push.apple.com"
+  - name: 自动选择
+    type: url-test
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Auto.svg
+    url: https://www.apple.com/library/test/success.html
+    interval: 300
+    tolerance: 50
+    lazy: true
+    include-all: true
+    exclude-type: DIRECT
 
-# ==================== Hosts 配置 ====================
-hosts:
-  cloudflare-dns.com: [1.1.1.1, 1.0.0.1]
-  dns.google: [8.8.8.8, 8.8.4.4]
-  doh.pub: [1.12.12.12, 120.53.53.53]
-  services.googleapis.cn: services.googleapis.com
-  '+.mcdn.bilivideo.com': ['0.0.0.0']
-  '+.mcdn.bilivideo.cn': ['0.0.0.0']
-  '+.edge.mountaintoys.cn': ['0.0.0.0']
-  '+.h2.smtcdns.net': ['0.0.0.0']
+  - name: 漏网之鱼
+    type: select
+    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Stack.svg
+    proxies:
+      - 国外
+      - 国内
 
-# ==================== DNS 配置 ====================
-dns_common:
-  chinaDNS: &chinaDNS ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT']
-  foreignDNS: &foreignDNS ['https://cloudflare-dns.com/dns-query#国外', 'https://dns.google/dns-query#国外']
-  defaultDNS: &defaultDNS ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://1.12.12.12/dns-query#DIRECT']
-  proxyServerDNS: &proxyServerDNS ['114.114.114.114#DIRECT', 'tls://223.5.5.5#DIRECT', 'https://doh.pub/dns-query#DIRECT']
-
+# --- DNS 配置 ---
 dns:
   enable: true
   ipv6: true
   use-hosts: true
-  cache-algorithm: arc
-  use-system-hosts: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/15
-  fake-ip-range6: 2001:2::1/48
   fake-ip-filter:
-    - rule-set:private
-    - rule-set:fakeip_filter
-    - rule-set:geolocation-cn
-  default-nameserver: *defaultDNS
-  proxy-server-nameserver: *proxyServerDNS
-  nameserver: *foreignDNS
+    - "rule-set:private"
+    - "rule-set:fakeip_filter"
+    - "rule-set:geolocation-cn"
+  default-nameserver:
+    - 114.114.114.114
+    - 223.5.5.5
+  proxy-server-nameserver:
+    - 114.114.114.114
+    - 223.5.5.5
+  nameserver:
+    - "https://cloudflare-dns.com/dns-query#国外"
+    - "https://dns.google/dns-query#国外"
   nameserver-policy:
-    'rule-set:private': system
-    'rule-set:douyin': ['system', '180.184.1.1', '180.184.2.2']
-    'rule-set:cn': *chinaDNS
-  direct-nameserver: *chinaDNS
-  direct-nameserver-follow-policy: true
+    "rule-set:private": system
+    "rule-set:cn":
+      - 223.5.5.5
+      - 119.29.29.29
+  direct-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
 
-# ==================== 代理提供者 (机场订阅) ====================
-# 使用方法：将你的机场订阅链接粘贴到下面的 url: '' 中
-proxy-providers:
-  provider1:
-    <<: [*proxy_providers_common, *global_exclude_filter]
-    url: '' # 此处单引号中间填入你的机场订阅链接
-    path: ./proxy_provider/provider1.yaml
-    override:
-      additional-prefix: 'p1 | '
-# provider2:
-#   <<: [*proxy_providers_common, *global_exclude_filter]
-#   url: ''
-#   path: ./proxy_provider/provider2.yaml
-#   override:
-#     additional-prefix: 'p2 | '
-
-# ==================== 策略组 ====================
-proxy-groups:
-  - name: '国外'
-    <<: *group_common_select
-    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Proxy.svg
-    proxies:
-      - '自动选择'
-      - '🇨🇳 直连 | 双栈'
-    include-all: true
-    exclude-type: 'DIRECT'
-
-  - name: '国内'
-    <<: *group_common_select
-    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/China.svg
-    proxies:
-      - '🇨🇳 直连 | 双栈'
-      - '🇨🇳 直连 | IPv4优先'
-      - '🇨🇳 直连 | IPv6优先'
-      - '国外'
-
-  - name: 'AI'
-    <<: *group_common_select
-    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg
-    proxies:
-      - '国外'
-      - '自动选择'
-    include-all: true
-    exclude-type: 'DIRECT'
-
-  - name: '自动选择'
-    <<: *group_common_auto
-    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Auto.svg
-
-  - name: '漏网之鱼'
-    <<: *group_common_select
-    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Stack.svg
-    proxies:
-      - '国外'
-      - '国内'
-
-# ==================== 规则集 ====================
+# --- 规则集 ---
 rule-providers:
   private:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs'
-    path: './ruleset/private.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs
+    path: ./ruleset/private.mrs
   private_ip:
-    <<: *rule_providers_ip
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs'
-    path: './ruleset/private_ip.mrs'
+    type: http
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs
+    path: ./ruleset/private_ip.mrs
   geolocation-cn:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs'
-    path: './ruleset/geolocation-cn.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs
+    path: ./ruleset/geolocation-cn.mrs
   cn_ip:
-    <<: *rule_providers_ip
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs'
-    path: './ruleset/cn_ip.mrs'
+    type: http
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs
+    path: ./ruleset/cn_ip.mrs
   cn_additional:
-    <<: *rule_providers_domain
-    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs'
-    path: './ruleset/cn-additional-list.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
+    path: ./ruleset/cn-additional-list.mrs
   cn:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
-    path: './ruleset/cn.mrs'
-  douyin:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/douyin.mrs'
-    path: './ruleset/douyin.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs
+    path: ./ruleset/cn.mrs
   fakeip_filter:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs'
-    path: './ruleset/fakeip-filter.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs
+    path: ./ruleset/fakeip-filter.mrs
   games_cn:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs'
-    path: './ruleset/category-games@cn.mrs'
-  epicgames:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs'
-    path: './ruleset/epicgames.mrs'
-  apple_cn:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs'
-    path: './ruleset/apple@cn.mrs'
-  microsoft_cn:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs'
-    path: './ruleset/microsoft@cn.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs
+    path: ./ruleset/category-games@cn.mrs
   category-ads:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ads.mrs'
-    path: './ruleset/category-ads.mrs'
-  openai:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/openai.mrs'
-    path: './ruleset/openai.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ads.mrs
+    path: ./ruleset/category-ads.mrs
   ai:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs'
-    path: './ruleset/ai.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs
+    path: ./ruleset/ai.mrs
   ai_ip:
-    <<: *rule_providers_ip
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/ai.mrs'
-    path: './ruleset/ai_ip.mrs'
+    type: http
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geoip/ai.mrs
+    path: ./ruleset/ai_ip.mrs
   geolocation-!cn:
-    <<: *rule_providers_domain
-    url: 'https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs'
-    path: './ruleset/geolocation-!cn.mrs'
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs
+    path: ./ruleset/geolocation-!cn.mrs
 
-# ==================== 路由规则 ====================
+# --- 路由分流规则 ---
 rules:
-  # 规则集与订阅下载域名直连/代理 (保证在任何网络环境下均可顺畅拉取规则)
+  # 规则集与面板下载域名
   - DOMAIN,github.com,国外
   - DOMAIN,raw.githubusercontent.com,国外
   - DOMAIN,cdn.jsdelivr.net,国外
   - DOMAIN,cdn.jsdmirror.com,国外
 
-  # 公共 DNS 真实 IP 直连 (防回环与泄露)
+  # 公共 DNS 真实 IP 直连
   - IP-CIDR,223.5.5.5/32,国内,no-resolve
   - IP-CIDR,223.6.6.6/32,国内,no-resolve
   - IP-CIDR,119.29.29.29/32,国内,no-resolve
-  - IP-CIDR,180.184.1.1/32,国内,no-resolve
-  - IP-CIDR,180.184.2.2/32,国内,no-resolve
   - IP-CIDR,114.114.114.114/32,国内,no-resolve
-  - IP-CIDR,114.114.115.115/32,国内,no-resolve
-  - IP-CIDR,1.12.12.12/32,国内,no-resolve
-  - IP-CIDR,120.53.53.53/32,国内,no-resolve
 
   # 私有网络直连
   - RULE-SET,private,国内
   - RULE-SET,private_ip,国内,no-resolve
 
-  # 国内直连 (常用服务加速与直连)
+  # 国内服务直连
   - RULE-SET,geolocation-cn,国内
   - RULE-SET,cn_additional,国内
   - RULE-SET,games_cn,国内
-  - RULE-SET,epicgames,国内
-  - RULE-SET,apple_cn,国内
-  - RULE-SET,microsoft_cn,国内
-  - DOMAIN,fsend.cn,国内
-  - DOMAIN,international-gfe.download.nvidia.com,国内
-  - DOMAIN-SUFFIX,ctaiot.com,国内
+  - DOMAIN-SUFFIX,cn,国内
 
-  # 禁用国外 QUIC 流量 (避免被运营商 QOS 降速)
+  # 拦截广告与国外 QUIC
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT
-
-  # 广告拦截
   - RULE-SET,category-ads,REJECT
 
   # AI 智能服务
-  - RULE-SET,openai,AI
   - RULE-SET,ai,AI
   - RULE-SET,ai_ip,AI,no-resolve
 
