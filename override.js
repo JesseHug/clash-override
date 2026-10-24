@@ -30,7 +30,6 @@ const ruleOptionsEnable = {
   FCM: true,              // Google FCM 推送（默认直连）
 
   PayPal: true,           // PayPal 支付
-  Patreon: true,          // Patreon 创作者赞助平台
   Netflix: true,          // Netflix 流媒体
   Emby: true,             // Emby 媒体服务
   Meta: true,             // Meta 服务 (Facebook/Instagram/WhatsApp)
@@ -59,7 +58,6 @@ const serviceConfigs = [
   { name: 'Telegram', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg' },
   { name: 'Games', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg' },
   { name: 'PayPal', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg' },
-  { name: 'Patreon', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg' },
   { name: 'X', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg' },
   { name: 'OpenAI', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg' },
   { name: 'AI', icon: 'https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
@@ -742,7 +740,6 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${icoSvg}/Telegram.svg`)] : []),
     ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${icoSvg}/PayPal.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Patreon ? [buildGroup("Patreon", `${icoSvg}/Patreon.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "HK" })] : []),
     ...(ruleOptionsEnable.X ? [buildGroup("X", `${icoSvg}/Twitter.svg`)] : []),
     ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/OpenAI.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
     ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
@@ -844,7 +841,6 @@ function main(config) {
       SteamIP: { ...mrsIP, url: `${rBett}/geo/geoip/steam.mrs`, path: "./rules/SteamIP.mrs", "path-in-bundle": "geo/geoip/steam.mrs" }
     } : {}),
     ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${rBett}/geo/geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
-    ...(ruleOptionsEnable.Patreon ? { Patreon: { ...mrs, url: `${rBett}/geo/geosite/patreon.mrs`, path: "./rules/Patreon.mrs", "path-in-bundle": "geo/geosite/patreon.mrs" } } : {}),
     ...(ruleOptionsEnable.X ? {
       Twitter: { ...mrs, url: `${rBett}/geo/geosite/twitter.mrs`, path: "./rules/Twitter.mrs" },
       TwitterIP: { ...mrsIP, url: `${rBett}/geo/geoip/twitter.mrs`, path: "./rules/TwitterIP.mrs" }
@@ -936,7 +932,6 @@ function main(config) {
     ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
     ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamIP,Games,no-resolve"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
-    ...(ruleOptionsEnable.Patreon ? ["RULE-SET,Patreon,Patreon"] : []),
     ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X", "RULE-SET,TwitterIP,X,no-resolve"] : []),
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple", "RULE-SET,AppleIP,Apple,no-resolve"] : []),
     ...(ruleOptionsEnable.Netflix ? [

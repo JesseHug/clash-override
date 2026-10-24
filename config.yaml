@@ -214,11 +214,6 @@ proxy-groups:
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
-  - name: Patreon
-    <<: *BaseSelect
-    icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Patreon.svg
-    default-selected: HK
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: X
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg
@@ -423,9 +418,6 @@ rule-providers:
   PayPal:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/paypal.mrs
-  Patreon:
-    <<: *BehaviorDN
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/patreon.mrs
   Twitter:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs
@@ -586,7 +578,6 @@ rules:
   - RULE-SET,Games,Games
   - RULE-SET,SteamIP,Games,no-resolve
   - RULE-SET,PayPal,PayPal
-  - RULE-SET,Patreon,Patreon
   - RULE-SET,Twitter,X
   - RULE-SET,TwitterIP,X,no-resolve
   - RULE-SET,Apple,Apple
