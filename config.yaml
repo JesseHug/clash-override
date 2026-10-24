@@ -250,6 +250,11 @@ proxy-groups:
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg
     default-selected: 直连
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+  - name: IPTV
+    <<: *BaseSelect
+    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Apple_TV.png
+    default-selected: 直连
+    proxies: [直连, Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Final.png
@@ -519,6 +524,14 @@ rule-providers:
     <<: *BehaviorIP
     url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs
     path: ./ruleset/iptv_ip.mrs
+  cathy_domain:
+    <<: *BehaviorDN
+    url: https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_domain.mrs
+    path: ./ruleset/cathy_domain.mrs
+  cathy_ip:
+    <<: *BehaviorIP
+    url: https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_ipcidr.mrs
+    path: ./ruleset/cathy_ip.mrs
 
 # ==================== 路由规则 ====================
 rules:
@@ -583,6 +596,10 @@ rules:
   - RULE-SET,EmbyIP,Emby
   - RULE-SET,Meta,Meta
   - RULE-SET,MetaIP,Meta,no-resolve
+
+  # Cathy 源 IPTV 规则分流 (默认直连)
+  - RULE-SET,cathy_domain,IPTV
+  - RULE-SET,cathy_ip,IPTV,no-resolve
 
   # Gary 源 IPTV 规则分流走代理
   - RULE-SET,iptv_domain,Proxies

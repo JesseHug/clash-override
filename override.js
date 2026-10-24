@@ -34,6 +34,7 @@ const ruleOptionsEnable = {
   Netflix: true,          // Netflix 流媒体
   Emby: true,             // Emby 媒体服务
   Meta: true,             // Meta 服务 (Facebook/Instagram/WhatsApp)
+  IPTV: true,             // IPTV 直播源 (Cathy 等，默认直连)
 
   // 非分流策略配置
   屏蔽国外QUIC: true,           // 屏蔽国外 QUIC 流量（防止视频卡顿）
@@ -67,6 +68,7 @@ const serviceConfigs = [
   { name: 'Emby', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
   { name: 'Meta', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg' },
   { name: 'FCM', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
+  { name: 'IPTV', icon: 'https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Apple_TV.png' },
 ];
 
 /**
@@ -749,6 +751,7 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${icoSvg}/Meta.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
+    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Apple_TV.png", proxies: ["直连", "Proxies", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
     buildGroup("Final", "Final", ["Proxies", "直连", ...activeRegions]),
@@ -887,6 +890,10 @@ function main(config) {
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
     iptv_domain: { ...mrs, url: "https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs", path: "./rules/iptv_domain.mrs" },
     iptv_ip: { ...mrsIP, url: "https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs", path: "./rules/iptv_ip.mrs" },
+    ...(ruleOptionsEnable.IPTV ? {
+      cathy_domain: { ...mrs, url: "https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_domain.mrs", path: "./rules/cathy_domain.mrs" },
+      cathy_ip: { ...mrsIP, url: "https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_ipcidr.mrs", path: "./rules/cathy_ip.mrs" },
+    } : {}),
   };
 
   newConfig.rules = [
@@ -943,6 +950,10 @@ function main(config) {
     ...(ruleOptionsEnable.Meta ? [
       "RULE-SET,Meta,Meta",
       "RULE-SET,MetaIP,Meta,no-resolve"
+    ] : []),
+    ...(ruleOptionsEnable.IPTV ? [
+      "RULE-SET,cathy_domain,IPTV",
+      "RULE-SET,cathy_ip,IPTV,no-resolve"
     ] : []),
     "RULE-SET,iptv_domain,Proxies",
     "RULE-SET,iptv_ip,Proxies,no-resolve",
