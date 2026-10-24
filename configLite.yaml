@@ -158,6 +158,20 @@ rule-providers:
     interval: 86400
     url: https://cdn.jsdmirror.com/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-!cn.yaml
     path: ./ruleset/geolocation-!cn.yaml
+  iptv_domain:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs
+    path: ./ruleset/iptv_domain.mrs
+  iptv_ip:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs
+    path: ./ruleset/iptv_ip.mrs
 
 # --- 路由分流规则 ---
 rules:
@@ -188,6 +202,10 @@ rules:
 
   # AI 智能服务
   - RULE-SET,ai,AI
+
+  # Gary 源 IPTV 规则分流走代理
+  - RULE-SET,iptv_domain,国外
+  - RULE-SET,iptv_ip,国外,no-resolve
 
   # 国外代理流量
   - RULE-SET,geolocation-!cn,国外

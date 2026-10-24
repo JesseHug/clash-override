@@ -885,6 +885,8 @@ function main(config) {
     cn: { ...mrs, url: `${rBett}/geo/geosite/cn.mrs`, path: "./rules/cn.mrs" },
     douyin: { ...mrs, url: `${rBett}/geo/geosite/douyin.mrs`, path: "./rules/douyin.mrs", "path-in-bundle": "geo/geosite/douyin.mrs" },
     cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
+    iptv_domain: { ...mrs, url: "https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs", path: "./rules/iptv_domain.mrs" },
+    iptv_ip: { ...mrsIP, url: "https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs", path: "./rules/iptv_ip.mrs" },
   };
 
   newConfig.rules = [
@@ -942,6 +944,8 @@ function main(config) {
       "RULE-SET,Meta,Meta",
       "RULE-SET,MetaIP,Meta,no-resolve"
     ] : []),
+    "RULE-SET,iptv_domain,Proxies",
+    "RULE-SET,iptv_ip,Proxies,no-resolve",
     "RULE-SET,geolocation-!cn,Proxies",
     "RULE-SET,cn_additional,直连",
     "RULE-SET,ChinaIP,直连",

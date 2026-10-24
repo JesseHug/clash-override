@@ -511,6 +511,14 @@ rule-providers:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs
     path: ./ruleset/EpicGames.mrs
+  iptv_domain:
+    <<: *BehaviorDN
+    url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs
+    path: ./ruleset/iptv_domain.mrs
+  iptv_ip:
+    <<: *BehaviorIP
+    url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs
+    path: ./ruleset/iptv_ip.mrs
 
 # ==================== 路由规则 ====================
 rules:
@@ -575,6 +583,10 @@ rules:
   - RULE-SET,EmbyIP,Emby
   - RULE-SET,Meta,Meta
   - RULE-SET,MetaIP,Meta,no-resolve
+
+  # Gary 源 IPTV 规则分流走代理
+  - RULE-SET,iptv_domain,Proxies
+  - RULE-SET,iptv_ip,Proxies,no-resolve
 
   # 国外网站兜底
   - RULE-SET,geolocation-!cn,Proxies

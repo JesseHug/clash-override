@@ -257,6 +257,8 @@ function main(config) {
     ai: { ...mrs, url: `${rBett}/geo/geosite/category-ai-!cn.mrs`, path: './ruleset/ai.mrs' },
     ai_ip: { ...mrsIP, url: `${rBett}/geo/geoip/ai.mrs`, path: './ruleset/ai_ip.mrs' },
     'geolocation-!cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: './ruleset/geolocation-!cn.mrs' },
+    iptv_domain: { ...mrs, url: 'https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs', path: './ruleset/iptv_domain.mrs' },
+    iptv_ip: { ...mrsIP, url: 'https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs', path: './ruleset/iptv_ip.mrs' },
   };
 
   // 路由分流规则
@@ -295,6 +297,9 @@ function main(config) {
     'RULE-SET,openai,AI',
     'RULE-SET,ai,AI',
     'RULE-SET,ai_ip,AI,no-resolve',
+
+    'RULE-SET,iptv_domain,国外',
+    'RULE-SET,iptv_ip,国外,no-resolve',
 
     'RULE-SET,geolocation-!cn,国外',
     'RULE-SET,cn_ip,国内',
