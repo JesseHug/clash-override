@@ -588,13 +588,11 @@ rules:
   - RULE-SET,Meta,Meta
   - RULE-SET,MetaIP,Meta,no-resolve
 
-  # Cathy 源 IPTV 规则分流 (默认直连)
+  # IPTV 规则分流 (Cathy & Gary 源)
   - RULE-SET,cathy_domain,IPTV
   - RULE-SET,cathy_ip,IPTV,no-resolve
-
-  # Gary 源 IPTV 规则分流走代理
-  - RULE-SET,iptv_domain,Proxies
-  - RULE-SET,iptv_ip,Proxies,no-resolve
+  - RULE-SET,iptv_domain,IPTV
+  - RULE-SET,iptv_ip,IPTV,no-resolve
 
   # 国外网站兜底
   - RULE-SET,geolocation-!cn,Proxies
