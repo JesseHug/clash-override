@@ -66,7 +66,7 @@ const serviceConfigs = [
   { name: 'Emby', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
   { name: 'Meta', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg' },
   { name: 'FCM', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
-  { name: 'IPTV', icon: 'https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Apple_TV.png' },
+  { name: 'IPTV', icon: 'https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg' },
 ];
 
 /**
@@ -748,7 +748,7 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${icoSvg}/Meta.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
     ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
-    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Apple_TV.png", proxies: ["直连", "Proxies", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
+    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg", proxies: ["直连", "Proxies", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
     buildGroup("Final", "Final", ["Proxies", "直连", ...activeRegions]),

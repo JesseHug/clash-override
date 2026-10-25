@@ -247,7 +247,7 @@ proxy-groups:
     proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: IPTV
     <<: *BaseSelect
-    icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Apple_TV.png
+    icon: https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg
     default-selected: 直连
     proxies: [直连, Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
   - name: Final
