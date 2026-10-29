@@ -43,6 +43,7 @@ const ruleOptionsEnable = {
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
   一倍率归入低倍率: true,         // 将1x、1.0x等一倍率节点也归入低倍率组
   生成倍率组: true,               // 是否生成低倍率/高倍率策略组（关闭后界面更简洁）
+  生成家宽节点组: true,         // 是否生成家宽（住宅/原生 IP）节点策略组
   过滤低倍率节点: false,        // 是否全局排除低倍率节点
   过滤重复节点: false,          // 是否按连接目标（服务器地址+端口）过滤重复节点
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
@@ -116,6 +117,20 @@ const excludeFilter = /群|返利|循环|官网|客服|网站|网址|获取|订�
 const lowRateRegex = /^(?!.*(?:剩|期|客户端|软件)).*(?:(?<![\d.])0\.\d+|下载|低倍|实验性|(?<![A-Za-z])free(?![A-Za-z]))/i;
 const oneRateRegex = /(?:(?<![\d.])(?:1|1\.0+)\s*(?:倍|[*×xX✕✖⨉]))|(?:[*×xX✕✖⨉]\s*(?:1|1\.0+)(?![\d.]))/i;
 const highRateRegex = /(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉]))/i;
+const homeRegex = /家宽|住宅|原生\s*IP|家庭宽带|\bISP\b|\bRES\b|residential/i;
+
+/**
+ * 零宽/不可见字符：部分机场会在节点名中逐字符插入这类字符（如 H\u200BK），打断地区、倍率等正则匹配。
+ * 刻意排除 ZWNJ/ZWJ 及变体选择符，避免破坏连字和 emoji 呈现。
+ */
+const invisibleCharsRegex = /[\u00AD\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u206F\uFEFF\u115F\u1160\u3164\uFFA0]/g;
+
+/**
+ * 取节点名「可用于匹配」的形式：剥离零宽/不可见字符
+ */
+function toMatchableName(name) {
+  return typeof name === 'string' ? name.replace(invisibleCharsRegex, '') : name;
+}
 
 const regionMappings = [
   { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg" },
@@ -302,7 +317,7 @@ function getMatchedRegions(proxyName) {
   }
 
   // 移除空白字符、零宽字符及不可见字符，避免干扰地区/国旗正则匹配
-  const cleanName = proxyName ? proxyName.replace(/[\s\u200B-\u200D\uFEFF]/g, '') : '';
+  const cleanName = toMatchableName(proxyName);
   const regions = anyRegionRegex.test(cleanName)
     ? regionMappings.filter((region) => region.regex.test(cleanName))
     : [];
@@ -333,7 +348,7 @@ function filterAndNormalizeProxies(config) {
   let filteredRawProxies = originalProxies.filter(proxy => {
     if (!checkProxy(proxy)) return false;
     if (builtinTypes.has(String(proxy.type ?? '').toLowerCase())) return false;
-    const cleanForFilter = proxy.name ? proxy.name.replace(/[\u200B-\u200D\uFEFF]/g, '') : '';
+    const cleanForFilter = toMatchableName(proxy.name);
     if (excludeFilter.test(cleanForFilter)) return false;
     if (ruleOptionsEnable.过滤低倍率节点 && lowRateRegex.test(cleanForFilter)) return false;
     if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(cleanForFilter)) return false;
@@ -350,7 +365,7 @@ function filterAndNormalizeProxies(config) {
 
     // 提取已有国旗，移除国旗、零宽/不可见字符和多余空格
     const existingFlag = oldName.match(flagRegex)?.[0];
-    const nameWithoutFlag = oldName.replace(flagRegex, '').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim();
+    const nameWithoutFlag = oldName.replace(flagRegex, '').replace(invisibleCharsRegex, '').replace(/\s+/g, ' ').trim();
 
     // 如果已有国旗则复用，否则从地区匹配取
     const regionFlag = existingFlag || matchedRegions.find((r) => r.flag)?.flag;
@@ -437,37 +452,56 @@ function buildDnsAndHostsConfig(config, proxies) {
   
   // 常见的公共 DNS，用于过滤订阅中的公共 DNS
   const commonDnsList = [
-    // IPv4（国内）
-    '223.5.5.5', '223.6.6.6', '119.29.29.29', '1.12.12.12', '120.53.53.53',
-    '114.114.114.114', '180.76.76.76', '1.2.4.8', '116.116.116.116',
-    '101.226.4.6', '123.125.81.6', '180.184.1.1', '180.184.2.2',
+    // ==================== 国内 ====================
+    // 阿里 AliDNS（阿里云）
+    '223.5.5.5', '223.6.6.6', '2400:3200::1', '2400:3200:baba::1', 'alidns',
+    // 腾讯 DNSPod（腾讯云）
+    '119.29.29.29', '119.28.28.28', '182.254.116.116', '1.12.12.12', '120.53.53.53',
+    '2402:4e00::', 'doh.pub', 'dot.pub', 'dns.pub', 'dnspod',
+    // 114DNS（南京信风）
+    '114.114.114.114', '114.114.115.115',
+    // 百度 BaiduDNS
+    '180.76.76.76', '2400:da00::6666', 'dns.baidu',
+    // CNNIC SDNS（中国互联网络信息中心）
+    '1.2.4.8', '210.2.4.8', '2001:dc7:1000::1', 'cnnic',
+    // 360 安全 DNS
+    '101.226.4.6', '218.30.118.6', '123.125.81.6', '2400:8800:1::6', '2400:8800:2::6', 'doh.360', 'dot.360',
+    // 火山引擎（字节跳动）
+    '180.184.1.1', '180.184.2.2',
 
-    // IPv6（国内）
-    '2400:3200::1', '2400:3200:baba::1', '2402:4e00::', '2400:da00::6666',
-
-    // IPv4（国外）
-    '1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4', '9.9.9.9',
-    '149.112.112.112', '208.67.222.222', '208.67.220.220',
-    '94.140.14.14', '94.140.15.15', '76.76.2.0', '76.76.10.0',
-    '185.228.168.9', '185.228.169.9', '77.88.8.8', '77.88.8.1',
-    '156.154.70.1', '156.154.71.1',
-
-    // IPv6（国外）
-    '2606:4700:4700::1111', '2606:4700:4700::1001',
-    '2001:4860:4860::8888', '2001:4860:4860::8844',
-    '2620:fe::fe', '2620:fe::9',
-    '2620:119:35::35', '2620:119:53::53',
-    '2a10:50c0::bad1:ff', '2a10:50c0::bad2:ff',
-    '2a10:50c0::ad1:ff', '2a10:50c0::ad2:ff',
-    '2a0d:2a00:1::2', '2a0d:2a00:2::2',
-    '2a02:6b8::feed:0ff', '2a02:6b8:0:1::feed:0ff',
-    '2610:a1:1018::1', '2610:a1:1019::1',
-
-    // 关键词（国内）
-    'alidns', 'doh.pub', 'dot.pub', 'dns.pub', 'dnspod', 'dns.baidu',
-
-    // 关键词（国外）
-    'dns.google', 'dns.cloudflare', 'cloudflare-dns', 'quad9', 'opendns', 'nextdns', 'adguard',
+    // ==================== 国外 ====================
+    // Cloudflare
+    '1.1.1.1', '1.0.0.1', '1.1.1.2', '1.0.0.2', '1.1.1.3', '1.0.0.3',
+    '2606:4700:4700::1111', '2606:4700:4700::1001', '2606:4700:4700::1112', '2606:4700:4700::1002',
+    '2606:4700:4700::1113', '2606:4700:4700::1003',
+    'dns.cloudflare', 'cloudflare-dns', 'one.one.one.one',
+    // Google Public DNS
+    '8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844', 'dns.google',
+    // Quad9
+    '9.9.9.9', '9.9.9.10', '9.9.9.11', '149.112.112.112', '149.112.112.10', '149.112.112.11',
+    '2620:fe::fe', '2620:fe::9', 'quad9',
+    // Cisco OpenDNS（含 FamilyShield）
+    '208.67.222.222', '208.67.220.220', '208.67.222.123', '208.67.220.123',
+    '2620:119:35::35', '2620:119:53::53', '2620:119:35::123', '2620:119:53::123', 'opendns',
+    // AdGuard DNS（含家庭版）
+    '94.140.14.14', '94.140.15.15', '94.140.14.15', '94.140.15.16',
+    '2a10:50c0::ad1:ff', '2a10:50c0::ad2:ff', '2a10:50c0::bad1:ff', '2a10:50c0::bad2:ff', 'adguard',
+    // Control D
+    '76.76.2.0', '76.76.10.0', '76.76.19.19', '76.223.122.150', '2a0d:2a00:1::2', '2a0d:2a00:2::2',
+    // CleanBrowsing（含安全/家庭版）
+    '185.228.168.9', '185.228.169.9', '185.228.168.10', '185.228.169.11', '185.228.168.168', '185.228.169.168',
+    // Yandex DNS
+    '77.88.8.8', '77.88.8.1', '2a02:6b8::feed:0ff', '2a02:6b8:0:1::feed:0ff',
+    // Neustar UltraDNS
+    '156.154.70.1', '156.154.71.1', '156.154.70.2', '156.154.71.2', '2610:a1:1018::1', '2610:a1:1019::1',
+    // Mullvad DNS
+    '194.242.2.2', '2a07:e340::2',
+    // Hurricane Electric
+    '74.82.42.42', '2001:470:20::2',
+    // NextDNS
+    'nextdns',
+    // Apple
+    'dns.apple',
   ];
 
   // 预编译为单个正则，避免逐个遍历数组进行子串匹配
@@ -646,7 +680,7 @@ function buildRegionGroups(proxies, customProxies) {
   const pNames = allProxies.map(p => p.name);
   const getNodes = (reg) => {
     const res = pNames.filter(name => {
-      const cleanName = name ? name.replace(/[\s\u200B-\u200D\uFEFF]/g, '') : '';
+      const cleanName = toMatchableName(name);
       return reg.test(cleanName);
     });
     return res.length > 0 ? res : ["DIRECT"];
@@ -702,6 +736,15 @@ function buildRegionGroups(proxies, customProxies) {
       activeRegions.push("高倍率节点");
       regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
       regionGroups.push({ name: "高倍率节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png", proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+    }
+  }
+
+  if (ruleOptionsEnable.生成家宽节点组) {
+    const nodesHome = getNodes(homeRegex);
+    if (nodesHome[0] !== "DIRECT") {
+      activeRegions.push("家宽节点");
+      regionAutoGroups.push({ name: "家宽节点-自动选择", proxies: nodesHome, hidden: true, ...autoBaseOption });
+      regionGroups.push({ name: "家宽节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/Home.svg", proxies: ["家宽节点-自动选择", ...nodesHome] });
     }
   }
 
@@ -816,6 +859,7 @@ function main(config) {
   newConfig['tun'] = { enable: true, stack: 'mips', 'auto-route': true, 'strict-route': true, 'auto-redirect': true, 'auto-detect-interface': true, 'dns-hijack': ['any:53', 'tcp://any:53'] };
 
   const regionData = buildRegionGroups(finalMappedProxies, customProxies);
+  const { activeRegions } = regionData;
   newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup });
 
   // --- Rule Providers (优先 bett-rules，EmbyIP 保留 666OS) ---
@@ -875,7 +919,6 @@ function main(config) {
     ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${rBett}/geo/geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
     MicrosoftCN: { ...mrs, url: `${rBett}/geo/geosite/microsoft@cn.mrs`, path: "./rules/MicrosoftCN.mrs" },
     NvidiaCN: { ...mrs, url: `${rBett}/geo/geosite/nvidia@cn.mrs`, path: "./rules/NvidiaCN.mrs" },
-    EpicGames: { ...mrs, url: `${rBett}/geo/geosite/epicgames.mrs`, path: "./rules/EpicGames.mrs" },
     'geolocation-!cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/geolocation-!cn.mrs" },
     'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
@@ -893,6 +936,8 @@ function main(config) {
   };
 
   newConfig.rules = [
+    // 规则集下载域名直连，避免出现鸡蛋问题
+    "DOMAIN,cdn.jsdmirror.com,直连",
     // 公共 DNS 直连过滤
     "IP-CIDR,223.5.5.5/32,直连,no-resolve",
     "IP-CIDR,223.6.6.6/32,直连,no-resolve",
@@ -908,7 +953,6 @@ function main(config) {
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
     "RULE-SET,MicrosoftCN,直连",
     "RULE-SET,NvidiaCN,直连",
-    "RULE-SET,EpicGames,直连",
     "DOMAIN,fsend.cn,直连",
     "DOMAIN,international-gfe.download.nvidia.com,直连",
     "DOMAIN-SUFFIX,ctaiot.com,直连",
@@ -952,6 +996,7 @@ function main(config) {
       "RULE-SET,iptv_domain,IPTV",
       "RULE-SET,iptv_ip,IPTV,no-resolve"
     ] : []),
+    ...(activeRegions.includes("US") ? ["DOMAIN-SUFFIX,nodeseek.com,US"] : ["DOMAIN-SUFFIX,nodeseek.com,Proxies"]),
     "RULE-SET,geolocation-!cn,Proxies",
     "RULE-SET,cn_additional,直连",
     "RULE-SET,ChinaIP,直连",

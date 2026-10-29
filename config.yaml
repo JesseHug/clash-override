@@ -10,6 +10,7 @@ proxy_providers_common: &proxy_providers_common
   type: http
   interval: 86400
   proxy: DIRECT
+  exclude-type: 'DIRECT|REJECT|REMATCH'
   health-check: { enable: true, url: https://www.apple.com/library/test/success.html, interval: 600, lazy: true }
 
 global_exclude_filter: &global_exclude_filter
@@ -188,68 +189,69 @@ proxy-groups:
       - Other
       - 低倍率节点
       - 高倍率节点
+      - 家宽节点
   - name: Google
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Google.svg
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: YouTube
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg
     default-selected: MO
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Spotify
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg
     default-selected: TW
-    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Telegram
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Games
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg
-    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: PayPal
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg
-    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: X
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: OpenAI
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg
     default-selected: US
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: AI
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/AI.png
     default-selected: US
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Apple
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg
-    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Emby
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg
-    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Meta
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg
-    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: FCM
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg
     default-selected: 直连
-    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: IPTV
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg
     default-selected: 直连
-    proxies: [直连, Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点]
+    proxies: [直连, Proxies, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
   - name: Final
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Final.png
@@ -341,6 +343,13 @@ proxy-groups:
     include-all: true
     filter: '(?u)(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉]))'
 
+  - name: 家宽节点
+    <<: *BaseSelect
+    icon: https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/Home.svg
+    proxies: [家宽节点-自动选择]
+    include-all: true
+    filter: '(?i)(家宽|住宅|原生\s*IP|家庭宽带|\bISP\b|\bRES\b|residential)'
+
 
   # 隐藏的 url-test 自动选择组（include-all + filter 动态注入节点）
   - <<: *BaseUT
@@ -383,6 +392,10 @@ proxy-groups:
     name: 高倍率节点-自动选择
     include-all: true
     filter: '(?u)(?:[*×xX✕✖⨯⨉]\s*(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*))|(?:(?<![\d.])(?:(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?|1\.[0-9]*[1-9]\d*)\s*(?:倍|[*×xX✕✖⨯⨉]))'
+  - <<: *BaseUT
+    name: 家宽节点-自动选择
+    include-all: true
+    filter: '(?i)(家宽|住宅|原生\s*IP|家庭宽带|\bISP\b|\bRES\b|residential)'
 
 
 # ==================== 规则集 ====================
@@ -504,10 +517,6 @@ rule-providers:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs
     path: ./ruleset/NvidiaCN.mrs
-  EpicGames:
-    <<: *BehaviorDN
-    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs
-    path: ./ruleset/EpicGames.mrs
   iptv_domain:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs
@@ -527,6 +536,9 @@ rule-providers:
 
 # ==================== 路由规则 ====================
 rules:
+  # 规则集下载域名直连，避免出现鸡蛋问题
+  - DOMAIN,cdn.jsdmirror.com,直连
+
   # 公共 DNS 直连过滤
   - IP-CIDR,223.5.5.5/32,直连,no-resolve
   - IP-CIDR,223.6.6.6/32,直连,no-resolve
@@ -543,7 +555,6 @@ rules:
   - RULE-SET,AppleCN,直连
   - RULE-SET,MicrosoftCN,直连
   - RULE-SET,NvidiaCN,直连
-  - RULE-SET,EpicGames,直连
   - DOMAIN,fsend.cn,直连
   - DOMAIN,international-gfe.download.nvidia.com,直连
   - DOMAIN-SUFFIX,ctaiot.com,直连
@@ -593,6 +604,9 @@ rules:
   - RULE-SET,cathy_ip,IPTV,no-resolve
   - RULE-SET,iptv_domain,IPTV
   - RULE-SET,iptv_ip,IPTV,no-resolve
+
+  # 自定义规则
+  - DOMAIN-SUFFIX,nodeseek.com,US
 
   # 国外网站兜底
   - RULE-SET,geolocation-!cn,Proxies
