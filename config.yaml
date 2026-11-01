@@ -517,6 +517,10 @@ rule-providers:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs
     path: ./ruleset/NvidiaCN.mrs
+  Synology:
+    <<: *BehaviorDN
+    url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/synology.mrs
+    path: ./ruleset/Synology.mrs
   iptv_domain:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs
@@ -555,6 +559,7 @@ rules:
   - RULE-SET,AppleCN,直连
   - RULE-SET,MicrosoftCN,直连
   - RULE-SET,NvidiaCN,直连
+  - RULE-SET,Synology,直连
   - DOMAIN,fsend.cn,直连
   - DOMAIN,international-gfe.download.nvidia.com,直连
   - DOMAIN-SUFFIX,ctaiot.com,直连
@@ -576,6 +581,9 @@ rules:
   - RULE-SET,OpenAI,OpenAI
   - RULE-SET,AI,AI
   - RULE-SET,AIIP,AI,no-resolve
+  - DOMAIN,cdn.usefathom.com,AI
+  - DOMAIN-SUFFIX,intercom.io,AI
+  - DOMAIN-SUFFIX,intercomcdn.com,AI
 
   # 流媒体 & 应用
   - RULE-SET,YouTube,YouTube

@@ -456,18 +456,26 @@ function buildDnsAndHostsConfig(config, proxies) {
     // 阿里 AliDNS（阿里云）
     '223.5.5.5', '223.6.6.6', '2400:3200::1', '2400:3200:baba::1', 'alidns',
     // 腾讯 DNSPod（腾讯云）
-    '119.29.29.29', '119.28.28.28', '182.254.116.116', '1.12.12.12', '120.53.53.53',
+    '119.29.29.29', '119.28.28.28', '182.254.116.116', '182.254.118.118', '1.12.12.12', '120.53.53.53',
     '2402:4e00::', 'doh.pub', 'dot.pub', 'dns.pub', 'dnspod',
     // 114DNS（南京信风）
-    '114.114.114.114', '114.114.115.115',
+    '114.114.114.114', '114.114.115.115', '114.114.114.119', '114.114.115.119', '114.114.114.110', '114.114.115.110',
     // 百度 BaiduDNS
     '180.76.76.76', '2400:da00::6666', 'dns.baidu',
     // CNNIC SDNS（中国互联网络信息中心）
     '1.2.4.8', '210.2.4.8', '2001:dc7:1000::1', 'cnnic',
     // 360 安全 DNS
-    '101.226.4.6', '218.30.118.6', '123.125.81.6', '2400:8800:1::6', '2400:8800:2::6', 'doh.360', 'dot.360',
+    '101.226.4.6', '218.30.118.6', '123.125.81.6', '140.207.198.6', '2400:8800:1::6', '2400:8800:2::6', 'doh.360', 'dot.360', 'dns.360',
     // 火山引擎（字节跳动）
     '180.184.1.1', '180.184.2.2',
+    // OneDNS（微步在线，拦截版/纯净版/家庭版）
+    '117.50.11.11', '117.50.22.22', '52.80.66.66', '117.50.10.10', '52.80.52.52', '117.50.60.30', '52.80.60.30', 'onedns.net',
+    // 清华大学 TUNA
+    '101.6.6.6', '2001:da8::666',
+    // 下一代互联网国家工程中心（IPv6 公共 DNS）
+    '240c::6666', '240c::6644',
+    // 中国科学技术大学（教育网防污染）
+    '202.141.162.123', '202.141.178.13',
 
     // ==================== 国外 ====================
     // Cloudflare
@@ -487,9 +495,9 @@ function buildDnsAndHostsConfig(config, proxies) {
     '94.140.14.14', '94.140.15.15', '94.140.14.15', '94.140.15.16',
     '2a10:50c0::ad1:ff', '2a10:50c0::ad2:ff', '2a10:50c0::bad1:ff', '2a10:50c0::bad2:ff', 'adguard',
     // Control D
-    '76.76.2.0', '76.76.10.0', '76.76.19.19', '76.223.122.150', '2a0d:2a00:1::2', '2a0d:2a00:2::2',
+    '76.76.2.0', '76.76.10.0', '76.76.19.19', '76.223.122.150',
     // CleanBrowsing（含安全/家庭版）
-    '185.228.168.9', '185.228.169.9', '185.228.168.10', '185.228.169.11', '185.228.168.168', '185.228.169.168',
+    '185.228.168.9', '185.228.169.9', '185.228.168.10', '185.228.169.11', '185.228.168.168', '185.228.169.168', '2a0d:2a00:1::2', '2a0d:2a00:2::2',
     // Yandex DNS
     '77.88.8.8', '77.88.8.1', '2a02:6b8::feed:0ff', '2a02:6b8:0:1::feed:0ff',
     // Neustar UltraDNS
@@ -919,6 +927,7 @@ function main(config) {
     ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${rBett}/geo/geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
     MicrosoftCN: { ...mrs, url: `${rBett}/geo/geosite/microsoft@cn.mrs`, path: "./rules/MicrosoftCN.mrs" },
     NvidiaCN: { ...mrs, url: `${rBett}/geo/geosite/nvidia@cn.mrs`, path: "./rules/NvidiaCN.mrs" },
+    Synology: { ...mrs, url: `${rBett}/geo/geosite/synology.mrs`, path: "./rules/Synology.mrs" },
     'geolocation-!cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/geolocation-!cn.mrs" },
     'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
     ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
@@ -953,6 +962,7 @@ function main(config) {
     ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleCN,直连"] : []),
     "RULE-SET,MicrosoftCN,直连",
     "RULE-SET,NvidiaCN,直连",
+    "RULE-SET,Synology,直连",
     "DOMAIN,fsend.cn,直连",
     "DOMAIN,international-gfe.download.nvidia.com,直连",
     "DOMAIN-SUFFIX,ctaiot.com,直连",
@@ -969,7 +979,13 @@ function main(config) {
     ] : []),
     ...(ruleOptionsEnable.FCM ? ["RULE-SET,GoogleFCM,FCM"] : []),
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
-    ...(ruleOptionsEnable.AI ? ["RULE-SET,AI,AI", "RULE-SET,AIIP,AI,no-resolve"] : []),
+    ...(ruleOptionsEnable.AI ? [
+      "RULE-SET,AI,AI",
+      "RULE-SET,AIIP,AI,no-resolve",
+      "DOMAIN,cdn.usefathom.com,AI",
+      "DOMAIN-SUFFIX,intercom.io,AI",
+      "DOMAIN-SUFFIX,intercomcdn.com,AI"
+    ] : []),
     ...(ruleOptionsEnable.YouTube ? ["RULE-SET,YouTube,YouTube"] : []),
     ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve", "RULE-SET,Gemini,Google"] : []),
     ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify", "RULE-SET,SpotifyIP,Spotify,no-resolve"] : []),
