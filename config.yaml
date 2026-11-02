@@ -580,7 +580,6 @@ rules:
   # AI
   - RULE-SET,OpenAI,OpenAI
   - RULE-SET,AI,AI
-  - RULE-SET,AIIP,AI,no-resolve
   - DOMAIN,cdn.usefathom.com,AI
   - DOMAIN-SUFFIX,intercom.io,AI
   - DOMAIN-SUFFIX,intercomcdn.com,AI
@@ -588,36 +587,39 @@ rules:
   # 流媒体 & 应用
   - RULE-SET,YouTube,YouTube
   - RULE-SET,Google,Google
-  - RULE-SET,GoogleIP,Google,no-resolve
   - RULE-SET,Gemini,Google
   - RULE-SET,Spotify,Spotify
-  - RULE-SET,SpotifyIP,Spotify,no-resolve
   - RULE-SET,Telegram,Telegram
-  - RULE-SET,TelegramIP,Telegram,no-resolve
   - RULE-SET,Games,Games
-  - RULE-SET,SteamIP,Games,no-resolve
   - RULE-SET,PayPal,PayPal
   - RULE-SET,Twitter,X
-  - RULE-SET,TwitterIP,X,no-resolve
   - RULE-SET,Apple,Apple
-  - RULE-SET,AppleIP,Apple,no-resolve
   - DOMAIN-SUFFIX,nubebelle.com,Emby
   - RULE-SET,Emby,Emby
-  - RULE-SET,EmbyIP,Emby
   - RULE-SET,Meta,Meta
-  - RULE-SET,MetaIP,Meta,no-resolve
 
   # IPTV 规则分流 (Cathy & Gary 源)
   - RULE-SET,cathy_domain,IPTV
-  - RULE-SET,cathy_ip,IPTV,no-resolve
   - RULE-SET,iptv_domain,IPTV
-  - RULE-SET,iptv_ip,IPTV,no-resolve
 
   # 自定义规则
   - DOMAIN-SUFFIX,nodeseek.com,US
 
   # 国外网站兜底
   - RULE-SET,geolocation-!cn,Proxies
+
+  # 代理（IP类，无 no-resolve，延后至域名规则之后，按解析结果兜底匹配）
+  - RULE-SET,GoogleIP,Google
+  - RULE-SET,SpotifyIP,Spotify
+  - RULE-SET,TelegramIP,Telegram
+  - RULE-SET,SteamIP,Games
+  - RULE-SET,TwitterIP,X
+  - RULE-SET,AppleIP,Apple
+  - RULE-SET,MetaIP,Meta
+  - RULE-SET,AIIP,AI
+  - RULE-SET,EmbyIP,Emby
+  - RULE-SET,cathy_ip,IPTV
+  - RULE-SET,iptv_ip,IPTV
 
   # 国内域名
   - RULE-SET,cn_additional,直连

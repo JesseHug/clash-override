@@ -981,39 +981,43 @@ function main(config) {
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
     ...(ruleOptionsEnable.AI ? [
       "RULE-SET,AI,AI",
-      "RULE-SET,AIIP,AI,no-resolve",
       "DOMAIN,cdn.usefathom.com,AI",
       "DOMAIN-SUFFIX,intercom.io,AI",
       "DOMAIN-SUFFIX,intercomcdn.com,AI"
     ] : []),
     ...(ruleOptionsEnable.YouTube ? ["RULE-SET,YouTube,YouTube"] : []),
-    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,GoogleIP,Google,no-resolve", "RULE-SET,Gemini,Google"] : []),
-    ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify", "RULE-SET,SpotifyIP,Spotify,no-resolve"] : []),
-    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram", "RULE-SET,TelegramIP,Telegram,no-resolve"] : []),
-    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games", "RULE-SET,SteamIP,Games,no-resolve"] : []),
+    ...(ruleOptionsEnable.Google ? ["RULE-SET,Google,Google", "RULE-SET,Gemini,Google"] : []),
+    ...(ruleOptionsEnable.Spotify ? ["RULE-SET,Spotify,Spotify"] : []),
+    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,Telegram,Telegram"] : []),
+    ...(ruleOptionsEnable.Games ? ["RULE-SET,Games,Games"] : []),
     ...(ruleOptionsEnable.PayPal ? ["RULE-SET,PayPal,PayPal"] : []),
-    ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X", "RULE-SET,TwitterIP,X,no-resolve"] : []),
-    ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple", "RULE-SET,AppleIP,Apple,no-resolve"] : []),
-    ...(ruleOptionsEnable.Netflix ? [
-      "RULE-SET,Netflix,Netflix",
-      "RULE-SET,NetflixIP,Netflix,no-resolve"
-    ] : []),
-    ...(ruleOptionsEnable.Emby ? [
-      "RULE-SET,Emby,Emby",
-      "RULE-SET,EmbyIP,Emby"
-    ] : []),
-    ...(ruleOptionsEnable.Meta ? [
-      "RULE-SET,Meta,Meta",
-      "RULE-SET,MetaIP,Meta,no-resolve"
-    ] : []),
+    ...(ruleOptionsEnable.X ? ["RULE-SET,Twitter,X"] : []),
+    ...(ruleOptionsEnable.Apple ? ["RULE-SET,Apple,Apple"] : []),
+    ...(ruleOptionsEnable.Netflix ? ["RULE-SET,Netflix,Netflix"] : []),
+    ...(ruleOptionsEnable.Emby ? ["RULE-SET,Emby,Emby"] : []),
+    ...(ruleOptionsEnable.Meta ? ["RULE-SET,Meta,Meta"] : []),
     ...(ruleOptionsEnable.IPTV ? [
       "RULE-SET,cathy_domain,IPTV",
-      "RULE-SET,cathy_ip,IPTV,no-resolve",
-      "RULE-SET,iptv_domain,IPTV",
-      "RULE-SET,iptv_ip,IPTV,no-resolve"
+      "RULE-SET,iptv_domain,IPTV"
     ] : []),
     ...(activeRegions.includes("US") ? ["DOMAIN-SUFFIX,nodeseek.com,US"] : ["DOMAIN-SUFFIX,nodeseek.com,Proxies"]),
     "RULE-SET,geolocation-!cn,Proxies",
+
+    // 代理（IP类，无 no-resolve，延后至域名规则之后，按解析结果兜底匹配）
+    ...(ruleOptionsEnable.Google ? ["RULE-SET,GoogleIP,Google"] : []),
+    ...(ruleOptionsEnable.Spotify ? ["RULE-SET,SpotifyIP,Spotify"] : []),
+    ...(ruleOptionsEnable.Telegram ? ["RULE-SET,TelegramIP,Telegram"] : []),
+    ...(ruleOptionsEnable.Games ? ["RULE-SET,SteamIP,Games"] : []),
+    ...(ruleOptionsEnable.X ? ["RULE-SET,TwitterIP,X"] : []),
+    ...(ruleOptionsEnable.Apple ? ["RULE-SET,AppleIP,Apple"] : []),
+    ...(ruleOptionsEnable.Netflix ? ["RULE-SET,NetflixIP,Netflix"] : []),
+    ...(ruleOptionsEnable.Meta ? ["RULE-SET,MetaIP,Meta"] : []),
+    ...(ruleOptionsEnable.AI ? ["RULE-SET,AIIP,AI"] : []),
+    ...(ruleOptionsEnable.Emby ? ["RULE-SET,EmbyIP,Emby"] : []),
+    ...(ruleOptionsEnable.IPTV ? [
+      "RULE-SET,cathy_ip,IPTV",
+      "RULE-SET,iptv_ip,IPTV"
+    ] : []),
     "RULE-SET,cn_additional,直连",
     "RULE-SET,ChinaIP,直连",
     "GEOIP,CN,直连",
