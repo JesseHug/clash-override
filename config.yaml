@@ -136,7 +136,7 @@ dns:
   fake-ip-filter:
     - rule-set:Private
     - rule-set:fakeip_filter
-    - rule-set:geolocation-cn
+    - rule-set:cn
     - rule-set:GoogleFCM
   default-nameserver: *defaultDNS
   # 【说明】proxy-server-nameserver 决定了解析节点域名的 DNS。
@@ -148,7 +148,7 @@ dns:
   nameserver: *foreignDNS
   nameserver-policy:
     "rule-set:Private": "system"
-    "rule-set:douyin": ["system", "180.184.1.1", "180.184.2.2"]
+    "rule-set:douyin": ["180.184.1.1", "180.184.2.2"]
     "rule-set:cn": *chinaDNS
   direct-nameserver: *chinaDNS
   direct-nameserver-follow-policy: true
@@ -255,7 +255,7 @@ proxy-groups:
   - name: Final
     <<: *BaseSelect
     icon: https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Final.png
-    proxies: [Proxies, 直连]
+    proxies: [Proxies, 直连, 默认代理, HK, JP, SG, TW, US, MO, EU, Other, 低倍率节点, 高倍率节点, 家宽节点]
 
   - name: 直连
     <<: *BaseSelect
@@ -506,9 +506,6 @@ rule-providers:
   douyin:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/douyin.mrs
-  cn_additional:
-    <<: *BehaviorDN
-    url: https://static-file-global.353355.xyz/rules/cn-additional-list.mrs
   MicrosoftCN:
     <<: *BehaviorDN
     url: https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs
@@ -572,8 +569,8 @@ rules:
   - DOMAIN-SUFFIX,jsdelivr.com,Proxies
   - DOMAIN-SUFFIX,jsdmirror.com,Proxies
 
-  # QUIC 拦截：禁用国外 UDP/443，防止视频卡顿
-  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
+  # 禁用国外 QUIC 流量（默认不启用，如需启用请取消注释）
+  # - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn),(RULE-SET,ChinaIP,no-resolve)))))),REJECT
 
   - RULE-SET,GoogleFCM,FCM
 
@@ -621,9 +618,7 @@ rules:
   - RULE-SET,cathy_ip,IPTV
   - RULE-SET,iptv_ip,IPTV
 
-  # 国内域名
-  - RULE-SET,cn_additional,直连
-
+  # 国内规则
   # IP 规则（no-resolve：不主动触发 DNS，仅已知 IP 时匹配）
   - RULE-SET,ChinaIP,直连
 

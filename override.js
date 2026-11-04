@@ -36,7 +36,7 @@ const ruleOptionsEnable = {
   IPTV: true,             // IPTV 直播源 (Cathy 等，默认直连)
 
   // 非分流策略配置
-  屏蔽国外QUIC: true,           // 屏蔽国外 QUIC 流量（防止视频卡顿）
+  屏蔽国外QUIC: false,          // 屏蔽国外 QUIC 流量（防止视频卡顿）
   显示默认隐藏的策略组: false,  // 显示隐藏的地区 url-test 自动选择组
   生成地区自动选择组: true,     // 为每个地区生成隐藏的 url-test 自动选择组
   隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
@@ -604,7 +604,7 @@ function buildDnsAndHostsConfig(config, proxies) {
     'fake-ip-filter': [
       'rule-set:Private',
       'rule-set:fakeip_filter',
-      'rule-set:geolocation-cn',
+      'rule-set:cn',
       ...(ruleOptionsEnable['FCM'] ? ['rule-set:GoogleFCM'] : []),
       ...proxyFakeIpFilter,
     ],
@@ -616,7 +616,7 @@ function buildDnsAndHostsConfig(config, proxies) {
     nameserver: foreignDNS,
     'nameserver-policy': {
       'rule-set:Private': 'system',
-      'rule-set:douyin': ['system', '180.184.1.1', '180.184.2.2'],
+      'rule-set:douyin': ['180.184.1.1', '180.184.2.2'],
       'rule-set:cn': chinaDNS,
     },
     'direct-nameserver': chinaDNS,
@@ -802,7 +802,7 @@ function buildProxyGroups(regionData, customInfo) {
     ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg", proxies: ["直连", "Proxies", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
-    buildGroup("Final", "Final", ["Proxies", "直连", ...activeRegions]),
+    buildGroup("Final", "Final", ["Proxies", "直连", "默认代理", ...activeRegions]),
 
     {
       name: "直连",
@@ -935,7 +935,6 @@ function main(config) {
     fakeip_filter: { ...mrs, url: `${rBett}/geo/geosite/fakeip-filter.mrs`, path: "./rules/fakeip_filter.mrs", "path-in-bundle": "geo/geosite/fakeip-filter.mrs" },
     cn: { ...mrs, url: `${rBett}/geo/geosite/cn.mrs`, path: "./rules/cn.mrs" },
     douyin: { ...mrs, url: `${rBett}/geo/geosite/douyin.mrs`, path: "./rules/douyin.mrs", "path-in-bundle": "geo/geosite/douyin.mrs" },
-    cn_additional: { ...mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./rules/cn_additional.mrs" },
     ...(ruleOptionsEnable.IPTV ? {
       cathy_domain: { ...mrs, url: "https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_domain.mrs", path: "./rules/cathy_domain.mrs" },
       cathy_ip: { ...mrsIP, url: "https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_ipcidr.mrs", path: "./rules/cathy_ip.mrs" },
@@ -975,7 +974,7 @@ function main(config) {
     "DOMAIN-SUFFIX,jsdelivr.com,Proxies",
     "DOMAIN-SUFFIX,jsdmirror.com,Proxies",
     ...(ruleOptionsEnable.屏蔽国外QUIC ? [
-      "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,geolocation-cn),(RULE-SET,cn_additional),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
+      "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
     ] : []),
     ...(ruleOptionsEnable.FCM ? ["RULE-SET,GoogleFCM,FCM"] : []),
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
@@ -1018,7 +1017,6 @@ function main(config) {
       "RULE-SET,cathy_ip,IPTV",
       "RULE-SET,iptv_ip,IPTV"
     ] : []),
-    "RULE-SET,cn_additional,直连",
     "RULE-SET,ChinaIP,直连",
     "GEOIP,CN,直连",
     "RULE-SET,PrivateIP,直连",
