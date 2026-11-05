@@ -137,7 +137,7 @@ const regionMappings = [
   { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg" },
   { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg" },
   { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|美西|美东|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
   { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Macao.png" },
   { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/European_Union.png" }
 ];
@@ -342,14 +342,34 @@ function filterAndNormalizeProxies(config) {
   };
 
   const originalProxies = config.proxies || [];
+  const originalGroups = config['proxy-groups'] || [];
+  const originalGroupMap = new Map(originalGroups.map(g => [g.name, g]));
+
+  // 识别参与链式代理的节点集合（自身有 dialer-proxy，或作为目标被 dialer-proxy 引用，或在原始链式策略组中）
+  const rawLandingNodes = originalProxies.filter(p => Boolean(p && p['dialer-proxy']));
+  const rawDialerTargets = new Set(rawLandingNodes.map(p => p['dialer-proxy']));
+  const rawRelayGroup = originalGroupMap.get('中转节点');
+  const rawLandingGroup = originalGroupMap.get('落地节点');
+
+  const chainNodeNames = new Set();
+  for (const p of rawLandingNodes) chainNodeNames.add(p.name);
+  for (const t of rawDialerTargets) chainNodeNames.add(t);
+  if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
+    for (const n of rawRelayGroup.proxies) chainNodeNames.add(n);
+  }
+  if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
+    for (const n of rawLandingGroup.proxies) chainNodeNames.add(n);
+  }
 
   const builtinTypes = new Set(['direct', 'reject', 'rematch']);
 
   let filteredRawProxies = originalProxies.filter(proxy => {
     if (!checkProxy(proxy)) return false;
     if (builtinTypes.has(String(proxy.type ?? '').toLowerCase())) return false;
+    // 参与链式代理的节点不因关键词误杀（但倍率过滤仍生效）
+    const isChainNode = chainNodeNames.has(proxy.name);
     const cleanForFilter = toMatchableName(proxy.name);
-    if (excludeFilter.test(cleanForFilter)) return false;
+    if (!isChainNode && excludeFilter.test(cleanForFilter)) return false;
     if (ruleOptionsEnable.过滤低倍率节点 && lowRateRegex.test(cleanForFilter)) return false;
     if (ruleOptionsEnable.过滤高倍率节点 && highRateRegex.test(cleanForFilter)) return false;
     return true;
@@ -406,6 +426,13 @@ function filterAndNormalizeProxies(config) {
   // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
   const normalizedProxyNames = new Set(deduplicatedProxies.map((p) => p.name));
 
+  // 合法的策略组目标：包括原配置中的所有策略组名称，以及通用链式策略组（中转节点、链式中转）
+  const validGroupTargets = new Set([
+    ...originalGroupMap.keys(),
+    '中转节点',
+    '链式中转'
+  ]);
+
   // 修复 dialer-proxy 引用：节点被重命名或移除后，更新/删除引用，避免内核报错
   let proxies = deduplicatedProxies.map(proxy => {
     const target = proxy['dialer-proxy'];
@@ -414,6 +441,8 @@ function filterAndNormalizeProxies(config) {
     if (renameMap.has(target)) return { ...proxy, 'dialer-proxy': renameMap.get(target) };
     // 目标节点存活且未重命名 → 引用依然有效
     if (normalizedProxyNames.has(target)) return proxy;
+    // 目标是指向合法的策略组（如 FLYX 的"中转节点"）→ 引用有效，保留
+    if (validGroupTargets.has(target)) return proxy;
     // 目标节点被过滤移除（或引用目标本就不存在）→ 删除引用
     const copy = { ...proxy };
     delete copy['dialer-proxy'];
@@ -444,7 +473,73 @@ function filterAndNormalizeProxies(config) {
     return 0;
   });
 
-  return proxies;
+  // 探测并构建链式代理策略组信息（FLYX 或自定义链式）
+  const hasChain = rawRelayGroup || rawLandingGroup || proxies.some(p => Boolean(p['dialer-proxy']));
+  let chainInfo = null;
+
+  if (hasChain) {
+    // 1. 中转节点列表：优先从原始"中转节点"策略组提取，或者取被 dialer-proxy 引用的单节点
+    let relayProxies = [];
+    if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
+      relayProxies = rawRelayGroup.proxies
+        .map(n => renameMap.get(n) || n)
+        .filter(n => normalizedProxyNames.has(n));
+    }
+    if (relayProxies.length === 0) {
+      const singleTargets = proxies
+        .map(p => p['dialer-proxy'])
+        .filter(t => t && normalizedProxyNames.has(t));
+      relayProxies = [...new Set(singleTargets)];
+    }
+    // 若仍然为空且存在 dialer-proxy: "中转节点"，兜底放入所有可用节点以防内核报错
+    if (relayProxies.length === 0 && proxies.length > 0) {
+      relayProxies = [...normalizedProxyNames];
+    }
+
+    // 2. 落地节点列表：从原始"落地节点"策略组提取，或者取所有含有 dialer-proxy 的节点
+    let landingProxies = [];
+    if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
+      landingProxies = rawLandingGroup.proxies
+        .map(n => renameMap.get(n) || n)
+        .filter(n => normalizedProxyNames.has(n));
+    }
+    const dialerLandingProxies = proxies
+      .filter(p => Boolean(p['dialer-proxy']))
+      .map(p => p.name);
+    landingProxies = [...new Set([...landingProxies, ...dialerLandingProxies])];
+
+    const chainGroups = [];
+
+    // 中转节点策略组
+    if (relayProxies.length > 0 || rawRelayGroup || proxies.some(p => p['dialer-proxy'] === '中转节点')) {
+      chainGroups.push({
+        name: '中转节点',
+        type: 'select',
+        icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Bypass.svg',
+        proxies: relayProxies.length > 0 ? relayProxies : ['DIRECT']
+      });
+    }
+
+    // 落地节点策略组
+    let landingGroupName = null;
+    if (landingProxies.length > 0 || rawLandingGroup) {
+      landingGroupName = '落地节点';
+      chainGroups.push({
+        name: landingGroupName,
+        type: 'select',
+        icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Server.svg',
+        proxies: landingProxies.length > 0 ? landingProxies : ['DIRECT']
+      });
+    }
+
+    chainInfo = {
+      chainGroups,
+      landingGroupName,
+      relayGroupName: '中转节点'
+    };
+  }
+
+  return { proxies, chainInfo };
 }
 
 function buildDnsAndHostsConfig(config, proxies) {
@@ -763,14 +858,18 @@ function buildProxyGroups(regionData, customInfo) {
   const { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico } = regionData;
   const customProxyNames = (customInfo && customInfo.customProxyNames) || [];
   const customGroup = (customInfo && customInfo.customGroup) || null;
+  const chainInfo = (customInfo && customInfo.chainInfo) || null;
   const masterName = "Auto";
 
   const allProxiesNames = [...pNames, ...customProxyNames];
 
   const icoSvg = "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg";
 
+  const landingGroupName = chainInfo && chainInfo.landingGroupName;
+  const chainGroups = (chainInfo && chainInfo.chainGroups) || [];
+
   const buildGroup = (name, iconTarget, groupProxies, extra) => {
-    if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...activeRegions];
+    if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions];
     if (!extra) extra = {};
     const icon = iconTarget.startsWith("http") ? iconTarget : `${ico}/${iconTarget}.png`;
     return { name, type: "select", icon, proxies: groupProxies, ...extra };
@@ -783,26 +882,34 @@ function buildProxyGroups(regionData, customInfo) {
     proxies: allProxiesNames.length > 0 ? allProxiesNames : ["DIRECT"]
   };
 
+  const proxiesList = [
+    masterName,
+    "默认代理",
+    ...(landingGroupName ? [landingGroupName] : []),
+    ...activeRegions
+  ];
+
   const groups = [
-    buildGroup("Proxies", `${icoSvg}/Proxy.svg`, [masterName, "默认代理", ...activeRegions]),
+    buildGroup("Proxies", `${icoSvg}/Proxy.svg`, proxiesList),
+    ...chainGroups, // 优先展示【落地节点】与【中转节点】策略组
     ...(ruleOptionsEnable.Google ? [buildGroup("Google", `${icoSvg}/Google.svg`)] : []),
-    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", `${icoSvg}/YouTube.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "MO" })] : []),
-    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", `${icoSvg}/Spotify.svg`, ["Proxies", "直连", "默认代理", ...activeRegions], { "default-selected": "TW" })] : []),
+    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", `${icoSvg}/YouTube.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "MO" })] : []),
+    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", `${icoSvg}/Spotify.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "TW" })] : []),
     ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${icoSvg}/Telegram.svg`)] : []),
-    ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${icoSvg}/PayPal.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
+    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${icoSvg}/PayPal.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
     ...(ruleOptionsEnable.X ? [buildGroup("X", `${icoSvg}/Twitter.svg`)] : []),
-    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/OpenAI.svg`, ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${icoSvg}/Apple.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${icoSvg}/Netflix.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${icoSvg}/Meta.svg`, ["Proxies", "默认代理", ...activeRegions])] : []),
-    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
-    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg", proxies: ["直连", "Proxies", "默认代理", ...activeRegions], "default-selected": "直连" }] : []),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/OpenAI.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${icoSvg}/Apple.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${icoSvg}/Netflix.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${icoSvg}/Meta.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
+    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], "default-selected": "直连" }] : []),
+    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg", proxies: ["直连", "Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], "default-selected": "直连" }] : []),
     
     // Final 策略组加入所有 activeRegions
-    buildGroup("Final", "Final", ["Proxies", "直连", "默认代理", ...activeRegions]),
+    buildGroup("Final", "Final", ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions]),
 
     {
       name: "直连",
@@ -824,7 +931,7 @@ function buildProxyGroups(regionData, customInfo) {
 function main(config) {
   const newConfig = {};
 
-  const proxies = filterAndNormalizeProxies(config);
+  const { proxies, chainInfo } = filterAndNormalizeProxies(config);
   
   newConfig['mixed-port'] = 7890;
   newConfig['allow-lan'] = true;
@@ -868,7 +975,7 @@ function main(config) {
 
   const regionData = buildRegionGroups(finalMappedProxies, customProxies);
   const { activeRegions } = regionData;
-  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup });
+  newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainInfo: chainInfo });
 
   // --- Rule Providers (优先 bett-rules，EmbyIP 保留 666OS) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
