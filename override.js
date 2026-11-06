@@ -458,22 +458,20 @@ function filterAndNormalizeProxies(config) {
 
   const chainEnabled = Boolean(ruleOptionsEnable.链式代理);
 
-  // 识别参与链式代理的节点集合（仅在链式代理开启时生效）
-  const rawLandingNodes = chainEnabled ? originalProxies.filter(p => Boolean(p && p['dialer-proxy'])) : [];
+  // 识别参与链式代理的节点集合（无论是来自 Sub-Store、FLYX 还是其他前置工具，均需识别并免受误过滤）
+  const rawLandingNodes = originalProxies.filter(p => Boolean(p && p['dialer-proxy']));
   const rawDialerTargets = new Set(rawLandingNodes.map(p => p['dialer-proxy']));
-  const rawRelayGroup = chainEnabled ? originalGroupMap.get('中转节点') : null;
-  const rawLandingGroup = chainEnabled ? originalGroupMap.get('落地节点') : null;
+  const rawRelayGroup = originalGroupMap.get('中转节点');
+  const rawLandingGroup = originalGroupMap.get('落地节点');
 
   const chainNodeNames = new Set();
-  if (chainEnabled) {
-    for (const p of rawLandingNodes) chainNodeNames.add(p.name);
-    for (const t of rawDialerTargets) chainNodeNames.add(t);
-    if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
-      for (const n of rawRelayGroup.proxies) chainNodeNames.add(n);
-    }
-    if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
-      for (const n of rawLandingGroup.proxies) chainNodeNames.add(n);
-    }
+  for (const p of rawLandingNodes) chainNodeNames.add(p.name);
+  for (const t of rawDialerTargets) chainNodeNames.add(t);
+  if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
+    for (const n of rawRelayGroup.proxies) chainNodeNames.add(n);
+  }
+  if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
+    for (const n of rawLandingGroup.proxies) chainNodeNames.add(n);
   }
 
   const builtinTypes = new Set(['direct', 'reject', 'rematch']);
@@ -548,24 +546,19 @@ function filterAndNormalizeProxies(config) {
     '链式中转'
   ]);
 
-  // 修复 dialer-proxy 引用：
-  // 若未启用链式代理，移除所有节点的 dialer-proxy，避免内核报错；
-  // 若启用链式代理，节点被重命名或移除后，更新/删除引用，避免内核报错
+  // 修复并保留 dialer-proxy 引用：
+  // 无论是否启用"链式代理"选项，Sub-Store 或前置订阅自带的节点链式代理均完整保留；
+  // 节点重命名后同步更新 target 引用，确保不会断链
   let proxies = deduplicatedProxies.map(proxy => {
     const target = proxy['dialer-proxy'];
     if (!target) return proxy;
-    if (!chainEnabled) {
-      const copy = { ...proxy };
-      delete copy['dialer-proxy'];
-      return copy;
-    }
-    // 目标节点被重命名 → 更新引用
+    // 目标节点被重命名 → 更新引用为标准化后的新名称
     if (renameMap.has(target)) return { ...proxy, 'dialer-proxy': renameMap.get(target) };
     // 目标节点存活且未重命名 → 引用依然有效
     if (normalizedProxyNames.has(target)) return proxy;
     // 目标是指向合法的策略组（如 FLYX 的"中转节点"）→ 引用有效，保留
     if (validGroupTargets.has(target)) return proxy;
-    // 目标节点被过滤移除（或引用目标本就不存在）→ 删除引用
+    // 仅当目标在所有节点与策略组中都彻底不存在（死引用）时，才删除以防内核报错
     const copy = { ...proxy };
     delete copy['dialer-proxy'];
     return copy;
@@ -595,8 +588,11 @@ function filterAndNormalizeProxies(config) {
     return 0;
   });
 
-  // 探测并构建链式代理策略组信息（仅在链式代理开启时生效）
-  const hasChain = chainEnabled && (rawRelayGroup || rawLandingGroup || proxies.some(p => Boolean(p['dialer-proxy'])));
+  // 探测并构建链式代理策略组信息：
+  // 1. 若开启"链式代理"开关：汇总构建【中转节点】与【落地节点】策略组，并将落地节点注入各分流组
+  // 2. 若未开启该开关：节点的 dialer-proxy 引用（Sub-Store 等注入）完整保留；仅在有节点明确引用"中转节点"策略组时兜底补齐中转组，防止内核报错
+  const needRelayGroup = proxies.some(p => p['dialer-proxy'] === '中转节点') || rawRelayGroup;
+  const hasChain = chainEnabled ? (rawRelayGroup || rawLandingGroup || proxies.some(p => Boolean(p['dialer-proxy']))) : Boolean(needRelayGroup);
   let chainInfo = null;
 
   if (hasChain) {
@@ -642,9 +638,9 @@ function filterAndNormalizeProxies(config) {
       });
     }
 
-    // 落地节点策略组
+    // 落地节点策略组（在开启链式代理或原订阅显式包含落地节点组时生成）
     let landingGroupName = null;
-    if (landingProxies.length > 0 || rawLandingGroup) {
+    if ((chainEnabled && landingProxies.length > 0) || rawLandingGroup) {
       landingGroupName = '落地节点';
       chainGroups.push({
         name: landingGroupName,
