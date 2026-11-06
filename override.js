@@ -11,6 +11,12 @@
 // 适配 Bettbox 自定义配置参数
 const Compatible_With_Bettbox = { ruleOptionsEnable: true };
 
+// CDN 基础路径统一配置 (fastly.jsdelivr.net)
+const iconBaseUrl = 'https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Icons/svg/';
+const iconQureBaseUrl = 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/';
+const iconCustomBaseUrl = 'https://fastly.jsdelivr.net/gh/JesseHug/clash-override@master/Icons/svg/';
+const ruleSetBaseUrl = 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/';
+
 /**
  * 自定义配置选项
  * true = 启用
@@ -36,38 +42,40 @@ const ruleOptionsEnable = {
   IPTV: true,             // IPTV 直播源 (Cathy 等，默认直连)
 
   // 非分流策略配置
-  屏蔽国外QUIC: false,          // 屏蔽国外 QUIC 流量（防止视频卡顿）
+  极简国内外分流模式: false,      // 是否启用极简国内外分流模式
+  屏蔽代理QUIC流量: false,      // 是否屏蔽非国内目标的 QUIC 流量（防止视频卡顿）
   显示默认隐藏的策略组: false,  // 显示隐藏的地区 url-test 自动选择组
   生成地区自动选择组: true,     // 为每个地区生成隐藏的 url-test 自动选择组
   隐藏地区手动选择组: false,    // 隐藏地区 select 手动选择组（仍然存在，只是不显示）
   过滤高倍率节点: false,        // 全局排除高倍率节点（2x 及以上）
   一倍率归入低倍率: true,         // 将1x、1.0x等一倍率节点也归入低倍率组
-  生成倍率组: true,               // 是否生成低倍率/高倍率策略组（关闭后界面更简洁）
+  生成高低倍率组: true,         // 是否生成低倍率/高倍率策略组（关闭后界面更简洁）
   生成家宽节点组: true,         // 是否生成家宽（住宅/原生 IP）节点策略组
   过滤低倍率节点: false,        // 是否全局排除低倍率节点
   过滤重复节点: false,          // 是否按连接目标（服务器地址+端口）过滤重复节点
   过滤非地区节点: true,         // 过滤掉不属于任何地区的节点（Other 组中的杂项节点）
   代理IPV4优先: false,          // 开启后所有订阅节点强制 ipv4-prefer
   代理IPV6优先: false,          // 开启后所有订阅节点强制 ipv6-prefer（与上条互斥，同时开启则不生效）
+  链式代理: false,              // 是否启用链式代理（中转节点与落地节点策略组）
 };
 
 // 专门用于适配 Bettbox GUI 读取开关图标的定义
 const serviceConfigs = [
-  { name: 'Google', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Google.svg' },
-  { name: 'YouTube', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/YouTube.svg' },
-  { name: 'Spotify', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Spotify.svg' },
-  { name: 'Telegram', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Telegram.svg' },
-  { name: 'Games', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Steam.svg' },
-  { name: 'PayPal', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/PayPal.svg' },
-  { name: 'X', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Twitter.svg' },
-  { name: 'OpenAI', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/OpenAI.svg' },
-  { name: 'AI', icon: 'https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/AI.png' },
-  { name: 'Apple', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Apple.svg' },
-  { name: 'Netflix', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Netflix.svg' },
-  { name: 'Emby', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Emby.svg' },
-  { name: 'Meta', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Meta.svg' },
-  { name: 'FCM', icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Fcm.svg' },
-  { name: 'IPTV', icon: 'https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg' },
+  { name: 'Google', icon: `${iconBaseUrl}Google.svg` },
+  { name: 'YouTube', icon: `${iconBaseUrl}YouTube.svg` },
+  { name: 'Spotify', icon: `${iconBaseUrl}Spotify.svg` },
+  { name: 'Telegram', icon: `${iconBaseUrl}Telegram.svg` },
+  { name: 'Games', icon: `${iconBaseUrl}Steam.svg` },
+  { name: 'PayPal', icon: `${iconBaseUrl}PayPal.svg` },
+  { name: 'X', icon: `${iconBaseUrl}Twitter.svg` },
+  { name: 'OpenAI', icon: `${iconBaseUrl}OpenAI.svg` },
+  { name: 'AI', icon: `${iconQureBaseUrl}AI.png` },
+  { name: 'Apple', icon: `${iconBaseUrl}Apple.svg` },
+  { name: 'Netflix', icon: `${iconBaseUrl}Netflix.svg` },
+  { name: 'Emby', icon: `${iconBaseUrl}Emby.svg` },
+  { name: 'Meta', icon: `${iconBaseUrl}Meta.svg` },
+  { name: 'FCM', icon: `${iconBaseUrl}Fcm.svg` },
+  { name: 'IPTV', icon: `${iconCustomBaseUrl}IPTV.svg` },
 ];
 
 /**
@@ -133,13 +141,13 @@ function toMatchableName(name) {
 }
 
 const regionMappings = [
-  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/HongKong.svg" },
-  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Singapore.svg" },
-  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Taiwan.svg" },
-  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Japan.svg" },
-  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|美西|美东|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/America.svg" },
-  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/Macao.png" },
-  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color/European_Union.png" }
+  { key: "HK", flag: "🇭🇰", regex: /🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|Hong\s*Kong/i, icon: `${iconBaseUrl}HongKong.svg` },
+  { key: "SG", flag: "🇸🇬", regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|Singapore/i, icon: `${iconBaseUrl}Singapore.svg` },
+  { key: "TW", flag: "🇹🇼", regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?:N)?(?![A-Za-z])|Taiwan/i, icon: `${iconBaseUrl}Taiwan.svg` },
+  { key: "JP", flag: "🇯🇵", regex: /🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|Japan/i, icon: `${iconBaseUrl}Japan.svg` },
+  { key: "US", flag: "🇺🇸", regex: /🇺🇸|美国|美西|美东|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|(?<![A-Za-z])USA?(?![A-Za-z])|America|United\s*States/i, icon: `${iconBaseUrl}America.svg` },
+  { key: "MO", flag: "🇲🇴", regex: /🇲🇴|澳门|(?<![A-Za-z])(?:MO|MAC)(?![A-Za-z])|Macao|Macau/i, icon: `${iconQureBaseUrl}Macao.png` },
+  { key: "EU", flag: "🇪🇺", regex: /🇪🇺|法国|德国|英国|荷兰|意大利|西班牙|匈牙利|乌克兰|(?<![A-Za-z])(?:FR|DE|GB|UK|NL|EU|IT|ES|HU|UA)(?![A-Za-z])|Europe|Frankfurt|London|Paris|Amsterdam|Milan|Madrid|Kyiv/i, icon: `${iconQureBaseUrl}European_Union.png` }
 ];
 
 // --- 域名匹配工具函数 ---
@@ -178,12 +186,114 @@ function matchDomainPattern(pattern, domains) {
   });
 }
 
+/**
+ * 预编译节点域名集合，返回「规则模式 → 是否命中」的匹配函数。
+ * 精确 / `+.` / `.` 三类模式查预建集合；通配模式按「段数 + 通配位之后的固定后缀」分组后逐段比对，
+ * 避免每个模式都遍历一遍整个域名集合（节点多时由 O(模式 × 域名) 降为近似 O(模式)）
+ */
+function createDomainMatcher(domains) {
+  const exact = new Set();
+  const suffixes = new Set();
+  const properSuffixes = new Set();
+  const splitDomains = [];
+
+  for (const raw of domains) {
+    const domain = raw.toLowerCase();
+    if (exact.has(domain)) continue;
+    exact.add(domain);
+    const parts = domain.split('.');
+    splitDomains.push(parts);
+    suffixes.add(domain);
+    for (let i = 1; i < parts.length; i++) {
+      const suffix = parts.slice(i).join('.');
+      suffixes.add(suffix);
+      properSuffixes.add(suffix);
+    }
+  }
+
+  let wildcardIndex = null;
+  const candidatesOf = (key) => {
+    if (!wildcardIndex) {
+      wildcardIndex = new Map();
+      for (const parts of splitDomains) {
+        for (let i = 0; i <= parts.length; i++) {
+          const indexKey = `${parts.length}:${parts.slice(i).join('.')}`;
+          const list = wildcardIndex.get(indexKey);
+          if (list) list.push(parts);
+          else wildcardIndex.set(indexKey, [parts]);
+        }
+      }
+    }
+    return wildcardIndex.get(key) || [];
+  };
+
+  return (rawPattern) => {
+    const pattern = String(rawPattern).toLowerCase();
+    if (pattern.startsWith('+.')) return suffixes.has(pattern.slice(2));
+    if (pattern.startsWith('.')) return properSuffixes.has(pattern.slice(1));
+    if (!pattern.includes('*')) return exact.has(pattern);
+
+    const patternParts = pattern.split('.');
+    const key = `${patternParts.length}:${patternParts.slice(patternParts.lastIndexOf('*') + 1).join('.')}`;
+    return candidatesOf(key).some((parts) =>
+      patternParts.every((part, index) => part === '*' || part === parts[index]),
+    );
+  };
+}
+
 // hosts 匹配优先级：精确 > +. > . > *（同级按出现顺序）
 function hostSpecificity(pattern) {
   if (pattern.startsWith('+.')) return 2;
   if (pattern.startsWith('.')) return 1;
   if (pattern.includes('*')) return 0;
   return 3;
+}
+
+/**
+ * 预编译 hosts 条目，返回「域名 → 命中条目」的查找函数。
+ * 精确 / `+.` / `.` 三类按模式建索引，通配模式保底逐个比对；
+ * 同类型命中时取 hosts 中靠前者，与「按优先级排序后线性查找」的结果保持一致。
+ * 入参需已按 hostSpecificity 降序排列（同一键只保留最先出现的一条）
+ */
+function createHostFinder(hostEntries) {
+  const exact = new Map();
+  const plus = new Map();
+  const dot = new Map();
+  const wildcards = [];
+
+  hostEntries.forEach((entry, index) => {
+    const pattern = entry[0].toLowerCase();
+    const level = hostSpecificity(pattern);
+    if (level === 0) {
+      wildcards.push(entry);
+      return;
+    }
+    const [map, key] =
+      level === 3 ? [exact, pattern] : level === 2 ? [plus, pattern.slice(2)] : [dot, pattern.slice(1)];
+    if (!map.has(key)) map.set(key, { entry, index });
+  });
+
+  const firstOf = (map, keys) => {
+    let found = null;
+    for (const key of keys) {
+      const item = map.get(key);
+      if (item && (!found || item.index < found.index)) found = item;
+    }
+    return found?.entry;
+  };
+
+  return (domain) => {
+    const exactEntry = exact.get(domain)?.entry;
+    if (exactEntry) return exactEntry;
+
+    const parts = domain.split('.');
+    const suffixes = parts.map((_, i) => parts.slice(i).join('.'));
+    return (
+      firstOf(plus, suffixes) ??
+      firstOf(dot, suffixes.slice(1)) ??
+      wildcards.find(([pattern]) => matchDomainPattern(pattern, domain))
+    );
+  };
 }
 
 // 根据订阅 hosts 映射改写节点 server，改写后无需再复制 hosts 进新配置。
@@ -207,6 +317,7 @@ function applyHostsToProxies(proxies, hosts) {
     return typeof value === 'string' && value.length > 0 ? value : null;
   };
 
+  const findHost = createHostFinder(hostEntries);
   // 解析结果缓存：相同节点域名只解析一次，后续直接复用
   const resolveCache = new Map();
 
@@ -220,7 +331,7 @@ function applyHostsToProxies(proxies, hosts) {
     let result = server;
     while (!seen.has(current)) {
       seen.add(current);
-      const entry = hostEntries.find(([pattern]) => matchDomainPattern(pattern, current));
+      const entry = findHost(current);
       const target = entry && targetOf(entry[1]);
       if (!target) break;
       result = target;
@@ -345,20 +456,24 @@ function filterAndNormalizeProxies(config) {
   const originalGroups = config['proxy-groups'] || [];
   const originalGroupMap = new Map(originalGroups.map(g => [g.name, g]));
 
-  // 识别参与链式代理的节点集合（自身有 dialer-proxy，或作为目标被 dialer-proxy 引用，或在原始链式策略组中）
-  const rawLandingNodes = originalProxies.filter(p => Boolean(p && p['dialer-proxy']));
+  const chainEnabled = Boolean(ruleOptionsEnable.链式代理);
+
+  // 识别参与链式代理的节点集合（仅在链式代理开启时生效）
+  const rawLandingNodes = chainEnabled ? originalProxies.filter(p => Boolean(p && p['dialer-proxy'])) : [];
   const rawDialerTargets = new Set(rawLandingNodes.map(p => p['dialer-proxy']));
-  const rawRelayGroup = originalGroupMap.get('中转节点');
-  const rawLandingGroup = originalGroupMap.get('落地节点');
+  const rawRelayGroup = chainEnabled ? originalGroupMap.get('中转节点') : null;
+  const rawLandingGroup = chainEnabled ? originalGroupMap.get('落地节点') : null;
 
   const chainNodeNames = new Set();
-  for (const p of rawLandingNodes) chainNodeNames.add(p.name);
-  for (const t of rawDialerTargets) chainNodeNames.add(t);
-  if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
-    for (const n of rawRelayGroup.proxies) chainNodeNames.add(n);
-  }
-  if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
-    for (const n of rawLandingGroup.proxies) chainNodeNames.add(n);
+  if (chainEnabled) {
+    for (const p of rawLandingNodes) chainNodeNames.add(p.name);
+    for (const t of rawDialerTargets) chainNodeNames.add(t);
+    if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
+      for (const n of rawRelayGroup.proxies) chainNodeNames.add(n);
+    }
+    if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
+      for (const n of rawLandingGroup.proxies) chainNodeNames.add(n);
+    }
   }
 
   const builtinTypes = new Set(['direct', 'reject', 'rematch']);
@@ -433,10 +548,17 @@ function filterAndNormalizeProxies(config) {
     '链式中转'
   ]);
 
-  // 修复 dialer-proxy 引用：节点被重命名或移除后，更新/删除引用，避免内核报错
+  // 修复 dialer-proxy 引用：
+  // 若未启用链式代理，移除所有节点的 dialer-proxy，避免内核报错；
+  // 若启用链式代理，节点被重命名或移除后，更新/删除引用，避免内核报错
   let proxies = deduplicatedProxies.map(proxy => {
     const target = proxy['dialer-proxy'];
     if (!target) return proxy;
+    if (!chainEnabled) {
+      const copy = { ...proxy };
+      delete copy['dialer-proxy'];
+      return copy;
+    }
     // 目标节点被重命名 → 更新引用
     if (renameMap.has(target)) return { ...proxy, 'dialer-proxy': renameMap.get(target) };
     // 目标节点存活且未重命名 → 引用依然有效
@@ -473,8 +595,8 @@ function filterAndNormalizeProxies(config) {
     return 0;
   });
 
-  // 探测并构建链式代理策略组信息（FLYX 或自定义链式）
-  const hasChain = rawRelayGroup || rawLandingGroup || proxies.some(p => Boolean(p['dialer-proxy']));
+  // 探测并构建链式代理策略组信息（仅在链式代理开启时生效）
+  const hasChain = chainEnabled && (rawRelayGroup || rawLandingGroup || proxies.some(p => Boolean(p['dialer-proxy'])));
   let chainInfo = null;
 
   if (hasChain) {
@@ -515,7 +637,7 @@ function filterAndNormalizeProxies(config) {
       chainGroups.push({
         name: '中转节点',
         type: 'select',
-        icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Bypass.svg',
+        icon: `${iconBaseUrl}Bypass.svg`,
         proxies: relayProxies.length > 0 ? relayProxies : ['DIRECT']
       });
     }
@@ -527,7 +649,7 @@ function filterAndNormalizeProxies(config) {
       chainGroups.push({
         name: landingGroupName,
         type: 'select',
-        icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Server.svg',
+        icon: `${iconBaseUrl}Server.svg`,
         proxies: landingProxies.length > 0 ? landingProxies : ['DIRECT']
       });
     }
@@ -632,6 +754,8 @@ function buildDnsAndHostsConfig(config, proxies) {
       .filter((server) => !isIpAddress(server)),
   );
 
+  const matchProxyDomain = createDomainMatcher(proxyDomains);
+
   // 命中触发条件时，私有 DNS 提取时直接置空，避免本地监听 DNS 被误留为私有 DNS
   const privateProxyServerNameservers = shouldRewriteByHosts ? [] : proxyServerNameservers;
 
@@ -655,7 +779,7 @@ function buildDnsAndHostsConfig(config, proxies) {
   const matchedProxyPolicy = Object.fromEntries(
     [originalDnsConfig['nameserver-policy'] ?? {}, originalDnsConfig['proxy-server-nameserver-policy'] ?? {}]
       .flatMap(Object.entries)
-      .filter(([domain]) => matchDomainPattern(domain, proxyDomains))
+      .filter(([domain]) => matchProxyDomain(domain))
       .map(([domain, dns]) => [
         domain,
         Array.isArray(dns) ? dns.map(stripDnsSuffix).filter((d) => d.length > 0) : stripDnsSuffix(dns),
@@ -680,7 +804,7 @@ function buildDnsAndHostsConfig(config, proxies) {
 
   // 继承机场自带的 fake-ip-filter（部分机场节点域名需走真实 IP 解析）
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] ?? [];
-  const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => matchDomainPattern(String(pattern), proxyDomains));
+  const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => matchProxyDomain(String(pattern)));
 
   const chinaDNS = ['223.5.5.5#DIRECT', '119.29.29.29#DIRECT'];
   const foreignDNS = ['https://cloudflare-dns.com/dns-query#Proxies', 'https://dns.google/dns-query#Proxies'];
@@ -733,11 +857,15 @@ function buildDnsAndHostsConfig(config, proxies) {
 }
 
 // 处理自定义节点：标准化名称、与订阅节点重名时添加前缀、内部去重，
-// 并构建"自建节点"策略组。
+// 并构建"自建节点"或"链式落地"策略组。
 // 自定义节点不参与订阅节点过滤，也不参与 hosts 改写及 DNS 域名处理
 function buildCustomizeGroups(filteredProxies) {
+  const chainEnabled = Boolean(ruleOptionsEnable.链式代理);
+  const customGroupName = chainEnabled ? '链式落地' : '自建节点';
+  const dialerProxyName = '链式中转';
+
   if (!customizeProxies.length) {
-    return { customProxies: [], customProxyNames: [], customGroup: null };
+    return { customProxies: [], customProxyNames: [], customGroup: null, customChainGroup: null, customGroupName };
   }
 
   const usedNames = new Set(filteredProxies.map((p) => p.name));
@@ -761,20 +889,37 @@ function buildCustomizeGroups(filteredProxies) {
     }
     usedNames.add(name);
 
-    customList.push(name === proxy.name ? proxy : { ...proxy, name });
+    const normalizedProxy = name === proxy.name ? proxy : { ...proxy, name };
+    customList.push(
+      chainEnabled
+        ? { ...normalizedProxy, 'dialer-proxy': dialerProxyName }
+        : normalizedProxy,
+    );
   }
 
   const customGroup = {
-    name: '自建节点',
+    name: customGroupName,
     type: 'select',
     proxies: customList.map((p) => p.name),
-    icon: 'https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg/Server.svg',
+    icon: `${iconBaseUrl}Server.svg`,
   };
+
+  const filteredProxyNames = filteredProxies.map((p) => p.name);
+  const customChainGroup = chainEnabled
+    ? {
+        name: dialerProxyName,
+        type: 'select',
+        icon: `${iconBaseUrl}Bypass.svg`,
+        proxies: filteredProxyNames.length > 0 ? filteredProxyNames : ['DIRECT'],
+      }
+    : null;
 
   return {
     customProxies: customList,
     customProxyNames: customList.map((p) => p.name),
     customGroup,
+    customChainGroup,
+    customGroupName,
   };
 }
 
@@ -791,7 +936,7 @@ function buildRegionGroups(proxies, customProxies) {
 
   const healthCheckUrl = "https://www.apple.com/library/test/success.html";
   const autoBaseOption = { type: "url-test", url: healthCheckUrl, interval: 300, tolerance: 50, lazy: true, timeout: 3000, "max-failed-times": 3, "exclude-type": "DIRECT", "empty-fallback": "REJECT" };
-  const ico = "https://cdn.jsdmirror.com/gh/Koolson/Qure@master/IconSet/Color";
+  const ico = iconQureBaseUrl.slice(0, -1);
 
   const regionGroups = [];
   const regionAutoGroups = [];
@@ -824,7 +969,8 @@ function buildRegionGroups(proxies, customProxies) {
     regionGroups.push({ name: "Other", type: "select", icon: `${ico}/Europe_Map.png`, proxies: otherGroupProxies, ...(ruleOptionsEnable.隐藏地区手动选择组 ? { hidden: true } : {}) });
   }
 
-  if (ruleOptionsEnable.生成倍率组) {
+  const generateRateGroupEnabled = ruleOptionsEnable.生成高低倍率组 ?? ruleOptionsEnable.生成倍率组;
+  if (generateRateGroupEnabled) {
     const finalLowRateRegex = ruleOptionsEnable.一倍率归入低倍率 
       ? new RegExp(`^(?!.*(?:剩|期|客户端|软件))(?!.*(?:${highRateRegex.source})).*$`, 'i') 
       : lowRateRegex;
@@ -833,12 +979,12 @@ function buildRegionGroups(proxies, customProxies) {
     if (nodesLowRate[0] !== "DIRECT") {
       activeRegions.push("低倍率节点");
       regionAutoGroups.push({ name: "低倍率节点-自动选择", proxies: nodesLowRate, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "低倍率节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png", proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
+      regionGroups.push({ name: "低倍率节点", type: "select", icon: "https://fastly.jsdelivr.net/gh/lixing0016/lige-icon@main/icon/05icon/liuliang(4).png", proxies: ["低倍率节点-自动选择", ...nodesLowRate] });
     }
     if (nodesHighRate[0] !== "DIRECT") {
       activeRegions.push("高倍率节点");
       regionAutoGroups.push({ name: "高倍率节点-自动选择", proxies: nodesHighRate, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "高倍率节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png", proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
+      regionGroups.push({ name: "高倍率节点", type: "select", icon: "https://fastly.jsdelivr.net/gh/lixing0016/lige-icon@main/icon/05icon/lightning(2).png", proxies: ["高倍率节点-自动选择", ...nodesHighRate] });
     }
   }
 
@@ -847,7 +993,7 @@ function buildRegionGroups(proxies, customProxies) {
     if (nodesHome[0] !== "DIRECT") {
       activeRegions.push("家宽节点");
       regionAutoGroups.push({ name: "家宽节点-自动选择", proxies: nodesHome, hidden: true, ...autoBaseOption });
-      regionGroups.push({ name: "家宽节点", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/Home.svg", proxies: ["家宽节点-自动选择", ...nodesHome] });
+      regionGroups.push({ name: "家宽节点", type: "select", icon: `${iconCustomBaseUrl}Home.svg`, proxies: ["家宽节点-自动选择", ...nodesHome] });
     }
   }
 
@@ -858,69 +1004,77 @@ function buildProxyGroups(regionData, customInfo) {
   const { regionGroups, regionAutoGroups, activeRegions, coreRegions, pNames, autoBaseOption, ico } = regionData;
   const customProxyNames = (customInfo && customInfo.customProxyNames) || [];
   const customGroup = (customInfo && customInfo.customGroup) || null;
+  const customChainGroup = (customInfo && customInfo.customChainGroup) || null;
+  const customGroupName = (customInfo && customInfo.customGroupName) || null;
   const chainInfo = (customInfo && customInfo.chainInfo) || null;
   const masterName = "Auto";
 
   const allProxiesNames = [...pNames, ...customProxyNames];
 
-  const icoSvg = "https://cdn.jsdmirror.com/gh/AIsouler/MyClash@main/Icons/svg";
+  const landingGroups = [];
+  if (chainInfo && chainInfo.landingGroupName) landingGroups.push(chainInfo.landingGroupName);
+  if (customGroup && customGroupName === '链式落地') landingGroups.push(customGroupName);
 
-  const landingGroupName = chainInfo && chainInfo.landingGroupName;
   const chainGroups = (chainInfo && chainInfo.chainGroups) || [];
 
-  const buildGroup = (name, iconTarget, groupProxies, extra) => {
-    if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions];
-    if (!extra) extra = {};
+  const buildGroup = (name, iconTarget, groupProxies, extra = {}) => {
+    if (!groupProxies) groupProxies = ["Proxies", "默认代理", ...landingGroups, ...activeRegions];
     const icon = iconTarget.startsWith("http") ? iconTarget : `${ico}/${iconTarget}.png`;
-    return { name, type: "select", icon, proxies: groupProxies, ...extra };
+    const res = { name, type: "select", icon, proxies: groupProxies, ...extra };
+    if (res['default-selected'] !== undefined && !groupProxies.includes(res['default-selected'])) {
+      delete res['default-selected'];
+    }
+    return res;
   };
 
   const defaultProxyGroup = {
     name: "默认代理",
     type: "select",
-    icon: `${icoSvg}/Global.svg`,
+    icon: `${iconBaseUrl}Global.svg`,
     proxies: allProxiesNames.length > 0 ? allProxiesNames : ["DIRECT"]
   };
 
   const proxiesList = [
     masterName,
     "默认代理",
-    ...(landingGroupName ? [landingGroupName] : []),
+    ...landingGroups,
     ...activeRegions
   ];
 
   const groups = [
-    buildGroup("Proxies", `${icoSvg}/Proxy.svg`, proxiesList),
-    ...chainGroups, // 优先展示【落地节点】与【中转节点】策略组
-    ...(ruleOptionsEnable.Google ? [buildGroup("Google", `${icoSvg}/Google.svg`)] : []),
-    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", `${icoSvg}/YouTube.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "MO" })] : []),
-    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", `${icoSvg}/Spotify.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "TW" })] : []),
-    ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${icoSvg}/Telegram.svg`)] : []),
-    ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${icoSvg}/Steam.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
-    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${icoSvg}/PayPal.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
-    ...(ruleOptionsEnable.X ? [buildGroup("X", `${icoSvg}/Twitter.svg`)] : []),
-    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${icoSvg}/OpenAI.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], { "default-selected": "US" })] : []),
-    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${icoSvg}/Apple.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${icoSvg}/Netflix.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${icoSvg}/Emby.svg`, ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
-    ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${icoSvg}/Meta.svg`, ["Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions])] : []),
-    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${icoSvg}/Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], "default-selected": "直连" }] : []),
-    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: "https://cdn.jsdmirror.com/gh/JesseHug/clash-override@master/Icons/svg/IPTV.svg", proxies: ["直连", "Proxies", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions], "default-selected": "直连" }] : []),
+    buildGroup("Proxies", `${iconBaseUrl}Proxy.svg`, proxiesList),
+    ...chainGroups, // FLYX【落地节点】与【中转节点】策略组
+    ...(customGroup && customGroupName === '链式落地' ? [customGroup] : []), // 自建链式落地组
+    ...(customChainGroup ? [customChainGroup] : []), // 自建链式中转组
+    ...(ruleOptionsEnable.Google ? [buildGroup("Google", `${iconBaseUrl}Google.svg`)] : []),
+    ...(ruleOptionsEnable.YouTube ? [buildGroup("YouTube", `${iconBaseUrl}YouTube.svg`, ["Proxies", "默认代理", ...landingGroups, ...activeRegions], { "default-selected": "MO" })] : []),
+    ...(ruleOptionsEnable.Spotify ? [buildGroup("Spotify", `${iconBaseUrl}Spotify.svg`, ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions], { "default-selected": "TW" })] : []),
+    ...(ruleOptionsEnable.Telegram ? [buildGroup("Telegram", `${iconBaseUrl}Telegram.svg`)] : []),
+    ...(ruleOptionsEnable.Games ? [buildGroup("Games", `${iconBaseUrl}Steam.svg`, ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions])] : []),
+    ...(ruleOptionsEnable.PayPal ? [buildGroup("PayPal", `${iconBaseUrl}PayPal.svg`, ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions])] : []),
+    ...(ruleOptionsEnable.X ? [buildGroup("X", `${iconBaseUrl}Twitter.svg`)] : []),
+    ...(ruleOptionsEnable.OpenAI ? [buildGroup("OpenAI", `${iconBaseUrl}OpenAI.svg`, ["Proxies", "默认代理", ...landingGroups, ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.AI ? [buildGroup("AI", "AI", ["Proxies", "默认代理", ...landingGroups, ...activeRegions], { "default-selected": "US" })] : []),
+    ...(ruleOptionsEnable.Apple ? [buildGroup("Apple", `${iconBaseUrl}Apple.svg`, ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Netflix ? [buildGroup("Netflix", `${iconBaseUrl}Netflix.svg`, ["Proxies", "默认代理", ...landingGroups, ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Emby ? [buildGroup("Emby", `${iconBaseUrl}Emby.svg`, ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions])] : []),
+    ...(ruleOptionsEnable.Meta ? [buildGroup("Meta", `${iconBaseUrl}Meta.svg`, ["Proxies", "默认代理", ...landingGroups, ...activeRegions])] : []),
+    ...(ruleOptionsEnable.FCM ? [{ name: "FCM", type: "select", icon: `${iconBaseUrl}Fcm.svg`, proxies: ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions], ...(["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions].includes("直连") ? { "default-selected": "直连" } : {}) }] : []),
+    ...(ruleOptionsEnable.IPTV ? [{ name: "IPTV", type: "select", icon: `${iconCustomBaseUrl}IPTV.svg`, proxies: ["直连", "Proxies", "默认代理", ...landingGroups, ...activeRegions], ...(["直连", "Proxies", "默认代理", ...landingGroups, ...activeRegions].includes("直连") ? { "default-selected": "直连" } : {}) }] : []),
     
     // Final 策略组加入所有 activeRegions
-    buildGroup("Final", "Final", ["Proxies", "直连", "默认代理", ...(landingGroupName ? [landingGroupName] : []), ...activeRegions]),
+    buildGroup("Final", "Final", ["Proxies", "直连", "默认代理", ...landingGroups, ...activeRegions]),
 
     {
       name: "直连",
       type: "select",
-      icon: `${icoSvg}/China.svg`,
+      icon: `${iconBaseUrl}China.svg`,
       proxies: [...directProxies.map(p => p.name)]
     },
 
-    { name: masterName, icon: `${icoSvg}/Auto.svg`, proxies: coreRegions, ...autoBaseOption },
+    { name: masterName, icon: `${iconBaseUrl}Auto.svg`, proxies: coreRegions, ...autoBaseOption },
     defaultProxyGroup,
-    ...(customGroup ? [customGroup] : []),
+    ...(customGroup && customGroupName !== '链式落地' ? [customGroup] : []),
     ...regionGroups,
     ...regionAutoGroups
   ];
@@ -977,82 +1131,82 @@ function main(config) {
   const { activeRegions } = regionData;
   newConfig["proxy-groups"] = buildProxyGroups(regionData, { customProxyNames: customProxyNames, customGroup: customGroup, chainInfo: chainInfo });
 
-  // --- Rule Providers (优先 bett-rules，EmbyIP 保留 666OS) ---
+  // --- Rule Providers (优先 bett-rules) ---
   const mrs = { type: "http", behavior: "domain", format: "mrs", interval: 86400 };
   const mrsIP = { type: "http", behavior: "ipcidr", format: "mrs", interval: 86400 };
-  const rBett = "https://cdn.jsdmirror.com/gh/appshubcc/bett-rules@meta";
-  const r66 = "https://cdn.jsdmirror.com/gh/666OS/rules@release/mihomo";
 
   newConfig["rule-providers"] = {
-    Private: { ...mrs, url: `${rBett}/geo/geosite/private.mrs`, path: "./rules/Private.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
-    ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${rBett}/geo/geosite/youtube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
+    Private: { ...mrs, url: `${ruleSetBaseUrl}geosite/private.mrs`, path: "./rules/Private.mrs", "path-in-bundle": "geo/geosite/private.mrs" },
+    ...(ruleOptionsEnable.YouTube ? { YouTube: { ...mrs, url: `${ruleSetBaseUrl}geosite/youtube.mrs`, path: "./rules/YouTube.mrs" } } : {}),
     ...(ruleOptionsEnable.Spotify ? {
-      Spotify: { ...mrs, url: `${rBett}/geo/geosite/spotify.mrs`, path: "./rules/Spotify.mrs" },
-      SpotifyIP: { ...mrsIP, url: `${rBett}/geo/geoip/spotify.mrs`, path: "./rules/SpotifyIP.mrs" }
+      Spotify: { ...mrs, url: `${ruleSetBaseUrl}geosite/spotify.mrs`, path: "./rules/Spotify.mrs" },
+      SpotifyIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/spotify.mrs`, path: "./rules/SpotifyIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Telegram ? {
-      Telegram: { ...mrs, url: `${rBett}/geo/geosite/telegram.mrs`, path: "./rules/Telegram.mrs" },
-      TelegramIP: { ...mrsIP, url: `${rBett}/geo/geoip/telegram.mrs`, path: "./rules/TelegramIP.mrs" }
+      Telegram: { ...mrs, url: `${ruleSetBaseUrl}geosite/telegram.mrs`, path: "./rules/Telegram.mrs" },
+      TelegramIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/telegram.mrs`, path: "./rules/TelegramIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Games ? {
-      GamesCN: { ...mrs, url: `${rBett}/geo/geosite/category-games@cn.mrs`, path: "./rules/GamesCN.mrs" },
-      Games: { ...mrs, url: `${rBett}/geo/geosite/category-games-!cn.mrs`, path: "./rules/Games.mrs" },
-      SteamIP: { ...mrsIP, url: `${rBett}/geo/geoip/steam.mrs`, path: "./rules/SteamIP.mrs", "path-in-bundle": "geo/geoip/steam.mrs" }
+      GamesCN: { ...mrs, url: `${ruleSetBaseUrl}geosite/category-games@cn.mrs`, path: "./rules/GamesCN.mrs" },
+      Games: { ...mrs, url: `${ruleSetBaseUrl}geosite/category-games-!cn.mrs`, path: "./rules/Games.mrs" },
+      SteamIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/steam.mrs`, path: "./rules/SteamIP.mrs", "path-in-bundle": "geo/geoip/steam.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${rBett}/geo/geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
+    ...(ruleOptionsEnable.PayPal ? { PayPal: { ...mrs, url: `${ruleSetBaseUrl}geosite/paypal.mrs`, path: "./rules/PayPal.mrs" } } : {}),
     ...(ruleOptionsEnable.X ? {
-      Twitter: { ...mrs, url: `${rBett}/geo/geosite/twitter.mrs`, path: "./rules/Twitter.mrs" },
-      TwitterIP: { ...mrsIP, url: `${rBett}/geo/geoip/twitter.mrs`, path: "./rules/TwitterIP.mrs" }
+      Twitter: { ...mrs, url: `${ruleSetBaseUrl}geosite/twitter.mrs`, path: "./rules/Twitter.mrs" },
+      TwitterIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/twitter.mrs`, path: "./rules/TwitterIP.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${rBett}/geo/geosite/openai.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
+    ...(ruleOptionsEnable.OpenAI ? { OpenAI: { ...mrs, url: `${ruleSetBaseUrl}geosite/openai.mrs`, path: "./rules/OpenAI.mrs" } } : {}),
     ...(ruleOptionsEnable.AI ? {
-      AI: { ...mrs, url: `${rBett}/geo/geosite/category-ai-!cn.mrs`, path: "./rules/AI.mrs" },
-      AIIP: { ...mrsIP, url: `${rBett}/geo/geoip/ai.mrs`, path: "./rules/AIIP.mrs" }
+      AI: { ...mrs, url: `${ruleSetBaseUrl}geosite/category-ai-!cn.mrs`, path: "./rules/AI.mrs" },
+      AIIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/ai.mrs`, path: "./rules/AIIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Apple ? {
-      AppleCN: { ...mrs, url: `${rBett}/geo/geosite/apple@cn.mrs`, path: "./rules/AppleCN.mrs" },
-      Apple: { ...mrs, url: `${rBett}/geo/geosite/apple.mrs`, path: "./rules/Apple.mrs" },
-      AppleIP: { ...mrsIP, url: `${rBett}/geo/geoip/apple.mrs`, path: "./rules/AppleIP.mrs", "path-in-bundle": "geo/geoip/apple.mrs" }
+      AppleCN: { ...mrs, url: `${ruleSetBaseUrl}geosite/apple@cn.mrs`, path: "./rules/AppleCN.mrs" },
+      Apple: { ...mrs, url: `${ruleSetBaseUrl}geosite/apple.mrs`, path: "./rules/Apple.mrs" },
+      AppleIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/apple.mrs`, path: "./rules/AppleIP.mrs", "path-in-bundle": "geo/geoip/apple.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Netflix ? {
-      Netflix: { ...mrs, url: `${rBett}/geo/geosite/netflix.mrs`, path: "./rules/Netflix.mrs" },
-      NetflixIP: { ...mrsIP, url: `${rBett}/geo/geoip/netflix.mrs`, path: "./rules/NetflixIP.mrs" }
+      Netflix: { ...mrs, url: `${ruleSetBaseUrl}geosite/netflix.mrs`, path: "./rules/Netflix.mrs" },
+      NetflixIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/netflix.mrs`, path: "./rules/NetflixIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Emby ? {
-      Emby: { ...mrs, url: `${rBett}/geo/geosite/category-emby.mrs`, path: "./rules/Emby.mrs" },
-      EmbyIP: { ...mrsIP, url: `${r66}/ip/Emby.mrs`, path: "./rules/EmbyIP.mrs" }
+      Emby: { ...mrs, url: `${ruleSetBaseUrl}geosite/category-emby.mrs`, path: "./rules/Emby.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Meta ? {
-      Meta: { ...mrs, url: `${rBett}/geo/geosite/meta.mrs`, path: "./rules/Meta.mrs" },
-      MetaIP: { ...mrsIP, url: `${rBett}/geo/geoip/facebook.mrs`, path: "./rules/MetaIP.mrs" }
+      Meta: { ...mrs, url: `${ruleSetBaseUrl}geosite/meta.mrs`, path: "./rules/Meta.mrs" },
+      MetaIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/facebook.mrs`, path: "./rules/MetaIP.mrs" }
     } : {}),
     ...(ruleOptionsEnable.Google ? {
-      Google: { ...mrs, url: `${rBett}/geo/geosite/google.mrs`, path: "./rules/Google.mrs" },
-      GoogleIP: { ...mrsIP, url: `${rBett}/geo/geoip/google.mrs`, path: "./rules/GoogleIP.mrs" },
-      Gemini: { ...mrs, url: `${rBett}/geo/geosite/google-gemini.mrs`, path: "./rules/Gemini.mrs" }
+      Google: { ...mrs, url: `${ruleSetBaseUrl}geosite/google.mrs`, path: "./rules/Google.mrs" },
+      GoogleIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/google.mrs`, path: "./rules/GoogleIP.mrs" },
+      Gemini: { ...mrs, url: `${ruleSetBaseUrl}geosite/google-gemini.mrs`, path: "./rules/Gemini.mrs" }
     } : {}),
-    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${rBett}/geo/geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
-    MicrosoftCN: { ...mrs, url: `${rBett}/geo/geosite/microsoft@cn.mrs`, path: "./rules/MicrosoftCN.mrs" },
-    NvidiaCN: { ...mrs, url: `${rBett}/geo/geosite/nvidia@cn.mrs`, path: "./rules/NvidiaCN.mrs" },
-    Synology: { ...mrs, url: `${rBett}/geo/geosite/synology.mrs`, path: "./rules/Synology.mrs" },
-    'geolocation-!cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-!cn.mrs`, path: "./rules/geolocation-!cn.mrs" },
-    'geolocation-cn': { ...mrs, url: `${rBett}/geo/geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
-    ChinaIP: { ...mrsIP, url: `${rBett}/geo/geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
-    PrivateIP: { ...mrsIP, url: `${rBett}/geo/geoip/private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
-    fakeip_filter: { ...mrs, url: `${rBett}/geo/geosite/fakeip-filter.mrs`, path: "./rules/fakeip_filter.mrs", "path-in-bundle": "geo/geosite/fakeip-filter.mrs" },
-    cn: { ...mrs, url: `${rBett}/geo/geosite/cn.mrs`, path: "./rules/cn.mrs" },
-    douyin: { ...mrs, url: `${rBett}/geo/geosite/douyin.mrs`, path: "./rules/douyin.mrs", "path-in-bundle": "geo/geosite/douyin.mrs" },
+    ...(ruleOptionsEnable.FCM ? { GoogleFCM: { ...mrs, url: `${ruleSetBaseUrl}geosite/googlefcm.mrs`, path: "./rules/googlefcm.mrs", "path-in-bundle": "geo/geosite/googlefcm.mrs" } } : {}),
+    MicrosoftCN: { ...mrs, url: `${ruleSetBaseUrl}geosite/microsoft@cn.mrs`, path: "./rules/MicrosoftCN.mrs" },
+    NvidiaCN: { ...mrs, url: `${ruleSetBaseUrl}geosite/nvidia@cn.mrs`, path: "./rules/NvidiaCN.mrs" },
+    Synology: { ...mrs, url: `${ruleSetBaseUrl}geosite/synology.mrs`, path: "./rules/Synology.mrs" },
+    'geolocation-!cn': { ...mrs, url: `${ruleSetBaseUrl}geosite/geolocation-!cn.mrs`, path: "./rules/geolocation-!cn.mrs" },
+    'geolocation-cn': { ...mrs, url: `${ruleSetBaseUrl}geosite/geolocation-cn.mrs`, path: "./rules/geolocation-cn.mrs" },
+    ChinaIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/cn.mrs`, path: "./rules/ChinaIP.mrs" },
+    PrivateIP: { ...mrsIP, url: `${ruleSetBaseUrl}geoip/private.mrs`, path: "./rules/PrivateIP.mrs", "path-in-bundle": "geo/geoip/private.mrs" },
+    fakeip_filter: { ...mrs, url: `${ruleSetBaseUrl}geosite/fakeip-filter.mrs`, path: "./rules/fakeip_filter.mrs", "path-in-bundle": "geo/geosite/fakeip-filter.mrs" },
+    cn: { ...mrs, url: `${ruleSetBaseUrl}geosite/cn.mrs`, path: "./rules/cn.mrs" },
+    douyin: { ...mrs, url: `${ruleSetBaseUrl}geosite/douyin.mrs`, path: "./rules/douyin.mrs", "path-in-bundle": "geo/geosite/douyin.mrs" },
     ...(ruleOptionsEnable.IPTV ? {
-      cathy_domain: { ...mrs, url: "https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_domain.mrs", path: "./rules/cathy_domain.mrs" },
-      cathy_ip: { ...mrsIP, url: "https://cdn.jsdmirror.com/gh/marcuccilli/Cathy@main/cathy_mihomo_ipcidr.mrs", path: "./rules/cathy_ip.mrs" },
-      iptv_domain: { ...mrs, url: "https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs", path: "./rules/iptv_domain.mrs" },
-      iptv_ip: { ...mrsIP, url: "https://cdn.jsdmirror.com/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs", path: "./rules/iptv_ip.mrs" },
+      cathy_domain: { ...mrs, url: "https://fastly.jsdelivr.net/gh/marcuccilli/Cathy@main/cathy_mihomo_domain.mrs", path: "./rules/cathy_domain.mrs" },
+      cathy_ip: { ...mrsIP, url: "https://fastly.jsdelivr.net/gh/marcuccilli/Cathy@main/cathy_mihomo_ipcidr.mrs", path: "./rules/cathy_ip.mrs" },
+      iptv_domain: { ...mrs, url: "https://fastly.jsdelivr.net/gh/marcuccilli/gary@main/iptv_mihomo_domain.mrs", path: "./rules/iptv_domain.mrs" },
+      iptv_ip: { ...mrsIP, url: "https://fastly.jsdelivr.net/gh/marcuccilli/gary@main/iptv_mihomo_ipcidr.mrs", path: "./rules/iptv_ip.mrs" },
     } : {}),
   };
 
+  const blockForeignQuic = [
+    'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn),(RULE-SET,ChinaIP,no-resolve)))))),REJECT'
+  ];
+  const quicEnabled = ruleOptionsEnable.屏蔽代理QUIC流量 ?? ruleOptionsEnable.屏蔽国外QUIC;
+
   newConfig.rules = [
-    // 规则集下载域名直连，避免出现鸡蛋问题
-    "DOMAIN,cdn.jsdmirror.com,直连",
     // 公共 DNS 直连过滤
     "IP-CIDR,223.5.5.5/32,直连,no-resolve",
     "IP-CIDR,223.6.6.6/32,直连,no-resolve",
@@ -1079,10 +1233,7 @@ function main(config) {
     "DOMAIN-SUFFIX,githubusercontent.com,Proxies",
     "DOMAIN-SUFFIX,jsdelivr.net,Proxies",
     "DOMAIN-SUFFIX,jsdelivr.com,Proxies",
-    "DOMAIN-SUFFIX,jsdmirror.com,Proxies",
-    ...(ruleOptionsEnable.屏蔽国外QUIC ? [
-      "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn),(RULE-SET,ChinaIP,no-resolve)))))),REJECT"
-    ] : []),
+    ...(quicEnabled ? blockForeignQuic : []),
     ...(ruleOptionsEnable.FCM ? ["RULE-SET,GoogleFCM,FCM"] : []),
     ...(ruleOptionsEnable.OpenAI ? ["RULE-SET,OpenAI,OpenAI"] : []),
     ...(ruleOptionsEnable.AI ? [
@@ -1119,7 +1270,6 @@ function main(config) {
     ...(ruleOptionsEnable.Netflix ? ["RULE-SET,NetflixIP,Netflix"] : []),
     ...(ruleOptionsEnable.Meta ? ["RULE-SET,MetaIP,Meta"] : []),
     ...(ruleOptionsEnable.AI ? ["RULE-SET,AIIP,AI"] : []),
-    ...(ruleOptionsEnable.Emby ? ["RULE-SET,EmbyIP,Emby"] : []),
     ...(ruleOptionsEnable.IPTV ? [
       "RULE-SET,cathy_ip,IPTV",
       "RULE-SET,iptv_ip,IPTV"
