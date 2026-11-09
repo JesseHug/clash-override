@@ -537,7 +537,35 @@ function filterAndNormalizeProxies(config) {
   }
 
   // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
+  // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
   const normalizedProxyNames = new Set(deduplicatedProxies.map((p) => p.name));
+
+  // 建立核心名称查找映射，用于跨前缀（如 Sub-Store 注入的 [自建]）精准匹配原始策略组中的节点
+  const getCoreName = (name) => {
+    return String(name || '')
+      .replace(/[\u{1F1E6}-\u{1F1FF}]{2}/gu, '')
+      .replace(/\[自建\]|自建-|\[.*?\]/g, '')
+      .replace(invisibleCharsRegex, '')
+      .replace(/\s+/g, '')
+      .toLowerCase();
+  };
+
+  const coreNameToNormalizedMap = new Map();
+  for (const p of deduplicatedProxies) {
+    const core = getCoreName(p.name);
+    if (core && !coreNameToNormalizedMap.has(core)) {
+      coreNameToNormalizedMap.set(core, p.name);
+    }
+  }
+
+  const resolveNodeName = (name) => {
+    if (!name || typeof name !== 'string') return null;
+    if (normalizedProxyNames.has(name)) return name;
+    if (renameMap.has(name)) return renameMap.get(name);
+    const core = getCoreName(name);
+    if (core && coreNameToNormalizedMap.has(core)) return coreNameToNormalizedMap.get(core);
+    return null;
+  };
 
   // 合法的策略组目标：包括原配置中的所有策略组名称，以及通用链式策略组（中转节点、链式中转）
   const validGroupTargets = new Set([
@@ -552,10 +580,9 @@ function filterAndNormalizeProxies(config) {
   let proxies = deduplicatedProxies.map(proxy => {
     const target = proxy['dialer-proxy'];
     if (!target) return proxy;
-    // 目标节点被重命名 → 更新引用为标准化后的新名称
-    if (renameMap.has(target)) return { ...proxy, 'dialer-proxy': renameMap.get(target) };
-    // 目标节点存活且未重命名 → 引用依然有效
-    if (normalizedProxyNames.has(target)) return proxy;
+    // 目标节点被重命名或模糊匹配到新名称 → 更新引用
+    const resolvedTarget = resolveNodeName(target);
+    if (resolvedTarget) return { ...proxy, 'dialer-proxy': resolvedTarget };
     // 目标是指向合法的策略组（如 FLYX 的"中转节点"）→ 引用有效，保留
     if (validGroupTargets.has(target)) return proxy;
     // 仅当目标在所有节点与策略组中都彻底不存在（死引用）时，才删除以防内核报错
@@ -590,45 +617,50 @@ function filterAndNormalizeProxies(config) {
 
   // 探测并构建链式代理策略组信息：
   // 1. 若开启"链式代理"开关：汇总构建【中转节点】与【落地节点】策略组，并将落地节点注入各分流组
-  // 2. 若未开启该开关：节点的 dialer-proxy 引用（Sub-Store 等注入）完整保留；仅在有节点明确引用"中转节点"策略组时兜底补齐中转组，防止内核报错
-  const needRelayGroup = proxies.some(p => p['dialer-proxy'] === '中转节点') || rawRelayGroup;
-  const hasChain = chainEnabled ? (rawRelayGroup || rawLandingGroup || proxies.some(p => Boolean(p['dialer-proxy']))) : Boolean(needRelayGroup);
+  // 2. 若未开启该开关：节点的 dialer-proxy 引用（Sub-Store 等注入）完整保留；
+  //    仅在有节点明确引用"中转节点"策略组时兜底补齐中转组，防止内核报错
+  const needRelayGroup = proxies.some(p => p['dialer-proxy'] === '中转节点') || Boolean(rawRelayGroup);
+  const hasChain = chainEnabled ? (Boolean(rawRelayGroup) || Boolean(rawLandingGroup) || proxies.some(p => Boolean(p['dialer-proxy']))) : Boolean(needRelayGroup);
   let chainInfo = null;
 
   if (hasChain) {
-    // 1. 中转节点列表：优先从原始"中转节点"策略组提取，或者取被 dialer-proxy 引用的单节点
+    // 落地节点名称集合（避免将落地节点本身放入中转组造成自身回环）
+    const dialerLandingNodes = proxies.filter(p => Boolean(p['dialer-proxy']));
+    const landingNodeNames = new Set(dialerLandingNodes.map(p => p.name));
+
+    // 1. 中转节点列表：优先从原始"中转节点"策略组提取（支持模糊匹配跨越 [自建] 等前缀）
     let relayProxies = [];
     if (rawRelayGroup && Array.isArray(rawRelayGroup.proxies)) {
       relayProxies = rawRelayGroup.proxies
-        .map(n => renameMap.get(n) || n)
-        .filter(n => normalizedProxyNames.has(n));
+        .map(n => resolveNodeName(n))
+        .filter(n => n && normalizedProxyNames.has(n) && !landingNodeNames.has(n));
     }
+    // 其次从节点引用的非策略组单节点提取
     if (relayProxies.length === 0) {
       const singleTargets = proxies
         .map(p => p['dialer-proxy'])
-        .filter(t => t && normalizedProxyNames.has(t));
+        .filter(t => t && normalizedProxyNames.has(t) && !landingNodeNames.has(t));
       relayProxies = [...new Set(singleTargets)];
     }
-    // 若仍然为空且存在 dialer-proxy: "中转节点"，兜底放入所有可用节点以防内核报错
+    // 若仍然为空且存在 dialer-proxy: "中转节点"，兜底放入所有非落地节点（若全为落地则放全部）以防内核报错
     if (relayProxies.length === 0 && proxies.length > 0) {
-      relayProxies = [...normalizedProxyNames];
+      const nonLanding = [...normalizedProxyNames].filter(n => !landingNodeNames.has(n));
+      relayProxies = nonLanding.length > 0 ? nonLanding : [...normalizedProxyNames];
     }
 
     // 2. 落地节点列表：从原始"落地节点"策略组提取，或者取所有含有 dialer-proxy 的节点
     let landingProxies = [];
     if (rawLandingGroup && Array.isArray(rawLandingGroup.proxies)) {
       landingProxies = rawLandingGroup.proxies
-        .map(n => renameMap.get(n) || n)
-        .filter(n => normalizedProxyNames.has(n));
+        .map(n => resolveNodeName(n))
+        .filter(n => n && normalizedProxyNames.has(n));
     }
-    const dialerLandingProxies = proxies
-      .filter(p => Boolean(p['dialer-proxy']))
-      .map(p => p.name);
-    landingProxies = [...new Set([...landingProxies, ...dialerLandingProxies])];
+    const dialerLandingProxyNames = dialerLandingNodes.map(p => p.name);
+    landingProxies = [...new Set([...landingProxies, ...dialerLandingProxyNames])];
 
     const chainGroups = [];
 
-    // 中转节点策略组
+    // 中转节点策略组：必须保证存在，防止 dialer-proxy: 中转节点 报 not found
     if (relayProxies.length > 0 || rawRelayGroup || proxies.some(p => p['dialer-proxy'] === '中转节点')) {
       chainGroups.push({
         name: '中转节点',
