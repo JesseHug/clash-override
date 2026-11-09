@@ -21,5 +21,6 @@ installer.py
 VPS_NOTES.md
 backup_rn/
 local_*.js
+substore_*.js
 data/
 sync_vps_notes.py
