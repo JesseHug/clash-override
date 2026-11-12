@@ -616,11 +616,14 @@ function filterAndNormalizeProxies(config) {
   });
 
   // 探测并构建链式代理策略组信息：
-  // 1. 若开启"链式代理"开关：汇总构建【中转节点】与【落地节点】策略组，并将落地节点注入各分流组
-  // 2. 若未开启该开关：节点的 dialer-proxy 引用（Sub-Store 等注入）完整保留；
-  //    仅在有节点明确引用"中转节点"策略组时兜底补齐中转组，防止内核报错
-  const needRelayGroup = proxies.some(p => p['dialer-proxy'] === '中转节点') || Boolean(rawRelayGroup);
-  const hasChain = chainEnabled ? (Boolean(rawRelayGroup) || Boolean(rawLandingGroup) || proxies.some(p => Boolean(p['dialer-proxy']))) : Boolean(needRelayGroup);
+  // 1. 若开启"链式代理"开关 (chainEnabled === true)：
+  //    汇总构建【中转节点】与【落地节点】策略组，并将落地节点注入各分流组
+  // 2. 若未开启该开关 (chainEnabled === false)：
+  //    - 节点层面的 dialer-proxy 引用（Sub-Store、面板节点直绑等）全部完整保留，让流量在底层静默走中转；
+  //    - 严格不生成【落地节点】策略组，也不向分流组注入落地节点；
+  //    - 仅在存在悬空引用（仍有节点指向抽象策略组名 '中转节点' 且未被消除）时，兜底生成一个【中转节点】策略组以防内核报错。
+  const orphanRelayNeeded = proxies.some(p => p['dialer-proxy'] === '中转节点');
+  const hasChain = chainEnabled || orphanRelayNeeded;
   let chainInfo = null;
 
   if (hasChain) {
@@ -660,8 +663,8 @@ function filterAndNormalizeProxies(config) {
 
     const chainGroups = [];
 
-    // 中转节点策略组：必须保证存在，防止 dialer-proxy: 中转节点 报 not found
-    if (relayProxies.length > 0 || rawRelayGroup || proxies.some(p => p['dialer-proxy'] === '中转节点')) {
+    // 中转节点策略组：仅在开启链式代理开关，或有节点明确引用 '中转节点' 组时才生成
+    if (chainEnabled ? (relayProxies.length > 0 || Boolean(rawRelayGroup)) : orphanRelayNeeded) {
       chainGroups.push({
         name: '中转节点',
         type: 'select',
@@ -670,9 +673,9 @@ function filterAndNormalizeProxies(config) {
       });
     }
 
-    // 落地节点策略组（在开启链式代理或原订阅显式包含落地节点组时生成）
+    // 落地节点策略组：严格仅在开启链式代理开关时生成
     let landingGroupName = null;
-    if ((chainEnabled && landingProxies.length > 0) || rawLandingGroup) {
+    if (chainEnabled && (landingProxies.length > 0 || Boolean(rawLandingGroup))) {
       landingGroupName = '落地节点';
       chainGroups.push({
         name: landingGroupName,
@@ -682,11 +685,13 @@ function filterAndNormalizeProxies(config) {
       });
     }
 
-    chainInfo = {
-      chainGroups,
-      landingGroupName,
-      relayGroupName: '中转节点'
-    };
+    if (chainGroups.length > 0 || landingGroupName) {
+      chainInfo = {
+        chainGroups,
+        landingGroupName,
+        relayGroupName: '中转节点'
+      };
+    }
   }
 
   return { proxies, chainInfo };
